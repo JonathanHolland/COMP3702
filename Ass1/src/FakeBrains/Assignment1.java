@@ -12,7 +12,7 @@ public class Assignment1 {
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
-			problem.loadProblem("testcases/3ASV-noOb");
+			problem.loadProblem("testcases/7ASV.txt");
 		} catch (Exception x) {
 			System.out.println("The file failed to load. Make sure it was legit");
 		}
@@ -21,16 +21,18 @@ public class Assignment1 {
 		
 		List<Point2D> positions = new ArrayList<Point2D>();
 		positions.add(new Point2D.Double(0.1, 0.1));
-		positions.add(new Point2D.Double(0.2, 0.2));
-		positions.add(new Point2D.Double(0.4, 0.4));
-		positions.add(new Point2D.Double(0.3, 0.5));
-		positions.add(new Point2D.Double(0.7, 0.4));
-		positions.add(new Point2D.Double(0.6, 0.8));
-		positions.add(new Point2D.Double(0.9, 0.7));
-		positions.add(new Point2D.Double(0.5, 0.3));
-		positions.add(new Point2D.Double(0.9, 0.9));
+//		positions.add(new Point2D.Double(0.2, 0.2));
+//		positions.add(new Point2D.Double(0.4, 0.4));
+//		positions.add(new Point2D.Double(0.3, 0.5));
+//		positions.add(new Point2D.Double(0.7, 0.4));
+//		positions.add(new Point2D.Double(0.6, 0.8));
+//		positions.add(new Point2D.Double(0.9, 0.7));
+//		positions.add(new Point2D.Double(0.5, 0.3));
+		positions.add(new Point2D.Double(0.9, 0.1));
 		
-		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.5);
+		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.08, 8000);
+//		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.5);
+		
 		
 		Map<Point2D, Node> nodes = prm.addPoints(positions);
 		
@@ -42,22 +44,23 @@ public class Assignment1 {
 //		visualHelper.repaint();
 		
 		Astar alg = new Astar();
-		System.out.println(nodes);
-		System.out.println(positions);
+//		System.out.println(nodes);
+//		System.out.println(positions);
 		Node start = nodes.get(positions.get(0));
-		System.out.println(start);
+//		System.out.println(start);
 		Node end = nodes.get(positions.get(positions.size()-1));
-		System.out.println(end);
+//		System.out.println(end);
 		
 		List<Node> path = alg.findPath(start, end);
 		List<Point2D> listy =  new ArrayList<Point2D>();
 		for(int i=0;i<path.size();i++) {
 			listy.add(path.get(i).getPos());
-			System.out.println(path.get(i).getPos());
+			
 		}
-		visualHelper.addPoints(listy);
-//		visualHelper.addPoints(positions);
-//		visualHelper.addLines(getNodeNetwork(prm.getNodes()));
+		visualHelper.addLinkedPoints(listy);
+		visualHelper.addPoints(prm.getPoints());
+		visualHelper.addRectangles(Ob2Rec(problem.getObstacles()));
+		visualHelper.addLines(getNodeNetwork(prm.getNodes()));
 		
 		visualHelper.repaint();
 		
@@ -71,6 +74,8 @@ public class Assignment1 {
 		}
 		return rects;
 	}
+	
+	
 	
 	private static List<Line2D> getNodeNetwork(List<Node> n){
 		List<Line2D> lines = new ArrayList<Line2D>();

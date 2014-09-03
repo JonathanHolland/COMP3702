@@ -24,10 +24,10 @@ public class Edge {
 	 * If given one side, return the other.
 	 */
 	public Node getOther(Node side) throws NoSuchNodeException{
-		if(side.equals(this.A)){
-			return this.B;
-		} else if (side.equals(this.B)) {
-			return this.A;
+		if(side.equals(A)){
+			return B;
+		} else if (side.equals(B)) {
+			return A;
 		}
 		throw new NoSuchNodeException("Node didn't exist in this edge");
 	}

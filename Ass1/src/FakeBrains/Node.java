@@ -73,11 +73,9 @@ public class Node {
 	}
 	
 	public List<Node> getAdjacent() throws NoSuchNodeException {
-		System.out.println("Getting Adjacent");
 		List<Node> adjacent = new ArrayList<Node>();
 		for(int i=0; i<edges.size(); i++) {
 			Node adding = edges.get(i).getOther(this);
-			System.out.println("Adding: " + adding);
 			adjacent.add(adding);
 		}
 		return adjacent;

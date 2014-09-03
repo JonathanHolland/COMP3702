@@ -21,25 +21,21 @@ public class Astar {
         boolean done = false;
         Node current = first;
         while (!done) {
-            current = closestNodeInOpen(current); // get node with lowest fCosts from openList
-            System.out.println("Current Node: " + current);
+            
             closedList.add(current); // add current node to closed list
             openList.remove(current); // delete current node from open list
 
             if (current.equals(end)) { // found goal
                 return calcPath(first, current);
             }
-            
-            if(closedList.size()>500) {
-            	System.out.println(openList);
-            	return calcPath(first,current);
-            }
             // for all adjacent nodes:
             List<Node> adjacentNodes = current.getAdjacent();
-            System.out.println("AdjNodes: " + adjacentNodes);
             for(int i = 0; i < adjacentNodes.size(); i++) {
-                Node currentAdj = adjacentNodes.get(i);
-                if (!openList.contains(currentAdj)) { // node is not in openList
+            	Node currentAdj = adjacentNodes.get(i);
+            	if(closedList.contains(currentAdj)) {
+                	continue;
+                }
+            	if (!openList.contains(currentAdj)) { // node is not in openList
                     currentAdj.setPrevious(current); // set current node as previous for this node
                     //currentAdj.sethCosts(nodes[endX][endY]); // set h costs of this node (estimated costs to goal)
                     currentAdj.updateCost(current); // set g costs of this node (costs from start to this node)
@@ -55,8 +51,11 @@ public class Astar {
             if (openList.isEmpty()) { // no path exists
                 return new LinkedList<Node>(); // return empty list
             }
-            System.out.println("oL" + openList.size());
-            System.out.println(closedList.size());
+            try {
+            	current = closestNodeInOpen(current, openList); // get node with lowest fCosts from openList
+            } catch(NullPointerException e) {
+            	return calcPath(first,current);
+            }
         }
         
         return null; // unreachable
@@ -71,7 +70,7 @@ public class Astar {
 		// Note now that the path will be reversed in actuality
 		path.add(current);
 		
-		while(firs) {
+		while(!firs) {
 			// When we get all the way to the first node from the current node, firs is reached (so is t)
 			nodeNext =  current.getPrevious();
 			if(nodeNext.equals(first)){
@@ -83,20 +82,26 @@ public class Astar {
 		return path;
 	}
 
-	private Node closestNodeInOpen(Node f) throws NoSuchNodeException {
+	private Node closestNodeInOpen(Node f, List<Node> openList) throws NoSuchNodeException {
 		List<Edge> edgeList = f.getEdges();
-		Edge shortestEdge;
+		Edge shortestEdge = null;
+		double shortest = 0;
+		boolean firsttime = true;
 		// For each edge listed from the current node f
 		// check the distance, and take the lowest
+		// IFF it's not in closedList i.e. It's in openList
 		if(edgeList.size()!=0) {
-			double shortest = edgeList.get(0).getLength();
-			shortestEdge = edgeList.get(0); 
-			
-			if(edgeList.size()>1) {
-				for(int i=1; i <edgeList.size(); i++) {
-					if(edgeList.get(i).getLength() < shortest) {
+			for(int i=0; i<edgeList.size(); i++) {
+				if(openList.contains(edgeList.get(i).getOther(f))){
+					if(firsttime) {
+						shortest = edgeList.get(i).getLength();
 						shortestEdge = edgeList.get(i);
-					}
+					} else {
+						if(edgeList.get(i).getLength() < shortest) {
+							shortestEdge = edgeList.get(i);
+						}
+					} 
+					firsttime = true;
 				}
 			}
 		return shortestEdge.getOther(f);

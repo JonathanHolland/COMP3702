@@ -156,7 +156,11 @@ public class PRMGraph {
 	private Point2D.Double obstaclePoint(Point2D.Double p){
 		Random r = new Random(); boolean badSpot = false;
 		//System.out.println("Got: " + r.nextGaussian());
-		Point2D.Double newP = new Point2D.Double(p.x + range*r.nextGaussian(), p.y + range*r.nextGaussian());
+		double newX = p.x + range*r.nextGaussian();
+		double newY = p.y + range*r.nextGaussian();
+		newX = newX <= 0 ? newX*-1.0 : newX;
+		newY = newY <= 0 ? newY*-1.0 : newY;
+		Point2D.Double newP = new Point2D.Double(newX, newY);
 		for(int k = 0; k < obstacles.size(); k++){
 			if(obstacles.get(k).getRect().contains(newP.x, newP.y)) badSpot = true;
 		}
