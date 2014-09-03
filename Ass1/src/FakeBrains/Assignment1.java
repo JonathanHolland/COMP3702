@@ -42,8 +42,12 @@ public class Assignment1 {
 //		visualHelper.repaint();
 		
 		Astar alg = new Astar();
+		System.out.println(nodes);
+		System.out.println(positions);
 		Node start = nodes.get(positions.get(0));
+		System.out.println(start);
 		Node end = nodes.get(positions.get(positions.size()-1));
+		System.out.println(end);
 		
 		for(int i = 0; i < positions.size(); i++) {
 			System.out.println(nodes.get(positions.get(i)).getEdges());
