@@ -24,13 +24,8 @@ public class Astar {
         Node current = first;
         while (!done) {
         	System.out.println("~~~~~~~~~~~~~~~~~~~_NEW_LOOP_~~~~~~~~~~~~~~~~~~~~~~~~");
-        	
-        	if(firstRun) {
-        		current = first;
-        		firstRun = false;
-        	}
+        	if(firstRun) current = first;
         	else current = closestNodeInOpen(current); // get node with lowest fCosts from openList
-        	
         	System.out.println("Old Node: " + current);
         	System.out.println("Old Node Edges: " + current.getEdges());
             
@@ -42,7 +37,7 @@ public class Astar {
                 return calcPath(first, current);
             }
             
-            if(closedList.size()>200) {
+            if(closedList.size()>500) {
             	System.out.println(openList);
             	return calcPath(first,current);
             }

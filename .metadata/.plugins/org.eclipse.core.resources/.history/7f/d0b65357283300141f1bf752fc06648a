@@ -45,11 +45,6 @@ public class Assignment1 {
 		Node start = nodes.get(positions.get(0));
 		Node end = nodes.get(positions.get(positions.size()-1));
 		
-		for(int i = 0; i < positions.size(); i++) {
-			System.out.println(nodes.get(positions.get(i)).getEdges());
-		}
-		
-		
 		List<Node> path = alg.findPath(start, end);
 		List<Point2D> listy =  new ArrayList<Point2D>();
 		for(int i=0;i<path.size();i++) {

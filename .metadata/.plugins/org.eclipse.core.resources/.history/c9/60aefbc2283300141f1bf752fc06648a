@@ -16,8 +16,8 @@ public class Edge {
 	private Node B;
 		
 	public Edge(Node one, Node two){
-		this.A = one;
-		this.B = two;
+		this.A = new Node(one);
+		this.B = new Node(two);
 	}
 	
 	/*

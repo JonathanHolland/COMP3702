@@ -10,8 +10,6 @@ public class Astar {
      *
      */
     public List<Node> findPath(Node first, Node end) throws NoSuchNodeException {
-    	 System.out.println("#############################_STARTING_ASTAR_#################################################");
-    	
     	List<Node> openList = new LinkedList<Node>();
         List<Node> closedList = new LinkedList<Node>();
         first.setCost(0);
@@ -20,20 +18,10 @@ public class Astar {
         double costFromStart = 0;
         double costToEnd = costFromStart + guessToEnd();
         
-        boolean done = false, firstRun = true;
+        boolean done = false;
         Node current = first;
         while (!done) {
-        	System.out.println("~~~~~~~~~~~~~~~~~~~_NEW_LOOP_~~~~~~~~~~~~~~~~~~~~~~~~");
-        	
-        	if(firstRun) {
-        		current = first;
-        		firstRun = false;
-        	}
-        	else current = closestNodeInOpen(current); // get node with lowest fCosts from openList
-        	
-        	System.out.println("Old Node: " + current);
-        	System.out.println("Old Node Edges: " + current.getEdges());
-            
+            current = closestNodeInOpen(current); // get node with lowest fCosts from openList
             System.out.println("Current Node: " + current);
             closedList.add(current); // add current node to closed list
             openList.remove(current); // delete current node from open list
@@ -42,7 +30,7 @@ public class Astar {
                 return calcPath(first, current);
             }
             
-            if(closedList.size()>200) {
+            if(closedList.size()>500) {
             	System.out.println(openList);
             	return calcPath(first,current);
             }
