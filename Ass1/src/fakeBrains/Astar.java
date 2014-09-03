@@ -10,6 +10,8 @@ public class Astar {
      *
      */
     public List<Node> findPath(Node first, Node end) throws NoSuchNodeException {
+    	 System.out.println("#############################_STARTING_ASTAR_#################################################");
+    	
     	List<Node> openList = new LinkedList<Node>();
         List<Node> closedList = new LinkedList<Node>();
         first.setCost(0);
@@ -18,10 +20,20 @@ public class Astar {
         double costFromStart = 0;
         double costToEnd = costFromStart + guessToEnd();
         
-        boolean done = false;
+        boolean done = false, firstRun = true;
         Node current = first;
         while (!done) {
-            current = closestNodeInOpen(current); // get node with lowest fCosts from openList
+        	System.out.println("~~~~~~~~~~~~~~~~~~~_NEW_LOOP_~~~~~~~~~~~~~~~~~~~~~~~~");
+        	
+        	if(firstRun) {
+        		current = first;
+        		firstRun = false;
+        	}
+        	else current = closestNodeInOpen(current); // get node with lowest fCosts from openList
+        	
+        	System.out.println("Old Node: " + current);
+        	System.out.println("Old Node Edges: " + current.getEdges());
+            
             System.out.println("Current Node: " + current);
             closedList.add(current); // add current node to closed list
             openList.remove(current); // delete current node from open list
@@ -30,7 +42,7 @@ public class Astar {
                 return calcPath(first, current);
             }
             
-            if(closedList.size()>500) {
+            if(closedList.size()>200) {
             	System.out.println(openList);
             	return calcPath(first,current);
             }
@@ -39,6 +51,11 @@ public class Astar {
             System.out.println("AdjNodes: " + adjacentNodes);
             for(int i = 0; i < adjacentNodes.size(); i++) {
                 Node currentAdj = adjacentNodes.get(i);
+                if (closedList.contains(currentAdj))
+                {
+                	continue; // If this is true we aren't interested in this adjacent node
+                			  // so skip to the next one. 
+                }
                 if (!openList.contains(currentAdj)) { // node is not in openList
                     currentAdj.setPrevious(current); // set current node as previous for this node
                     //currentAdj.sethCosts(nodes[endX][endY]); // set h costs of this node (estimated costs to goal)
