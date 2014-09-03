@@ -42,8 +42,12 @@ public class Assignment1 {
 //		visualHelper.repaint();
 		
 		Astar alg = new Astar();
+		System.out.println(nodes);
+		System.out.println(positions);
 		Node start = nodes.get(positions.get(0));
+		System.out.println(start);
 		Node end = nodes.get(positions.get(positions.size()-1));
+		System.out.println(end);
 		
 		List<Node> path = alg.findPath(start, end);
 		List<Point2D> listy =  new ArrayList<Point2D>();
