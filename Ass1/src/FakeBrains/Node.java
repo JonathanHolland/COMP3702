@@ -20,8 +20,10 @@ public class Node {
 	// Store the previous node to link the final path
 	private Node previousNode;
 	
-	// Store the current cost up to this node along the path
+	// Store the current cost up to this node from the start state
 	private double cost;
+	// Store the heuristic cost to the end state
+	private double hcost;
 	
 	/* Init from x,y */
 	public Node(double x, double y){
@@ -86,7 +88,7 @@ public class Node {
 	}
 	
 	public double getCost(){
-		return cost;
+		return cost+hcost;
 	}
 	
 	public static void setNodeIndex(int num){
@@ -118,7 +120,7 @@ public class Node {
 	}
 	
 	public double calcCost(Node previous) {
-		return previous.cost + this.getPos().distance(previous.getPos());
+		return previous.cost + this.getPos().distance(previous.getPos()) +hcost;
 	}
 
 	public Node getPrevious() {
@@ -127,5 +129,10 @@ public class Node {
 
 	public void setCost(double i) {
 		this.cost = i;
+	}
+
+	public void sethCost(Node current, Node end) {
+		this.hcost = current.getPos().distance(end.getPos());
+		
 	}
 }
