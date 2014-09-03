@@ -1,0 +1,42 @@
+package fakeBrains;
+
+import java.util.*;
+import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
+
+
+// This is a trivial representation of a Node
+// In reality for this problem a node needs to represent ALL ASV's and their
+// positions
+// Therefore, the variables would be the same as contained in the current
+// getASVPositions()
+public class Node {
+	
+	private Point2D.Double pos; // Position
+	int nodeIndex;	int lastNode; // Counter and status value
+	
+	List<Edge> edges;
+	
+	public Node(double x, double y){
+		this.pos = new Point2D.Double(x, y); // Make the point
+		edges = new ArrayList<Edge>(); // #soedgy
+	}
+	
+	public Node(Point2D.Double position){
+		this.pos = new Point2D.Double(position.x, position.y); // Make the Point
+		edges = new ArrayList<Edge>(); // #soedgy
+	}
+	
+	public Node(Node node){
+		this.edges = new ArrayList<Edge>(node.edges);
+		this.pos = new Point2D.Double(node.pos.x, node.pos.y);
+		this.nodeIndex = node.nodeIndex;
+		this.lastNode = node.lastNode;
+	}
+	
+	public Point2D.Double getPos(){
+		return new Point2D.Double(pos.x, pos.y);
+	}
+	
+	
+}

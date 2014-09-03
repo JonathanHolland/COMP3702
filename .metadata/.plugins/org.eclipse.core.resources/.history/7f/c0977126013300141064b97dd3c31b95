@@ -1,0 +1,80 @@
+package fakeBrains;
+
+import java.awt.geom.*;
+import java.awt.geom.Point2D.Double;
+import java.util.*;
+
+import problem.*;
+import visualDebugger.VisualHelper;
+
+public class Assignment1 {
+
+	public static void main(String[] args) throws NoSuchNodeException {
+		ProblemSpec problem = new ProblemSpec();
+		try {
+			problem.loadProblem("testcases/3ASV-easy.txt");
+		} catch (Exception x) {
+			System.out.println("The file failed to load. Make sure it was legit");
+		}
+		// Starting and ending points, these will be different for the final
+		
+		
+		List<Point2D> positions = new ArrayList<Point2D>();
+		positions.add(new Point2D.Double(0.1, 0.1));
+		positions.add(new Point2D.Double(0.2, 0.2));
+		positions.add(new Point2D.Double(0.4, 0.4));
+		positions.add(new Point2D.Double(0.3, 0.5));
+		positions.add(new Point2D.Double(0.7, 0.4));
+		positions.add(new Point2D.Double(0.6, 0.8));
+		positions.add(new Point2D.Double(0.9, 0.7));
+		positions.add(new Point2D.Double(0.5, 0.3));
+		
+		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.1);
+		
+		Map<Point2D.Double, Node> nodes = new HashMap<Point2D, Node>(prm.addPoints(positions));
+		
+		
+		
+		
+		VisualHelper visualHelper = new VisualHelper();
+//		visualHelper.addPoints(prm.getPoints());
+		
+//		visualHelper.addLines(getNodeNetwork(prm.getNodes()));
+//		visualHelper.addRectangles(Ob2Rec(problem.getObstacles()));
+//		visualHelper.repaint();
+		
+//		Astar alg = new Astar();
+//		List<Node> path = alg.findPath(startEndNodes.get(start), startEndNodes.get(end).getPos().x, startEndNodes.get(end).getPos().y);
+//		List<Point2D> listy =  new ArrayList<Point2D>();
+//		for(int i=0;i<path.size();i++) {
+//			listy.add(path.get(i).getPos());
+//			System.out.println(path.get(i).getPos());
+//		}
+		visualHelper.addPoints(positions);
+		visualHelper.repaint();
+		
+	}
+	
+	
+	private static List<Rectangle2D> Ob2Rec(List<Obstacle> o){
+		List<Rectangle2D> rects = new ArrayList<Rectangle2D>();
+		for(int i = 0; i < o.size(); i++){
+			rects.add(o.get(i).getRect());
+		}
+		return rects;
+	}
+	
+	private static List<Line2D> getNodeNetwork(List<Node> n){
+		List<Line2D> lines = new ArrayList<Line2D>();
+		Node tempNode; Edge tempEdge;
+		for(int i = 0; i < n.size(); i++){
+			tempNode = n.get(i); // make a temp Node
+			for(int e = 0; e < n.get(i).getEdges().size(); e++){
+				tempEdge = tempNode.getEdges().get(e); // Make a temp Edge
+				//System.out.println(tempEdge.getLine().getX1()+", "+tempEdge.getLine().getY1());
+				lines.add(tempEdge.getLine()); // Add the line made by the Edge to lines
+			}
+		}
+		return lines;
+	}
+}

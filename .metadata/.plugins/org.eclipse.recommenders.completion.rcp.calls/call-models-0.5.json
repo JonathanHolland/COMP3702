@@ -1,0 +1,12 @@
+{
+  "C:\\Users\\Michael\\Dropbox\\UQ\\2014\\Semester 2\\comp3702\\COMP3702 Group\\Ass1\\src": {
+    "location": "C:\\Users\\Michael\\Dropbox\\UQ\\2014\\Semester 2\\comp3702\\COMP3702 Group\\Ass1\\src",
+    "status": "UNRESOLVED",
+    "error": "No class path info available for \u0027C:\\Users\\Michael\\Dropbox\\UQ\\2014\\Semester 2\\comp3702\\COMP3702 Group\\Ass1\\src\u0027. Skipped."
+  },
+  "C:\\Program Files\\Java\\jre7\\lib\\rt.jar": {
+    "coordinate": "jre:jre:zip:call:1.0.0",
+    "location": "C:\\Program Files\\Java\\jre7\\lib\\rt.jar",
+    "status": "RESOLVED"
+  }
+}

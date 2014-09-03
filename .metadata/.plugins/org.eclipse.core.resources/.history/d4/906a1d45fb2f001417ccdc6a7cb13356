@@ -1,0 +1,42 @@
+package fakeBrains;
+
+import java.util.*;
+
+public class Edge {
+	// The edge weight calculation is already done for us in ASVConfig
+	// Allowing us to compare the current position from getASVPositions()
+	// to the intended position constructed as a node to move to
+	// Then we simply utilise totalDistance(ASVConfig otherState);
+	// (Max distance is not necessarily what we want as we want to minimise OVER
+	// ALL ASV's)
+	private Node A = new Node();
+	private Node B = new Node();
+		
+	public Edge(Node one, Node two){
+		this.A = one;
+		this.B = two;
+	}
+	
+	
+	/*
+	 * If given one side, return the other.
+	 */
+	public Node getOther(Node side) throws NoSuchNodeException{
+		if(side.equals(A)){
+			return B;
+		} else if (side.equals(B)) {
+			return A;
+		}
+		throw new NoSuchNodeException("Node didn't exist in this edge");
+	}
+	
+	/*
+	 * Return the sides of an edge
+	 */
+	public List<Node> getSides(){
+		List<Node> sides = new ArrayList<Node>();
+		sides.add(A); sides.add(B);
+		return sides;
+	}
+	
+}

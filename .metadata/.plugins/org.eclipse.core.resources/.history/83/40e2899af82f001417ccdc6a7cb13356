@@ -1,0 +1,5 @@
+package fakeBrains;
+
+public class NoSuchNodeException extends Exception {
+	
+}
