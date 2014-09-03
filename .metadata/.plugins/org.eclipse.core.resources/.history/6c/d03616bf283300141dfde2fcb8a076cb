@@ -49,15 +49,15 @@ public class Assignment1 {
 		Node end = nodes.get(positions.get(positions.size()-1));
 		System.out.println(end);
 		
-		List<Node> path = alg.findPath(start, end);
-		List<Point2D> listy =  new ArrayList<Point2D>();
-		for(int i=0;i<path.size();i++) {
-			listy.add(path.get(i).getPos());
-			System.out.println(path.get(i).getPos());
-		}
-		visualHelper.addPoints(listy);
-//		visualHelper.addPoints(positions);
-//		visualHelper.addLines(getNodeNetwork(prm.getNodes()));
+//		List<Node> path = alg.findPath(start, end);
+//		List<Point2D> listy =  new ArrayList<Point2D>();
+//		for(int i=0;i<path.size();i++) {
+//			listy.add(path.get(i).getPos());
+//			System.out.println(path.get(i).getPos());
+//		}
+//		visualHelper.addPoints(listy);
+		visualHelper.addPoints(positions);
+		visualHelper.addLines(getNodeNetwork(prm.getNodes()));
 		
 		visualHelper.repaint();
 		
