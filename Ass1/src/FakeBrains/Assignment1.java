@@ -12,7 +12,7 @@ public class Assignment1 {
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
-			problem.loadProblem("testcases/7ASV.txt");
+			problem.loadProblem("testcases/3ASV-easy.txt");
 		} catch (Exception x) {
 			System.out.println("The file failed to load. Make sure it was legit");
 		}
@@ -30,7 +30,7 @@ public class Assignment1 {
 //		positions.add(new Point2D.Double(0.5, 0.3));
 		positions.add(new Point2D.Double(0.9, 0.1));
 		
-		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.08, 8000);
+		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.1, 300);
 //		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.5);
 		
 		
