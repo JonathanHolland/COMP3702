@@ -51,6 +51,11 @@ public class Astar {
             System.out.println("AdjNodes: " + adjacentNodes);
             for(int i = 0; i < adjacentNodes.size(); i++) {
                 Node currentAdj = adjacentNodes.get(i);
+                if (closedList.contains(currentAdj))
+                {
+                	continue; // If this is true we aren't interested in this adjacent node
+                			  // so skip to the next one. 
+                }
                 if (!openList.contains(currentAdj)) { // node is not in openList
                     currentAdj.setPrevious(current); // set current node as previous for this node
                     //currentAdj.sethCosts(nodes[endX][endY]); // set h costs of this node (estimated costs to goal)
