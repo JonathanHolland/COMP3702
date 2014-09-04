@@ -187,11 +187,14 @@ public class PRMGraph {
 	// Give the initial state of the program to make a node from and add it to the graph
 	public Node giveInitialState(ASVConfig initialState) {
 		Point2D f = initialState.getASVPositions().get(0); // First ASV in List
-		Point2D l = initialState.getASVPositions()  // Last ASV in List
-				.get(initialState.getASVPositions().size()-1);
 		
-		Point2D mid = new Point2D.Double( (f.getX()+l.getX())/2.0, (f.getY()+l.getY())/2 );
-		Node toReturn = this.addPoint(mid);
+		
+		/* The below is commented out 'cause we're using the first point in the array */
+//		Point2D l = initialState.getASVPositions()  // Last ASV in List
+//				.get(initialState.getASVPositions().size()-1);
+//		
+//		Point2D mid = new Point2D.Double( (f.getX()+l.getX())/2.0, (f.getY()+l.getY())/2 );
+		Node toReturn = this.addPoint(f);
 		toReturn.giveASVConfig(initialState);
 		return toReturn;
 	}
@@ -200,14 +203,16 @@ public class PRMGraph {
 		
 		// Grab the first and last point
 		Point2D f = goalState.getASVPositions().get(0); // First ASV in List
-		Point2D l = goalState.getASVPositions()  // Last ASV in List
-				.get(goalState.getASVPositions().size()-1);
-		
-		// Make a midpoint
-		Point2D mid = new Point2D.Double( (f.getX()+l.getX())/2.0, (f.getY()+l.getY())/2 );
+
+		/* The below is commented out 'cause we're using the first point in the array */
+//		Point2D l = goalState.getASVPositions()  // Last ASV in List
+//				.get(goalState.getASVPositions().size()-1);
+//		
+//		// Make a midpoint
+//		Point2D mid = new Point2D.Double( (f.getX()+l.getX())/2.0, (f.getY()+l.getY())/2 );
 		
 		// Add the point to the Graph
-		Node toReturn = this.addPoint(mid);
+		Node toReturn = this.addPoint(f);
 		
 		// Give the node the goal state ASV
 		toReturn.giveASVConfig(goalState);
