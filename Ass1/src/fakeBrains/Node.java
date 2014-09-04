@@ -4,6 +4,8 @@ import java.util.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 
+import problem.ASVConfig;
+
 
 // This is a trivial representation of a Node
 // In reality for this problem a node needs to represent ALL ASV's and their
@@ -11,10 +13,18 @@ import java.awt.geom.Point2D.Double;
 // Therefore, the variables would be the same as contained in the current
 // getASVPositions()
 public class Node {
+	// This iterates for every new Node that is created 
 	static int nodeIndex;	
 	
-	private Point2D.Double pos; // Position
+	// The position of the node
+	private Point2D.Double pos; 
+	
+	// The Configuration of the ASV's
+	private ASVConfig config;
+	
+	// Should be unique for every new node
 	private int ID;
+	
 	private List<Edge> edges; // Holds teh edges
 	
 	// Store the previous node to link the final path
@@ -22,6 +32,7 @@ public class Node {
 	
 	// Store the current cost up to this node from the start state
 	private double cost;
+	
 	// Store the heuristic cost to the end state
 	private double hcost;
 	
@@ -133,6 +144,11 @@ public class Node {
 
 	public void sethCost(Node current, Node end) {
 		this.hcost = current.getPos().distance(end.getPos());
+		
+	}
+
+	public void giveASVConfig(ASVConfig initialState) {
+		// TODO Auto-generated method stub
 		
 	}
 }

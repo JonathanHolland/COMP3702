@@ -21,14 +21,14 @@ public class Assignment1 {
 		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.15, 500);		
 		
 		// Make and add the beginning and end points to the Graph
-//		Node start = prm.giveInitialState(problem.getInitialState());
-//		Node goal = prm.giveGoalState(problem.getGoalState());
-		List<Point2D> positions = new ArrayList<Point2D>();
-		positions.add(new Point2D.Double(0.1, 0.1));
-		positions.add(new Point2D.Double(0.9, 0.1));
-		Map<Point2D, Node> map = prm.addPoints(positions);
-		Node start = map.get(positions.get(0));
-		Node goal = map.get(positions.get(1));
+		Node start = prm.giveInitialState(problem.getInitialState());
+		Node goal = prm.giveGoalState(problem.getGoalState());
+//		List<Point2D> positions = new ArrayList<Point2D>();
+//		positions.add(new Point2D.Double(0.1, 0.1));
+//		positions.add(new Point2D.Double(0.9, 0.1));
+//		Map<Point2D, Node> map = prm.addPoints(positions);
+//		Node start = map.get(positions.get(0));
+//		Node goal = map.get(positions.get(1));
 		
 	// Next we get the path through the map
 
