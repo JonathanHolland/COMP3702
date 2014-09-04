@@ -146,7 +146,7 @@ public class Node {
 		this.hcost = current.getPos().distance(end.getPos());
 		
 	}
-
+	
 	public void giveASVConfig(ASVConfig asvConfig) {
 		this.config = asvConfig;
 	}
@@ -155,3 +155,4 @@ public class Node {
 		return config;
 	}
 }
+
