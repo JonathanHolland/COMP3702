@@ -54,15 +54,16 @@ public class Interpolate {
 			ASVConfig stepPos;
 			ASVConfig currentPos = start.getConfig();
 			List<Point2D> cPos;
-			double[] sPos = null;
 			boolean endReached =  false;
 			while(!endReached) {
-				
 				cPos = currentPos.getASVPositions();
+				double[] sPos = new double[currentPos.getASVCount()*2];
 				int count = 0;
+				double[] listxy;
 				for(int k=0;k<cPos.size();k++) {
-					sPos[count] = (cPos.get(k).getX()+0.001);
-					sPos[count+1] = (cPos.get(k).getY()+0.001);
+					listxy = xymove(cPos.get(k).getX(), cPos.get(k).getY(), end.getConfig().getPosition(k));
+					sPos[count] = (cPos.get(k).getX()+listxy[0]); // add x movement
+					sPos[count+1] = (cPos.get(k).getY()+listxy[1]); // add y movement
 					count = count+2;
 				}
 				stepPos = new ASVConfig(sPos);
@@ -82,7 +83,55 @@ public class Interpolate {
 			return pathPiece;
 		}
 	
-	// Not sure if we need this
+	/**
+	 * xymove calculates the required x and y distances to move the asv
+	 * in order to not exceed 0.001 and to do so in the direction of the goal
+	 * 
+	 * @param y 
+	 * @param x 
+	 * @param endpos 
+	 */
+	private double[] xymove(double x, double y, Point2D endpos) {
+		double[] resultxy = new double[2];
+		boolean negx;
+		boolean negy;
+		double xmove;
+		double ymove;
+		
+		// Compare the current x and y to the end state
+		// We need to do this every state we move just in case
+		// we had to override for obstacles
+		double resx = (endpos.getX() - x);
+		double resy = (endpos.getY() - y);
+		// Check direction and take absolute for trig
+		if(resx > 0) {
+			negx = false;
+		} else {
+			negx = true;
+			resx = Math.abs(resx);
+		}
+		if(resy > 0) {
+			negy = false;
+		} else {
+			negy = true;
+			resy = Math.abs(resy);
+		}
+		
+		// Use similar triangles to take angles for direction of move
+		double thetaa = Math.acos(resy/resx);
+		double thetab = (0.5*Math.PI)-thetaa;
+		
+		// Use these angles in the sine rule subbed into pythagoras to find x and y distances with a hypotenuse of 0.001
+		double signratio = Math.sin(thetab)/Math.sin(thetaa); 
+		xmove = (signratio)/(Math.sqrt(1000000*Math.pow(signratio,2)+1000000));
+		ymove = (Math.sin(thetaa)*xmove)/Math.sin(thetab);
+		
+		resultxy[0] = xmove;
+		resultxy[1] = ymove;
+		
+		return resultxy;
+	}
+
 	/**
 	 * Blends everything together. interpolate would work between nodes
 	 * but this is meant to spit out the over-all solution
