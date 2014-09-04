@@ -2,8 +2,20 @@ package fakeBrains;
 
 import java.util.List;
 
+import problem.*;
+
 public class Interpolate {
 
+	// The List of Obstacles
+	private List<Obstacle> obstacles;
+	
+	// The Path found with Astar
+	private	List<Node> path;
+	
+	public Interpolate(List<Obstacle> obstacles, List<Node> path){
+		this.obstacles = obstacles;
+		this.path = path;
+	}
 	/**
 	 * Moves from one node asv configuration to another,
 	 * changing the configuration shape as needed to meet
@@ -13,7 +25,8 @@ public class Interpolate {
 	 * @param end - the node to end at
 	 * @return the node of the end if successful
 	 */
-	public Node Interpolate(Node start, Node end) {
+	public List<ASVConfig> Interpolate(Node start, Node end) {
+		
 		boolean asvLeft =  true;
 		
 		while(asvLeft) {
@@ -27,21 +40,12 @@ public class Interpolate {
 		// Make this separate function call another function on each iteration that checks constraints
 		// Same as above for the checking constrains but also checking for nearby obstacles
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		return end;
+		return null;
 	}
 	
+	private ASVConfig makeValidConfig(){
+		
+		return null;
+	}
 	
 }

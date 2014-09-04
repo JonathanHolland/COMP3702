@@ -18,31 +18,36 @@ public class Assignment1 {
 		}
 		
 		// Generate the Probabilistic Road Map 
-		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.15, 500);		
+		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.05, 2000);		
 		
 		// Make and add the beginning and end points to the Graph
 		Node start = prm.giveInitialState(problem.getInitialState());
 		Node goal = prm.giveGoalState(problem.getGoalState());
-//		List<Point2D> positions = new ArrayList<Point2D>();
-//		positions.add(new Point2D.Double(0.1, 0.1));
-//		positions.add(new Point2D.Double(0.9, 0.1));
-//		Map<Point2D, Node> map = prm.addPoints(positions);
-//		Node start = map.get(positions.get(0));
-//		Node goal = map.get(positions.get(1));
-		
-	// Next we get the path through the map
 
+		
+		// Next we get the path through the map
 		Astar alg = new Astar();
 
 		// Find a path through the Graph
 		List<Node> path = alg.findPath(start, goal);
-		System.out.println(path);
+		System.out.println(path); // Show us the path
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		// Display what we have	with visualHelper
 		VisualHelper visualHelper = new VisualHelper();
+		
 		if(path != null) visualHelper.addLinkedPoints(nodes2Points(path));
 		visualHelper.addPoints(prm.getPoints());
 		visualHelper.addRectangles(Ob2Rec(problem.getObstacles()));
+		visualHelper.addLinkedPoints(start.getConfig().getASVPositions());
+		visualHelper.addLinkedPoints(goal.getConfig().getASVPositions());
 //		visualHelper.addLines(getNodeNetwork(prm.getNodes()));
 		
 		visualHelper.repaint();
@@ -50,6 +55,11 @@ public class Assignment1 {
 	}
 	
 	
+	/**
+	 * Converts a list of Nodes to a list of Point2Ds
+	 * @param path
+	 * @return
+	 */
 	private static List<Point2D> nodes2Points(List<Node> path) {
 		List<Point2D> listy =  new ArrayList<Point2D>();
 		for(int i=0;i<path.size();i++) {
@@ -59,6 +69,11 @@ public class Assignment1 {
 	}
 
 
+	/**
+	 * Converts a list of obstacles to a list of rectangles
+	 * @param o
+	 * @return
+	 */
 	private static List<Rectangle2D> Ob2Rec(List<Obstacle> o){
 		List<Rectangle2D> rects = new ArrayList<Rectangle2D>();
 		for(int i = 0; i < o.size(); i++){
@@ -67,8 +82,10 @@ public class Assignment1 {
 		return rects;
 	}
 	
-	
-	
+	/**
+	 * Returns a list of lines, portraying the connections of the
+	 * nodes made by PRMGraph
+	 */
 	private static List<Line2D> getNodeNetwork(List<Node> n){
 		List<Line2D> lines = new ArrayList<Line2D>();
 		Node tempNode; Edge tempEdge;
@@ -99,4 +116,13 @@ public class Assignment1 {
 		return positions;
 	}
 
+//	List<Point2D> positions = new ArrayList<Point2D>();
+//	positions.add(new Point2D.Double(0.1, 0.1));
+//	positions.add(new Point2D.Double(0.9, 0.1));
+//	Map<Point2D, Node> map = prm.addPoints(positions);
+//	Node start = map.get(positions.get(0));
+//	Node goal = map.get(positions.get(1));
+	
+	
+	
 }

@@ -147,8 +147,11 @@ public class Node {
 		
 	}
 
-	public void giveASVConfig(ASVConfig initialState) {
-		// TODO Auto-generated method stub
-		
+	public void giveASVConfig(ASVConfig asvConfig) {
+		this.config = asvConfig;
+	}
+
+	public ASVConfig getConfig() {
+		return config;
 	}
 }

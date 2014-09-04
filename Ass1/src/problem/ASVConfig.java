@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.awt.geom.Point2D;
 
+import fakeBrains.Node;
+
 /**
  * Represents a configuration of the ASVs. This class doesn't do any validity
  * checking - see the code in tester.Tester for this.
@@ -146,5 +148,20 @@ public class ASVConfig {
 	 */
 	public List<Point2D> getASVPositions() {
 		return new ArrayList<Point2D>(asvPositions);
+	}
+	
+	/**
+	 * A .equals method because it didn't come with one >:/
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof ASVConfig)) {
+			return false;
+		}
+		ASVConfig c = (ASVConfig) o; // the object to compare
+		for(int i = 0; i < c.asvPositions.size(); i++){
+			if(this.asvPositions.get(i) != c.asvPositions.get(i)) return false;
+		}
+		return true;
 	}
 }
