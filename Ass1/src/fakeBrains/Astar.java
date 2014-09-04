@@ -35,19 +35,18 @@ public class Astar {
             for(int i = 0; i < adjacentNodes.size(); i++) {
             	Node currentAdj = adjacentNodes.get(i);
             	if(closedList.contains(currentAdj)) {
-                } else {
-	            	if (!openList.contains(currentAdj)) { // node is not in openList
-	                    currentAdj.setPrevious(current); // set current node as previous for this node
-	                    currentAdj.sethCost(current,end); // set h costs of this node (estimated costs to goal)
-	                    currentAdj.updateCost(current); // set g costs of this node (costs from start to this node)
-	                    openList.add(currentAdj); // add node to openList
-	                    pQueue.add(currentAdj);
-	                } else { // node is in openList
-	                    if (currentAdj.getCost() > currentAdj.calcCost(current)) { // costs from current node are cheaper than previous costs
-	                        currentAdj.setPrevious(current); // set current node as previous for this node
-	                        currentAdj.updateCost(current); // set g costs of this node (costs from start to this node)
-	                    }
-	                }
+            		// If the node's in the closedList do nothing
+                } else if (!openList.contains(currentAdj)) { // node is not in openList
+                    currentAdj.setPrevious(current); // set current node as previous for this node
+                    currentAdj.sethCost(current,end); // set h costs of this node (estimated costs to goal)
+                    currentAdj.updateCost(current); // set g costs of this node (costs from start to this node)
+                    openList.add(currentAdj); // add node to openList
+                    pQueue.add(currentAdj);
+                } else { // node is in openList
+                    if (currentAdj.getCost() > currentAdj.calcCost(current)) { // costs from current node are cheaper than previous costs
+                        currentAdj.setPrevious(current); // set current node as previous for this node
+                        currentAdj.updateCost(current); // set g costs of this node (costs from start to this node)
+                    }
                 }
             }
 

@@ -12,13 +12,13 @@ public class Assignment1 {
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
-			problem.loadProblem("testcases/3ASV-easy.txt");
+			problem.loadProblem("testcases/7ASV.txt");
 		} catch (Exception x) {
 			System.out.println("The file failed to load. Make sure it was legit");
 		}
 		
 		// Generate the Probabilistic Road Map 
-		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.15, 250);		
+		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.15, 500);		
 		
 		// Make and add the beginning and end points to the Graph
 //		Node start = prm.giveInitialState(problem.getInitialState());
