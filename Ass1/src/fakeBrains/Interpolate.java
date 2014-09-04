@@ -1,6 +1,7 @@
 package fakeBrains;
 
-import java.util.List;
+import java.util.*;
+import java.awt.geom.*;
 
 public class Interpolate {
 
@@ -15,10 +16,12 @@ public class Interpolate {
 	 */
 	public Node Interpolate(Node start, Node end) {
 		boolean asvLeft =  true;
+		Map<Point2D, Point2D> asvStartEnd =  new HashMap<Point2D, Point2D>();
+		
 		
 		while(asvLeft) {
 			// While there are still asv's to check, add the start and end positions of each one to a map
-			
+			asvStart.add
 		}
 		
 		// Use the start and end positions from the map to extract how many primitive steps each one needs to travel
