@@ -75,7 +75,7 @@ public class Assignment1 {
 	 * @param o
 	 * @return
 	 */
-	private static List<Rectangle2D> Ob2Rec(List<Obstacle> o){
+	public static List<Rectangle2D> Ob2Rec(List<Obstacle> o){
 		List<Rectangle2D> rects = new ArrayList<Rectangle2D>();
 		for(int i = 0; i < o.size(); i++){
 			rects.add(o.get(i).getRect());

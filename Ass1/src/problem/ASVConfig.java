@@ -59,7 +59,38 @@ public class ASVConfig {
 	public ASVConfig(ASVConfig cfg) {
 		asvPositions = cfg.getASVPositions();
 	}
-
+	
+	/**
+	 * Constructor from a list of Point2D elements
+	 * @param asvPositions
+	 */
+	public ASVConfig(List<Point2D> asvPositions) {
+		this.asvPositions = asvPositions;
+	}
+	
+	/**
+	 * Constructor from a point and an ASVConfig
+	 * This constructor creates a new config that has been translated
+	 * across the map such that asv[1] of the new config is at the 
+	 * supplied point.
+	 * That is a disgusting explanation 
+	 */
+	public ASVConfig(Point2D p, ASVConfig config) {
+		this.asvPositions.add(p);
+		Point2D o = config.getASVPositions().get(0);
+		for(int i = 1; i < config.getASVPositions().size(); i++) {
+			Point2D temp = config.getASVPositions().get(i);
+			
+			// Find the difference between the old asv's
+			double diffX = temp.getX() - o.getX();
+			double diffY = temp.getY() - o.getY();
+			
+			// Make a new asv with this distance
+			this.asvPositions.add(new Point2D.Double(p.getX() + diffX, p.getY() + diffY));
+		}
+	}
+	
+	
 	/**
 	 * Returns a space-separated string of the ASV coordinates.
 	 *
