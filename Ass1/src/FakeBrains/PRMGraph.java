@@ -176,5 +176,16 @@ public class PRMGraph {
 	public List<Node> getNodes(){
 		return new ArrayList<Node>(nodes);
 	}
+
+	public Node giveInitialState(ASVConfig initialState) {
+		return null;
+		
+	}
+
+	public Node giveGoalState(ASVConfig goalState) {
+		return null;
+		// TODO Auto-generated method stub
+		
+	}
 	
 }
