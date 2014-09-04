@@ -32,7 +32,8 @@ public class Assignment1 {
 		List<Node> path = alg.findPath(start, goal);
 		System.out.println(path); // Show us the path
 		
-		
+		Interpolate inter = new Interpolate(problem.getObstacles(), path);
+		problem.setPath(inter.makeSolution(start, goal));
 		
 		
 		

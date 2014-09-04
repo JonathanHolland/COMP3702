@@ -1,7 +1,6 @@
 package fakeBrains;
 
-import java.util.List;
-
+import java.util.*;
 import problem.*;
 
 public class Interpolate {
@@ -16,6 +15,32 @@ public class Interpolate {
 		this.obstacles = obstacles;
 		this.path = path;
 	}
+	
+	// Not sure if we need this
+	/**
+	 * Blends everything together. interpolate would work between nodes
+	 * but this is meant to spit out the over-all solution
+	 * @return solution - every single ASVConfig moved through to reach the goal
+	 */
+	public List<ASVConfig> makeSolution(Node start, Node goal){
+		List<ASVConfig> solution = new ArrayList<ASVConfig>();
+		
+		int i = 1;
+		Node current = path.get(i++);
+		Node previous = start;
+		while(previous != goal){
+			
+			// Move between the 2
+			solution.addAll(Interpolate(previous, current));
+
+			// Update things for the next round
+			previous = current;
+			current = path.get(i++);
+		}
+		
+		return null;
+	}
+	
 	/**
 	 * Moves from one node asv configuration to another,
 	 * changing the configuration shape as needed to meet
