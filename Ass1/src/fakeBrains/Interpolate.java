@@ -2,7 +2,7 @@ package fakeBrains;
 
 import java.util.*;
 import java.awt.geom.*;
-
+import tester.Tester;
 import problem.*;
 
 
@@ -68,8 +68,15 @@ public class Interpolate {
 				}
 				stepPos = new ASVConfig(sPos);
 				
-				// Add position config to ASVconfig list to return
-				pathPiece.add(stepPos);
+				// Before adding the asv configuration, check if it hit any obstacles
+				boolean collide = hasCollision(stepPos, obstacles);
+				
+				if(collide) {
+					// find out which obstacle collided and change its move accordingly
+				} else {
+					// Add position config to ASVconfig list to return
+					pathPiece.add(stepPos);
+				}
 				
 				currentPos = stepPos;
 				
