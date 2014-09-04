@@ -146,22 +146,13 @@ public class Node {
 		this.hcost = current.getPos().distance(end.getPos());
 		
 	}
-
-<<<<<<< HEAD
-	public void giveASVConfig(ASVConfig initialState) {
-		// TODO Auto-generated method stub
-	}
 	
-	public ASVConfig getASVConfig() {
-		return this.config;
-=======
 	public void giveASVConfig(ASVConfig asvConfig) {
 		this.config = asvConfig;
 	}
 
 	public ASVConfig getConfig() {
 		return config;
->>>>>>> 4faebc539a2d83ef48074ae76b48e5410b501469
 	}
 }
 
