@@ -54,8 +54,9 @@ public class Configurator {
 		while(prev != goal){
 			current = (i < p.size()) ? p.get(i++): p.get(i);
 			
-			ASVConfig t = new ASVConfig(current.getPos(), prev.getConfig());
-
+			ASVConfig t = new ASVConfig(current.getPos(), prev);
+			System.out.println(t);
+			
 			// If there is no collision at this node then there's no worry :D
 			// Just give current prev's shifted config
 			if(!test.hasCollision(t, o)){

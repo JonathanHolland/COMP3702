@@ -75,15 +75,13 @@ public class ASVConfig {
 	 * supplied point.
 	 * That is a disgusting explanation 
 	 */
-	public ASVConfig(Point2D p, ASVConfig config) {
-		this.asvPositions.add(p);
-		Point2D o = config.getASVPositions().get(0);
-		for(int i = 1; i < config.getASVPositions().size(); i++) {
-			Point2D temp = config.getASVPositions().get(i);
+	public ASVConfig(Point2D p, Node prev) {
+		for(int i = 0; i < prev.getConfig().getASVPositions().size(); i++) {
+			Point2D temp = prev.getConfig().getASVPositions().get(i);
 			
 			// Find the difference between the old asv's
-			double diffX = temp.getX() - o.getX();
-			double diffY = temp.getY() - o.getY();
+			double diffX = temp.getX() - prev.getPos().getX();
+			double diffY = temp.getY() - prev.getPos().getY();
 			
 			// Make a new asv with this distance
 			this.asvPositions.add(new Point2D.Double(p.getX() + diffX, p.getY() + diffY));

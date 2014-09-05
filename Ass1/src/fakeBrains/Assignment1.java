@@ -12,13 +12,13 @@ public class Assignment1 {
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
-			problem.loadProblem("testcases/7ASV.txt");
+			problem.loadProblem("testcases/3ASV.txt");
 		} catch (Exception x) {
 			System.out.println("The file failed to load. Make sure it was legit");
 		}
 		
 		// Generate the Probabilistic Road Map 
-		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.05, 2000);		
+		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.5, 20);		
 		
 		// Make and add the beginning and end points to the Graph
 		Node start = prm.giveInitialState(problem.getInitialState());
@@ -32,19 +32,6 @@ public class Assignment1 {
 		List<Node> path = alg.findPath(start, goal);
 		System.out.println(path); // Show us the path
 		
-		Configurator configor = new Configurator(path, problem.getObstacles());
-		configor.giveConfigurations();
-		
-		
-		Interpolate inter = new Interpolate(problem.getObstacles(), path);
-		problem.setPath(inter.makeSolution(start, goal));
-		
-		
-		
-		
-		
-		
-		
 		// Display what we have	with visualHelper
 		VisualHelper visualHelper = new VisualHelper();
 		
@@ -53,7 +40,23 @@ public class Assignment1 {
 		visualHelper.addRectangles(Ob2Rec(problem.getObstacles()));
 		visualHelper.addLinkedPoints(start.getConfig().getASVPositions());
 		visualHelper.addLinkedPoints(goal.getConfig().getASVPositions());
-//		visualHelper.addLines(getNodeNetwork(prm.getNodes()));
+		
+		visualHelper.repaint();
+		
+		// Node find what each node should be like
+		Configurator configor = new Configurator(path, problem.getObstacles());
+		if(path != null) configor.giveConfigurations();
+		
+		// Interpolation!11!1
+		Interpolate inter = new Interpolate(problem.getObstacles(), path);
+//		problem.setPath(inter.makeSolution(start, goal));
+		
+		// Add all the intermediate configs to the picture
+		if(path != null) {
+			for(int i = 0; i < path.size(); i++) {
+				visualHelper.addLinkedPoints(path.get(i).getConfig().getASVPositions());
+			}
+		}
 		
 		visualHelper.repaint();
 		
@@ -91,7 +94,7 @@ public class Assignment1 {
 	 * Returns a list of lines, portraying the connections of the
 	 * nodes made by PRMGraph
 	 */
-	private static List<Line2D> getNodeNetwork(List<Node> n){
+	public static List<Line2D> getNodeNetwork(List<Node> n){
 		List<Line2D> lines = new ArrayList<Line2D>();
 		Node tempNode; Edge tempEdge;
 		for(int i = 0; i < n.size(); i++){

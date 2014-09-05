@@ -134,6 +134,7 @@ public class PRMGraph {
 		// Connect the Nodes
 		for(int i = 0; i < newNodes.size(); i++){
 			this.nodes.add(newNodes.get(i));
+			this.points.add(newNodes.get(i).getPos());
 			connectNode(newNodes.get(i));
 		}
 		
@@ -186,33 +187,28 @@ public class PRMGraph {
 	
 	// Give the initial state of the program to make a node from and add it to the graph
 	public Node giveInitialState(ASVConfig initialState) {
-		Point2D f = initialState.getASVPositions().get(0); // First ASV in List
+		double x = 0, y = 0;
+		for (int i = 0; i < initialState.getASVCount(); i++) {
+			x += initialState.getASVPositions().get(i).getX();
+			y += initialState.getASVPositions().get(i).getY();
+		}
+		Point2D pt = new Point2D.Double(x/initialState.getASVCount(), y/initialState.getASVCount());
 		
-		
-		/* The below is commented out 'cause we're using the first point in the array */
-//		Point2D l = initialState.getASVPositions()  // Last ASV in List
-//				.get(initialState.getASVPositions().size()-1);
-//		
-//		Point2D mid = new Point2D.Double( (f.getX()+l.getX())/2.0, (f.getY()+l.getY())/2 );
-		Node toReturn = this.addPoint(f);
+		Node toReturn = this.addPoint(pt);
 		toReturn.giveASVConfig(initialState);
 		return toReturn;
 	}
 
 	public Node giveGoalState(ASVConfig goalState) {
-		
-		// Grab the first and last point
-		Point2D f = goalState.getASVPositions().get(0); // First ASV in List
-
-		/* The below is commented out 'cause we're using the first point in the array */
-//		Point2D l = goalState.getASVPositions()  // Last ASV in List
-//				.get(goalState.getASVPositions().size()-1);
-//		
-//		// Make a midpoint
-//		Point2D mid = new Point2D.Double( (f.getX()+l.getX())/2.0, (f.getY()+l.getY())/2 );
+		double x = 0, y = 0;
+		for (int i = 0; i < goalState.getASVCount(); i++) {
+			x += goalState.getASVPositions().get(i).getX();
+			y += goalState.getASVPositions().get(i).getY();
+		}
+		Point2D pt = new Point2D.Double(x/goalState.getASVCount(), y/goalState.getASVCount());
 		
 		// Add the point to the Graph
-		Node toReturn = this.addPoint(f);
+		Node toReturn = this.addPoint(pt);
 		
 		// Give the node the goal state ASV
 		toReturn.giveASVConfig(goalState);
