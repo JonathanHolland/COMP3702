@@ -193,4 +193,13 @@ public class ASVConfig {
 		}
 		return true;
 	}
+
+	public Point2D massCenter() {
+		double x = 0, y = 0;
+		for (int i = 0; i < this.getASVCount(); i++) {
+			x += this.getASVPositions().get(i).getX();
+			y += this.getASVPositions().get(i).getY();
+		}
+		return new Point2D.Double(x/this.getASVCount(), y/this.getASVCount());
+	}
 }

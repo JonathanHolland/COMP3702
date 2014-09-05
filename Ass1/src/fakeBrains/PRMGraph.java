@@ -1,11 +1,10 @@
 package fakeBrains;
 
 import java.util.*;
-import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
-import java.awt.geom.RectangularShape;
+import java.awt.geom.*;
 
 import problem.*;
+import tester.Tester;
 
 public class PRMGraph {
 	
@@ -110,7 +109,8 @@ public class PRMGraph {
 			double ran2 = rand.nextDouble();
 			Point2D.Double temp = new Point2D.Double((mapSize.x * ran1), (mapSize.y * ran2));
 			for(int k = 0; k < obstacles.size(); k++){
-				if(obstacles.get(k).getRect().contains(temp.x, temp.y)) badSpot = true;
+				Rectangle2D tempRect = Tester.grow(obstacles.get(k).getRect(), 0.005);
+				if(tempRect.contains(temp.x, temp.y)) badSpot = true;
 			}
 			if(badSpot){
 				points.add(obstaclePoint(temp));			
@@ -145,12 +145,22 @@ public class PRMGraph {
 		return newPoints;
 	}
 	
+	/**
+	 * 
+	 * @param pos
+	 * @return
+	 */
 	public Node addPoint(Point2D pos){
 		List<Point2D> tempList = new ArrayList<Point2D>();
 		tempList.add(pos);
 		return addPoints(tempList).get(pos);
 	}
 	
+	/**
+	 * 
+	 * @param positions
+	 * @return
+	 */
 	private List<Node> convertPoints2Nodes(List<Point2D> positions) {
 		List<Node> n = new ArrayList<Node>();
 		for(int i = 0; i < positions.size(); i++){
@@ -159,7 +169,12 @@ public class PRMGraph {
 		return n;
 	}
 
-	/* Moves a point until it is no longer in an obstacle */
+	/**
+	 * 
+	 * 
+	 * @param p
+	 * @return
+	 */
 	private Point2D.Double obstaclePoint(Point2D.Double p){
 		Random r = new Random(); boolean badSpot = false;
 		//System.out.println("Got: " + r.nextGaussian());
@@ -169,7 +184,9 @@ public class PRMGraph {
 		newY = newY <= 0 ? newY*-1.0 : newY;
 		Point2D.Double newP = new Point2D.Double(newX, newY);
 		for(int k = 0; k < obstacles.size(); k++){
-			if(obstacles.get(k).getRect().contains(newP.x, newP.y)) badSpot = true;
+			// Make the used rectangle slightly bigger, so we don't get points too close to edges
+			Rectangle2D temp = Tester.grow(obstacles.get(k).getRect(), 0.01);
+			if(temp.contains(newP.x, newP.y)) badSpot = true;
 		}
 		if(badSpot) return obstaclePoint(newP);
 		else return newP;
@@ -187,28 +204,18 @@ public class PRMGraph {
 	
 	// Give the initial state of the program to make a node from and add it to the graph
 	public Node giveInitialState(ASVConfig initialState) {
-		double x = 0, y = 0;
-		for (int i = 0; i < initialState.getASVCount(); i++) {
-			x += initialState.getASVPositions().get(i).getX();
-			y += initialState.getASVPositions().get(i).getY();
-		}
-		Point2D pt = new Point2D.Double(x/initialState.getASVCount(), y/initialState.getASVCount());
+		// Add the point to the Graph
+		Node toReturn = this.addPoint(initialState.massCenter());
 		
-		Node toReturn = this.addPoint(pt);
+		// Give the node the goal state ASV
 		toReturn.giveASVConfig(initialState);
+
 		return toReturn;
 	}
 
 	public Node giveGoalState(ASVConfig goalState) {
-		double x = 0, y = 0;
-		for (int i = 0; i < goalState.getASVCount(); i++) {
-			x += goalState.getASVPositions().get(i).getX();
-			y += goalState.getASVPositions().get(i).getY();
-		}
-		Point2D pt = new Point2D.Double(x/goalState.getASVCount(), y/goalState.getASVCount());
-		
 		// Add the point to the Graph
-		Node toReturn = this.addPoint(pt);
+		Node toReturn = this.addPoint(goalState.massCenter());
 		
 		// Give the node the goal state ASV
 		toReturn.giveASVConfig(goalState);

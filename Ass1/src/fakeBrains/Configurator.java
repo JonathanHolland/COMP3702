@@ -47,15 +47,15 @@ public class Configurator {
 		int i = 1;
 		
 		// can ignore the first node, as it is the starting node
-		Node current = p.get(i);
+		Node current;
 		Node prev = p.get(0);
 		
 		// Time to Spider
-		while(prev != goal){
-			current = (i < p.size()) ? p.get(i++): p.get(i);
+		while(i < p.size()-1){
+			current = p.get(i++);
 			
+			// Make a tentative config the same shape as the last node's
 			ASVConfig t = new ASVConfig(current.getPos(), prev);
-			System.out.println(t);
 			
 			// If there is no collision at this node then there's no worry :D
 			// Just give current prev's shifted config
@@ -66,7 +66,7 @@ public class Configurator {
 			}
 			
 			// Now check if we could fit purely with rotation
-			ASVConfig t2 = checkRotations(t);
+			ASVConfig t2 = checkRotations(t, current.getPos());
 			
 			// if t2 != null we have a valid solution and can continue
 			if(t2 != null) {
@@ -92,14 +92,14 @@ public class Configurator {
 		return true;
 	}
 
-	private ASVConfig checkRotations(ASVConfig prevConfig) {
+	private ASVConfig checkRotations(ASVConfig prevConfig, Point2D center) {
 
 		for(int angle = 0; angle < 360; angle++) {
-			Point2D[] tempPosArray = null;
+			Point2D tempPosArray[] = new Point2D[prevConfig.getASVCount()];
 			
 			// Make the turn
-			AffineTransform.getRotateInstance(Math.toRadians(angle))
-				.transform(prevConfig.getASVPositions().toArray(new Point2D[0]), 0, tempPosArray, 0, prevConfig.getASVCount());
+			AffineTransform rawr = AffineTransform.getRotateInstance(Math.toRadians(angle), center.getX(), center.getY());
+			rawr.transform(prevConfig.getASVPositions().toArray(new Point2D[0]), 0, tempPosArray, 0, prevConfig.getASVCount());
 			
 			// make a new config from the turned points
 			ASVConfig t2 = new ASVConfig(Arrays.asList(tempPosArray));
