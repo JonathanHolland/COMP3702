@@ -14,10 +14,12 @@ public class Interpolate {
 	// The Path found with Astar
 	private	List<Node> path;
 	
+	private Tester test;
 	
 	public Interpolate(List<Obstacle> obstacles, List<Node> path){
 		this.obstacles = obstacles;
-		this.path = path;	
+		this.path = path;
+		test = new Tester();
 	}	
 		
 	
@@ -69,7 +71,7 @@ public class Interpolate {
 				stepPos = new ASVConfig(sPos);
 				
 				// Before adding the asv configuration, check if it hit any obstacles
-				boolean collide = hasCollision(stepPos, obstacles);
+				boolean collide = test.hasCollision(stepPos, obstacles);
 				
 				if(collide) {
 					// find out which obstacle collided and change its move accordingly
