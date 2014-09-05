@@ -20,7 +20,7 @@ public class Node {
 	private Point2D.Double pos; 
 	
 	// The Configuration of the ASV's
-	private ASVConfig config;
+	private ASVConfig config = null;
 	
 	// Should be unique for every new node
 	private int ID;

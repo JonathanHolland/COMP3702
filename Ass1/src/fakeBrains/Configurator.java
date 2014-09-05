@@ -1,7 +1,9 @@
 package fakeBrains;
 
 import java.awt.geom.*;
+import java.lang.reflect.Array;
 import java.util.*;
+
 import fakeBrains.*;
 import tester.Tester;
 import problem.*;
@@ -50,6 +52,8 @@ public class Configurator {
 		
 		// Time to Spider
 		while(prev != goal){
+			current = (i < p.size()) ? p.get(i++): p.get(i);
+			
 			ASVConfig t = new ASVConfig(current.getPos(), prev.getConfig());
 
 			// If there is no collision at this node then there's no worry :D
@@ -57,19 +61,59 @@ public class Configurator {
 			if(!test.hasCollision(t, o)){
 				current.giveASVConfig(new ASVConfig(t));
 				prev = current;
-				current = p.get(i++);
 				continue;
 			}
 			
-						
+			// Now check if we could fit purely with rotation
+			ASVConfig t2 = checkRotations(t);
+			
+			// if t2 != null we have a valid solution and can continue
+			if(t2 != null) {
+				current.giveASVConfig(new ASVConfig(t2));
+				prev = current;
+				continue;
+			}
+			
+			/* If we're still here that means no matter how we rotate this
+			 * config it's not fitting.
+			 * Let's figure out which ASVs are causing the pain and shift
+			 * them slightly
+			 */
+			
 			
 
 			
 			// Update things for the next round
 			prev = current;
-			current = p.get(i++);
 		}
+		
+		
 		return true;
+	}
+
+	private ASVConfig checkRotations(ASVConfig prevConfig) {
+
+		for(int angle = 0; angle < 360; angle++) {
+			Point2D[] tempPosArray = null;
+			
+			// Make the turn
+			AffineTransform.getRotateInstance(Math.toRadians(angle))
+				.transform(prevConfig.getASVPositions().toArray(new Point2D[0]), 0, tempPosArray, 0, prevConfig.getASVCount());
+			
+			// make a new config from the turned points
+			ASVConfig t2 = new ASVConfig(Arrays.asList(tempPosArray));
+			
+			// Check if we still have a collision
+			if(test.hasCollision(t2, o)) {
+				// If we do, try the next angle
+				continue;
+				
+			} else {
+				// If we're now free return the free config
+				return new ASVConfig(t2);
+			}
+		}
+		return null;
 	}
 	
 }

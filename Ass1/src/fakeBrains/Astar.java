@@ -75,7 +75,7 @@ public class Astar {
 			if(nodeNext.equals(first)){
 				firs = true;
 			}
-			path.add(nodeNext);
+			path.add(0,nodeNext);
 			current = nodeNext;
 		}
 		return path;
