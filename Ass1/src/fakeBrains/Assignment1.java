@@ -43,16 +43,18 @@ public class Assignment1 {
 		
 		visualHelper.repaint();
 		
+		boolean configd = false;
+		
 		// Node find what each node should be like
 		Configurator configor = new Configurator(path, problem.getObstacles());
-		if(path != null) configor.giveConfigurations();
+		if(path != null) configd = configor.giveConfigurations();
 		
 		// Interpolation!11!1
 		Interpolate inter = new Interpolate(problem.getObstacles(), path);
 //		problem.setPath(inter.makeSolution(start, goal));
 		
 		// Add all the intermediate configs to the picture
-		if(path != null) {
+		if(configd) {
 			for(int i = 0; i < path.size(); i++) {
 				visualHelper.addLinkedPoints(path.get(i).getConfig().getASVPositions());
 			}
@@ -108,6 +110,19 @@ public class Assignment1 {
 		return lines;
 	}
 	
+	/**
+	 * Determines the angle of a straight line drawn between point one and two. 
+	 * The number returned, which is a double in degrees, tells us how much we 
+	 * have to rotate a horizontal line clockwise for it to match the line 
+	 * between the two points. * If you prefer to deal with angles using radians 
+	 * instead of degrees, 
+	 * just change the last line to: "return Math.atan2(yDiff, xDiff);" 
+	 * */ 
+	public static double GetAngleOfLineBetweenTwoPoints(Point2D p1, Point2D p2) { 
+		double xDiff = p2.getX() - p1.getX(); 
+		double yDiff = p2.getY() - p1.getY(); 
+		return Math.toDegrees(Math.atan2(yDiff, xDiff));
+	}
 	
 	// Just to return the debugging points
 	private static List<Point2D> debugPositions(){

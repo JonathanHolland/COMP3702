@@ -59,7 +59,8 @@ public class Configurator {
 			
 			// If there is no collision at this node then there's no worry :D
 			// Just give current prev's shifted config
-			if(!test.hasCollision(t, o)){
+			if(!test.hasCollision(t, o) && test.fitsBounds(t)){
+				System.out.println("Translated");
 				current.giveASVConfig(new ASVConfig(t));
 				prev = current;
 				continue;
@@ -70,6 +71,7 @@ public class Configurator {
 			
 			// if t2 != null we have a valid solution and can continue
 			if(t2 != null) {
+				System.out.println("Rotated");
 				current.giveASVConfig(new ASVConfig(t2));
 				prev = current;
 				continue;
@@ -81,11 +83,19 @@ public class Configurator {
 			 * them slightly
 			 */
 			
+			// If an asv is in an obstacle 
+			for(int k = 0; k < t.getASVCount(); k++) {
+				
+			}
 			
 
 			
 			// Update things for the next round
 			prev = current;
+			
+			if(prev.getConfig() == null) {
+				return false;
+			}
 		}
 		
 		
@@ -105,7 +115,7 @@ public class Configurator {
 			ASVConfig t2 = new ASVConfig(Arrays.asList(tempPosArray));
 			
 			// Check if we still have a collision
-			if(test.hasCollision(t2, o)) {
+			if(test.hasCollision(t2, o) || !test.fitsBounds(t2)) {
 				// If we do, try the next angle
 				continue;
 				

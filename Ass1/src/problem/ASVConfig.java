@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.awt.geom.Point2D;
 
+import fakeBrains.Assignment1;
 import fakeBrains.Node;
 
 /**
@@ -13,11 +14,14 @@ import fakeBrains.Node;
  * checking - see the code in tester.Tester for this.
  *
  * @author lackofcheese
+ * Heavily Modified by s4262468
  */
 public class ASVConfig {
 	/** The position of each ASV */
 	private List<Point2D> asvPositions = new ArrayList<Point2D>();
 
+	public Point2D point = new Point2D.Double();
+	public List<Double> angles = new ArrayList<Double>();
 	/**
 	 * Constructor. Takes an array of 2n x and y coordinates, where n is the
 	 * number of ASVs
@@ -86,6 +90,30 @@ public class ASVConfig {
 			// Make a new asv with this distance
 			this.asvPositions.add(new Point2D.Double(p.getX() + diffX, p.getY() + diffY));
 		}
+	}
+	
+	/**
+	 * Converts the current asvPositions array into the 
+	 * 1 point many angles setout
+	 */
+	public List<Double> points2Angles(){
+		List<Double> a = new ArrayList<Double>();
+		for(int i = 0; i < this.getASVCount()-1; i++) {
+			Point2D p1 = asvPositions.get(i);
+			Point2D p2 = asvPositions.get(i+1);
+			a.add(Assignment1.GetAngleOfLineBetweenTwoPoints(p1, p2));
+		}
+		this.point = asvPositions.get(0);
+		this.angles = a;
+		return a;
+	}
+	
+	/**
+	 * Angles to points
+	 */
+	public List<Point2D> angles2Points() {
+		// TODO blergh running out of time is lame :(
+		return null;
 	}
 	
 	
@@ -180,7 +208,7 @@ public class ASVConfig {
 	}
 	
 	/**
-	 * A .equals method because it didn't come with one >:/
+	 * An .equals method because it didn't come with one >:/
 	 */
 	@Override
 	public boolean equals(Object o) {
