@@ -367,9 +367,9 @@ public class Interpolate {
 		return solution;
 	}
 
-	private ASVConfig makeValidConfig() {
-
-		return null;
+	public static Point2D rotateAroundPoint(Point2D point, double deg, Point2D centerPoint) {
+		AffineTransform rawr = AffineTransform.getRotateInstance(Math.toRadians(deg), centerPoint.getX(), centerPoint.getY());
+		return rawr.transform(point,point);//(prevConfig.getASVPositions().toArray(new Point2D[0]), 0, tempPosArray, 0, prevConfig.getASVCount());
 	}
 
 }
