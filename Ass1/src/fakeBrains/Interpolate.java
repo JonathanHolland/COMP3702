@@ -368,8 +368,8 @@ public class Interpolate {
 	}
 
 	public static Point2D rotateAroundPoint(Point2D point, double deg, Point2D centerPoint) {
-		AffineTransform rawr = AffineTransform.getRotateInstance(Math.toRadians(deg), centerPoint.getX(), centerPoint.getY());
-		return rawr.transform(point,point);//(prevConfig.getASVPositions().toArray(new Point2D[0]), 0, tempPosArray, 0, prevConfig.getASVCount());
+		AffineTransform t = AffineTransform.getRotateInstance(Math.toRadians(deg), centerPoint.getX(), centerPoint.getY());
+		return t.transform(point,point);
 	}
 
 }
