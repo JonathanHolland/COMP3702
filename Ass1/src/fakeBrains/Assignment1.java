@@ -12,13 +12,13 @@ public class Assignment1 {
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
-			problem.loadProblem("testcases/3ASV.txt");
+			problem.loadProblem("testcases/3ASV-noOb");
 		} catch (Exception x) {
 			System.out.println("The file failed to load. Make sure it was legit");
 		}
 		
 		// Generate the Probabilistic Road Map 
-		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.5, 20);		
+		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.5, 200);		
 		
 		// Make and add the beginning and end points to the Graph
 		Node start = prm.giveInitialState(problem.getInitialState());
@@ -51,7 +51,7 @@ public class Assignment1 {
 		
 		// Interpolation!11!1
 		Interpolate inter = new Interpolate(problem.getObstacles(), path);
-//		problem.setPath(inter.makeSolution(start, goal));
+		problem.setPath(inter.makeSolution(start, goal, visualHelper));
 		
 		// Add all the intermediate configs to the picture
 		if(configd) {
