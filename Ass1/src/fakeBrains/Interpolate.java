@@ -287,29 +287,29 @@ public class Interpolate {
 		// Given the newly moved point of the asv next to this one, we calculate
 		// the distance between them and then subsequently move this point (x,y)
 		// so that the boom length is the specified constrained value
-		xdiff = Math.abs(xconn - x);
-		ydiff = Math.abs(yconn - y);
+		xdiff = xconn - x;
+		ydiff = yconn - y;
 		
-		if (xdiff > 0) {
-			negx = false;
-		} else {
-			negx = true;
-			xdiff = Math.abs(xdiff);
-		}
-		if (ydiff > 0) {
-			negy = false;
-		} else {
-			negy = true;
-			ydiff = Math.abs(ydiff);
-		}
-		
+//		if (xdiff > 0) {
+//			negx = false;
+//		} else {
+//			negx = true;
+//			xdiff = Math.abs(xdiff);
+//		}
+//		if (ydiff > 0) {
+//			negy = false;
+//		} else {
+//			negy = true;
+//			ydiff = Math.abs(ydiff);
+//		}
 		
 		
 		diagonalDistance = Math.sqrt(Math.pow(xdiff, 2)
 				+ Math.pow(ydiff, 2));
 		// The distance to move is the total diagonal distance minus the boom
 		// length constraint (0.05)
-		distanceToMove = diagonalDistance - 0.05;
+		double length = 0.05;
+		distanceToMove = diagonalDistance - length;
 		// Then, break distanceToMove into x and y positions using similar
 		// triangles with the original xdiff,ydiff and diagonalDistance
 		System.out.println("ConstrainBoomFunc");
@@ -321,6 +321,9 @@ public class Interpolate {
 		System.out.println(ydiff);
 		thetaa = Math.atan(ydiff / xdiff);
 		System.out.println(thetaa);
+		if(thetaa>(Math.PI/2)) {
+			System.out.println("WTF");
+		}
 		ymove = Math.sin(thetaa)*distanceToMove;
 		xmove = Math.cos(thetaa)*distanceToMove;
 		// System.out.println(ymove);
