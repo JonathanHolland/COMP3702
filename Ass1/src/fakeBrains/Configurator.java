@@ -150,8 +150,19 @@ public class Configurator {
 			}
 			
 			ASVConfig tC = new ASVConfig(t);
+			boolean turnedConcave = false;
 			if(test.fitsBounds(tC) && !test.hasCollision(tC, o) && test.hasEnoughArea(tC) && test.isConvex(tC) && test.hasValidBoomLengths(tC)){ 
-				possibleConfigs.add(tC);
+				for(int i=1;i<tC.getASVCount()-1;i++) {
+					double ab = Assignment1.GetAngleOfLineBetweenTwoPoints(tC.getASVPositions().get(i-1),tC.getASVPositions().get(i));
+					double bc = Assignment1.GetAngleOfLineBetweenTwoPoints(tC.getASVPositions().get(i),tC.getASVPositions().get(i+1));
+					if((ab-bc)<0) {
+						turnedConcave = true;
+					}
+				}
+				if (!turnedConcave) {
+					possibleConfigs.add(tC);
+				}
+				
 			}
 			
 			if(count > 2000000 && possibleConfigs.size() > 20) {
