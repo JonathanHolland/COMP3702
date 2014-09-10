@@ -2,6 +2,7 @@ package fakeBrains;
 
 import java.awt.geom.*;
 import java.awt.geom.Point2D.Double;
+import java.io.IOException;
 import java.util.*;
 
 import problem.*;
@@ -12,25 +13,24 @@ public class Assignment1 {
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
-			problem.loadProblem("testcases/3ASV-noOb");
+			problem.loadProblem("testcases/7ASV.txt");
 		} catch (Exception x) {
 			System.out.println("The file failed to load. Make sure it was legit");
 		}
 		
 		// Generate the Probabilistic Road Map 
-		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.5, 200);		
+		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.08, 4000);		
 		
 		// Make and add the beginning and end points to the Graph
 		Node start = prm.giveInitialState(problem.getInitialState());
 		Node goal = prm.giveGoalState(problem.getGoalState());
-
 		
 		// Next we get the path through the map
 		Astar alg = new Astar();
 
 		// Find a path through the Graph
 		List<Node> path = alg.findPath(start, goal);
-		System.out.println(path); // Show us the path
+		System.out.println("PATH: " + path); // Show us the path
 		
 		// Display what we have	with visualHelper
 		VisualHelper visualHelper = new VisualHelper();
@@ -50,15 +50,25 @@ public class Assignment1 {
 		if(path != null) configd = configor.giveConfigurations();
 		
 		// Interpolation!11!1
-		Interpolate inter = new Interpolate(problem.getObstacles(), path);
-		problem.setPath(inter.makeSolution(start, goal, visualHelper));
+//		Interpolate inter = new Interpolate(problem.getObstacles(), path);
+//		problem.setPath(inter.makeSolution(start, goal, visualHelper));
 		
 		// Add all the intermediate configs to the picture
 		if(configd) {
 			for(int i = 0; i < path.size(); i++) {
-				visualHelper.addLinkedPoints(path.get(i).getConfig().getASVPositions());
+//				System.out.println(path.get(i).getConfig().getASVPositions());
+				if(path.get(i).getConfig().getASVPositions() != null) {
+					visualHelper.addLinkedPoints(path.get(i).getConfig().getASVPositions());
+				}
 			}
 		}
+		
+//		try {
+//			problem.saveSolution("rawr.txt");
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		visualHelper.repaint();
 		

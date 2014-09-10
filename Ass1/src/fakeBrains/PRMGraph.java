@@ -182,6 +182,8 @@ public class PRMGraph {
 		double newY = p.y + range*r.nextGaussian();
 		newX = newX <= 0 ? newX*-1.0 : newX;
 		newY = newY <= 0 ? newY*-1.0 : newY;
+		newX = newX > 1.0 ? 1.0 : newX;
+		newY = newY > 1.0 ? 1.0 : newY;
 		Point2D.Double newP = new Point2D.Double(newX, newY);
 		for(int k = 0; k < obstacles.size(); k++){
 			// Make the used rectangle slightly bigger, so we don't get points too close to edges
