@@ -20,10 +20,7 @@ public class Configurator {
 	
 	// tester instance
 	Tester test;
-	
-	// Visualiser instance
-//	Visual
-	
+
 	/**
 	 * Default Constructor
 	 * Takes and sets up needed vars
@@ -175,34 +172,6 @@ public class Configurator {
 		}
 		
 		return new ASVConfig(closest);
-	}
-
-	private ASVConfig flexConfig(Integer i, ASVConfig current) {
-		for(int angle = 0; angle < 360; angle++) {
-			List<Point2D> rawr = new ArrayList<Point2D>();
-
-			// rotate the point around the points
-			
-			List<Point2D> points2rotate = current.getASVPositions().subList(i, current.getASVCount());
-			System.out.println("\nrotating: \n" + points2rotate + "\naround: \n" + current.getPosition(i));
-			
-			rawr = pointsAroundPoint(points2rotate, angle, current.getPosition(i));
-			
-			// make a new config to from the points to test with
-			ASVConfig t = new ASVConfig(rawr);
-			
-			if(!test.hasCollision(t, o) && test.fitsBounds(t)){
-				System.out.println("Flexed");
-				return new ASVConfig(t);
-			} else {
-				List<Integer> infringing = asvObstacleCheck(t);
-				System.out.println("ASVsbeing blocked: " + infringing);
-				for(int z = 0; z < infringing.size(); z++) 
-					System.out.println(infringing.get(z)+ ": " + t.getASVPositions().get(infringing.get(z)));
-				return flexConfig(i+1, current);
-			}
-		}
-		return null;
 	}
 	
 	public List<Integer> asvObstacleCheck(ASVConfig config) {

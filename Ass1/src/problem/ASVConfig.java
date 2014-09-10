@@ -92,30 +92,6 @@ public class ASVConfig {
 		}
 	}
 	
-	/**
-	 * Converts the current asvPositions array into the 
-	 * 1 point many angles setout
-	 */
-	public List<Double> points2Angles(){
-		List<Double> a = new ArrayList<Double>();
-		for(int i = 0; i < this.getASVCount()-1; i++) {
-			Point2D p1 = asvPositions.get(i);
-			Point2D p2 = asvPositions.get(i+1);
-			a.add(Assignment1.GetAngleOfLineBetweenTwoPoints(p1, p2));
-		}
-		this.point = asvPositions.get(0);
-		this.angles = a;
-		return a;
-	}
-	
-	/**
-	 * Angles to points
-	 */
-	public List<Point2D> angles2Points() {
-		// TODO blergh running out of time is lame :(
-		return null;
-	}
-	
 	
 	/**
 	 * Returns a space-separated string of the ASV coordinates.

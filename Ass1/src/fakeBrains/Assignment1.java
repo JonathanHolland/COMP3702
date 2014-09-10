@@ -13,13 +13,13 @@ public class Assignment1 {
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
-			problem.loadProblem("testcases/7ASV.txt");
+			problem.loadProblem("testcases/3ASV-noOb");
 		} catch (Exception x) {
 			System.out.println("The file failed to load. Make sure it was legit");
 		}
 		
 		// Generate the Probabilistic Road Map 
-		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.08, 4000);		
+		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.2, 500);		
 		
 		// Make and add the beginning and end points to the Graph
 		Node start = prm.giveInitialState(problem.getInitialState());
@@ -46,12 +46,16 @@ public class Assignment1 {
 		boolean configd = false;
 		
 		// Node find what each node should be like
+		System.out.println("Configure each node");
 		Configurator configor = new Configurator(path, problem.getObstacles());
 		if(path != null) configd = configor.giveConfigurations();
 		
 		// Interpolation!11!1
-//		Interpolate inter = new Interpolate(problem.getObstacles(), path);
-//		problem.setPath(inter.makeSolution(start, goal, visualHelper));
+		System.out.println("Interpolate between each node");
+		Interpolate inter = new Interpolate(problem.getObstacles(), path);
+		problem.setPath(inter.makeSolution(start, goal, visualHelper));
+		
+		System.out.println("Displaying shtuff");
 		
 		// Add all the intermediate configs to the picture
 		if(configd) {
@@ -63,12 +67,14 @@ public class Assignment1 {
 			}
 		}
 		
-//		try {
-//			problem.saveSolution("rawr.txt");
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		try {
+			String savename = "testcases/solution.txt";
+			problem.saveSolution(savename);
+			System.out.println("Saved to " + savename);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		visualHelper.repaint();
 		

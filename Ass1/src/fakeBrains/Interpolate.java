@@ -2,6 +2,7 @@ package fakeBrains;
 
 import java.util.*;
 import java.awt.geom.*;
+import java.awt.geom.Point2D.Double;
 
 import tester.Tester;
 import visualDebugger.VisualHelper;
@@ -39,26 +40,45 @@ public class Interpolate {
 
 		List<ASVConfig> pathPiece = new ArrayList<ASVConfig>();
 
-		ASVConfig stepPos;
+		ASVConfig stepPos = null;
 		ASVConfig currentPos = start.getConfig();
 		List<Point2D> cPos;
 		boolean endReached = false;
-
+		
+		int switcher = 0;
 		while (!endReached) {
 			cPos = currentPos.getASVPositions();
-			double[] sPos = new double[currentPos.getASVCount() * 2];
-			int count = 0;
+			List<Point2D> sPos = new ArrayList<Point2D>(currentPos.getASVCount());
 			double[] listxy;
 			
-			
-			listxy = xymove(cPos.get(0).getX(), cPos.get(0).getY(), end
-					.getConfig().getPosition(0));
-			for (int k = 0; k < (cPos.size()); k++) {
-				sPos[count] = (cPos.get(k).getX() + listxy[0]); // add x movement
-				sPos[count + 1] = (cPos.get(k).getY() + listxy[1]); // add y		
-				count = count + 2;
+			switch (switcher%2) {
+				case 0: // Translate
+					listxy = xymove(cPos.get(0).getX(), cPos.get(0).getY(), end
+							.getConfig().getPosition(0));
+					for (int k = 0; k < (cPos.size()); k++) {
+						double x = (cPos.get(k).getX() + listxy[0]); // add x movement
+						double y = (cPos.get(k).getY() + listxy[1]); // add y
+						sPos.add(new Point2D.Double(x,y));
+					}
+					stepPos = new ASVConfig(sPos);
+					
+					// Check is legit
+					if(!test.hasValidBoomLengths(stepPos)){
+						System.out.println("### BAD CONFIG ###");
+						System.out.println(stepPos.getPosition(0).distance(stepPos.getPosition(1)));
+						System.out.println(stepPos.getPosition(2).distance(stepPos.getPosition(1)));
+					}
+					break;
+					
+				case 1: //Rotate
+					sPos = rotmove(currentPos, end.getConfig());
+					if(sPos == null){switcher++; continue;}
+					System.out.println(sPos);
+					stepPos = new ASVConfig(sPos);
+					System.out.println(stepPos);
+					break;
 			}
-			stepPos = new ASVConfig(sPos);
+			
 			
 			// // Before adding the asv configuration, check if it hit any
 			// // obstacles
@@ -76,14 +96,52 @@ public class Interpolate {
 			currentPos = stepPos;
 
 			// This is not the ideal end pos check
-			if (currentPos.getPosition(0).distance(
-					end.getConfig().getPosition(0)) < 0.001) {
+			System.out.println(end.getConfig());
+			System.out.println(currentPos);
+			if (currentPos.getPosition(0).distance(end.getConfig().getPosition(0)) < 0.001) {
 				// rotate the rest and keep this one here??
 				endReached = true;
 
 			}
+			switcher++;
 		}
 		return pathPiece;
+	}
+
+	/**
+	 * rot move returns 
+	 * @param currentPos
+	 * @param config
+	 * @return
+	 */
+	private List<Point2D> rotmove(ASVConfig currentPos, ASVConfig goal) {
+		
+		// Check if we need to return
+		
+		// List to return
+		List<Point2D> points = currentPos.getASVPositions();
+		
+		// Find the point farthest from point 1
+		Point2D f = currentPos.getPosition(0);
+		for(int i = 1; i < currentPos.getASVPositions().size(); i++) {
+			double currentMaxDist = f.distance(currentPos.getPosition(0));
+			double newMaxDist = currentPos.getPosition(0).distance(currentPos.getPosition(i));
+			f = (newMaxDist > currentMaxDist) ? currentPos.getPosition(i) : f;
+		}
+		
+		// Find the angle you can turn this at before it moves > 0.001
+		double radius = f.distance(currentPos.getPosition(0));
+		double angle = Math.atan(0.001 / radius); // radians
+
+		// Turn the points
+		Point2D tempPosArray[] = new Point2D[currentPos.getASVCount()];
+		
+		AffineTransform rawr = AffineTransform.getRotateInstance(
+				angle, currentPos.getPosition(0).getX(), currentPos.getPosition(0).getY());
+		
+		rawr.transform(points.toArray(new Point2D[0]), 0, tempPosArray, 0, points.size());
+		System.out.println("Array " + tempPosArray);
+		return new ArrayList<Point2D>(Arrays.asList(tempPosArray));
 	}
 
 	/**
@@ -112,16 +170,16 @@ public class Interpolate {
 		double resy = (endpos.getY() - y);
 		 //Check direction and take absolute for trig
 		 if (resx > 0) {
-		 negx = false;
+			 negx = false;
 		 } else {
-		 negx = true;
-		 resx = Math.abs(resx);
+			 negx = true;
+			 resx = Math.abs(resx);
 		 }
 		 if (resy > 0) {
-		 negy = false;
+			 negy = false;
 		 } else {
-		 negy = true;
-		 resy = Math.abs(resy);
+			 negy = true;
+			 resy = Math.abs(resy);
 		 }
 
 		// Use similar triangles to take angles for direction of move
