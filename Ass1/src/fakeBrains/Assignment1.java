@@ -36,6 +36,7 @@ public class Assignment1 {
 		VisualHelper visualHelper = new VisualHelper();
 		
 		if(path != null) visualHelper.addLinkedPoints(nodes2Points(path));
+		
 		visualHelper.addPoints(prm.getPoints());
 		visualHelper.addRectangles(Ob2Rec(problem.getObstacles()));
 		visualHelper.addLinkedPoints(start.getConfig().getASVPositions());
@@ -53,7 +54,7 @@ public class Assignment1 {
 		// Interpolation!11!1
 		System.out.println("Interpolate between each node");
 		Interpolate inter = new Interpolate(problem.getObstacles(), path);
-		problem.setPath(inter.makeSolution(start, goal, visualHelper));
+		problem.setPath(inter.makeSolution(start, goal));
 		
 		System.out.println("Displaying shtuff");
 		
@@ -134,10 +135,10 @@ public class Assignment1 {
 	 * instead of degrees, 
 	 * just change the last line to: "return Math.atan2(yDiff, xDiff);" 
 	 * */ 
-	public static double GetAngleOfLineBetweenTwoPoints(Point2D p1, Point2D p2) { 
+	public static double angleOf2Points(Point2D p1, Point2D p2) { 
 		double xDiff = p2.getX() - p1.getX(); 
 		double yDiff = p2.getY() - p1.getY(); 
-		return Math.toDegrees(Math.atan2(yDiff, xDiff));
+		return (Math.atan2(yDiff, xDiff));
 	}
 	
 	// Just to return the debugging points

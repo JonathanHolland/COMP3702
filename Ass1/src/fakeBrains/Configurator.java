@@ -16,7 +16,7 @@ public class Configurator {
 	List<Node> p;
 	
 	// The obstacles
-	List<Obstacle> o;
+	static List<Obstacle> o;
 	
 	// tester instance
 	Tester test;
@@ -153,8 +153,8 @@ public class Configurator {
 			boolean turnedConcave = false;
 			if(test.fitsBounds(tC) && !test.hasCollision(tC, o) && test.hasEnoughArea(tC) && test.isConvex(tC) && test.hasValidBoomLengths(tC)){ 
 				for(int i=1;i<tC.getASVCount()-1;i++) {
-					double ab = Assignment1.GetAngleOfLineBetweenTwoPoints(tC.getASVPositions().get(i-1),tC.getASVPositions().get(i));
-					double bc = Assignment1.GetAngleOfLineBetweenTwoPoints(tC.getASVPositions().get(i),tC.getASVPositions().get(i+1));
+					double ab = Assignment1.angleOf2Points(tC.getASVPositions().get(i-1),tC.getASVPositions().get(i));
+					double bc = Assignment1.angleOf2Points(tC.getASVPositions().get(i),tC.getASVPositions().get(i+1));
 					if((ab-bc)<0) {
 						turnedConcave = true;
 					}
@@ -185,9 +185,9 @@ public class Configurator {
 		return new ASVConfig(closest);
 	}
 	
-	public List<Integer> asvObstacleCheck(ASVConfig config) {
-		VisualHelper v = new VisualHelper();
-		v.addRectangles(Assignment1.Ob2Rec(o));
+	public static List<Integer> asvObstacleCheck(ASVConfig config) {
+//		VisualHelper v = new VisualHelper();
+//		v.addRectangles(Assignment1.Ob2Rec(o));
 		
 		// Make a list to return
 		List<Integer> infringing = new ArrayList<Integer>();
@@ -219,9 +219,9 @@ public class Configurator {
 			}
 		}
 		
-		v.addPoints(ps);
-		v.addLinkedPoints(config.getASVPositions());
-		v.repaint();
+//		v.addPoints(ps);
+//		v.addLinkedPoints(config.getASVPositions());
+//		v.repaint();
 		// return the infringing indexes
 		return new ArrayList<Integer>(infringing);
 		
