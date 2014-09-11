@@ -56,7 +56,7 @@ public class Interpolate {
 			
 			switch (switcher%2) {
 				case 0: // Translate
-					System.out.println("Translate");
+					System.out.println("__Translate__");
 					
 					// Get the step's asv positions
 					sPos = xyMove(cPos, end);
@@ -67,7 +67,7 @@ public class Interpolate {
 					break;
 					
 				case 1: //Rotate
-					System.out.println("Rotate");
+					System.out.println("__Rotate__");
 					
 					// Get the step's asv positions
 					sPos = rotmove(cConfig, end);
@@ -82,6 +82,7 @@ public class Interpolate {
 				System.out.println("### BAD CONFIG ###");
 				System.out.println(sConfig.getPosition(0).distance(sConfig.getPosition(1)));
 				System.out.println(sConfig.getPosition(2).distance(sConfig.getPosition(1)));
+//				System.exit(-1);
 			}
 			if(test.hasCollision(sConfig, obstacles)) {
 				System.out.println("### COLLISION ###");
@@ -106,10 +107,12 @@ public class Interpolate {
 			// This is not the ideal end pos check
 			if(cConfig.maxDistance(end.getConfig()) < err) {
 				endReached = true;
+				System.out.println("GOOD ENOUGH    " + cConfig.maxDistance(end.getConfig()) + "  &&  " + err);
+			} else {
+				System.out.println("NOT GOOD ENOUGH   " + cConfig.maxDistance(end.getConfig()) + "  &&  " + err);
+				System.out.println("--" + cConfig);
+				System.out.println("--" + end.getConfig());
 			}
-			System.out.println("NOT GOOD ENOUGH   " + cConfig.maxDistance(end.getConfig()) + "  &&  " + err);
-			System.out.println("--" + cConfig);
-			System.out.println("--" + end.getConfig());
 			switcher++; // inc this to choose other option next time
 		}
 		return pathPiece;
@@ -153,7 +156,7 @@ public class Interpolate {
 				
 				continue; // This angle is all good :D
 			}
-			System.out.println((cAngle - gAngle) + " is < " + err);
+			System.out.println((cAngle - gAngle) + " is > " + err);
 			break;
 		}
 		
@@ -217,14 +220,14 @@ public class Interpolate {
 	private List<Point2D> xyMove(List<Point2D> cPos, Node endPos) {
 		double[] listxy; 
 		List<Point2D> sPos = new ArrayList<Point2D>();
-		System.out.println("cPos: " + cPos);
+//		System.out.println("cPos: " + cPos);
 		listxy = xymove(cPos.get(0).getX(), cPos.get(0).getY(), endPos.getConfig().getPosition(0));
 		for (int k = 0; k < (cPos.size()); k++) {
 			double x = (cPos.get(k).getX() + listxy[0]); // add x movement
 			double y = (cPos.get(k).getY() + listxy[1]); // add y
 			sPos.add(new Point2D.Double(x,y));
 		}
-		System.out.println("sPos: " + sPos);
+//		System.out.println("sPos: " + sPos);
 		return sPos;
 	}
 	/**
@@ -319,7 +322,7 @@ public class Interpolate {
 
 			// Because it's not reaching the goal - infinite loop
 		}
-
+		solution.add(goal.getConfig());
 		return solution;
 	}
 
