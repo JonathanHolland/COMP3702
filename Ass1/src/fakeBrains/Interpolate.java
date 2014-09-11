@@ -17,11 +17,14 @@ public class Interpolate {
 	private List<Node> path;
 
 	private Tester test;
+	
+	double err;
 
 	public Interpolate(List<Obstacle> obstacles, List<Node> path) {
 		this.obstacles = obstacles;
 		this.path = path;
 		test = new Tester();
+		this.err = 0.001;
 	}
 
 	/**
@@ -36,18 +39,18 @@ public class Interpolate {
 	 * @return the list of the states created in between start and end
 	 */
 	public List<ASVConfig> pathBetween(Node start, Node end) {
-
+		System.out.println("_____________________________________\n__________________________________________");
 		List<ASVConfig> pathPiece = new ArrayList<ASVConfig>();
 
-		ASVConfig stepPos = null;
-		ASVConfig currentPos = start.getConfig();
-		List<Point2D> cPos;
+		ASVConfig sConfig = null; // Step Config
+		ASVConfig cConfig = start.getConfig(); // currentConfig
+		List<Point2D> cPos; // Current Positions
 		boolean endReached = false;
 		
 		int switcher = 0;
 		while (!endReached) {
-			cPos = currentPos.getASVPositions();
-			List<Point2D> sPos = new ArrayList<Point2D>(currentPos.getASVCount());
+			cPos = cConfig.getASVPositions();
+			List<Point2D> sPos = new ArrayList<Point2D>(cConfig.getASVCount()); // Step Positions
 			double[] listxy;
 			
 			switch (switcher%2) {
@@ -59,28 +62,28 @@ public class Interpolate {
 						double y = (cPos.get(k).getY() + listxy[1]); // add y
 						sPos.add(new Point2D.Double(x,y));
 					}
-					stepPos = new ASVConfig(sPos);
+					sConfig = new ASVConfig(sPos);
 					
 					break;
 					
 				case 1: //Rotate
-					sPos = rotmove(currentPos, end.getConfig());
+					sPos = rotmove(cConfig, end.getConfig());
 					if(sPos == null){switcher++; continue;}
 //					System.out.println(sPos);
-					stepPos = new ASVConfig(sPos);
+					sConfig = new ASVConfig(sPos);
 //					System.out.println(stepPos);
 					break;
 			}
 			
 			// Check is legit
-			if(!test.hasValidBoomLengths(stepPos)){
+			if(!test.hasValidBoomLengths(sConfig)){
 				System.out.println("### BAD CONFIG ###");
-				System.out.println(stepPos.getPosition(0).distance(stepPos.getPosition(1)));
-				System.out.println(stepPos.getPosition(2).distance(stepPos.getPosition(1)));
+				System.out.println(sConfig.getPosition(0).distance(sConfig.getPosition(1)));
+				System.out.println(sConfig.getPosition(2).distance(sConfig.getPosition(1)));
 			}
-			if(test.hasCollision(stepPos, obstacles)) {
-				System.out.println("### COLISION ###");
-				System.out.println(Configurator.asvObstacleCheck(stepPos));
+			if(test.hasCollision(sConfig, obstacles)) {
+				System.out.println("### COLLISION ###");
+				System.out.println(Configurator.asvObstacleCheck(sConfig));
 			}
 			
 			// // Before adding the asv configuration, check if it hit any
@@ -95,16 +98,18 @@ public class Interpolate {
 			// pathPiece.add(stepPos);
 			// }
 
-			pathPiece.add(stepPos);
-			currentPos = stepPos;
+			pathPiece.add(sConfig);
+			cConfig = sConfig;
 
 			// This is not the ideal end pos check
-//			System.out.println("END Config: " + end.getConfig());
-//			System.out.println("CURRENT Config: " + currentPos);
-			if (currentPos.getPosition(0).distance(end.getConfig().getPosition(0)) < 0.001) {
-				// rotate the rest and keep this one here??
-				endReached = true;
-
+			endReached = true;
+			for(int i = 0; i < start.getConfig().getASVCount(); i++) {
+				if(cConfig.getPosition(i) != end.getConfig().getPosition(i)) {
+					endReached = false;
+					System.out.println(cConfig.getPosition(i));
+					System.out.println(end.getConfig().getPosition(i));
+					break;
+				}
 			}
 			switcher++;
 		}
@@ -118,16 +123,19 @@ public class Interpolate {
 	 * @return
 	 */
 	private List<Point2D> rotmove(ASVConfig cPos, ASVConfig goal) {
+		// If the gap is really small, say it's the same.
+		if(cPos.maxDistance(goal) <= err) return goal.getASVPositions();
+		
 		// Point 1
 		Point2D f = cPos.getPosition(0);
 		
 		// Check if we need to return
 		double cAngle = Assignment1.angleOf2Points(cPos.getPosition(1), f);
-		System.out.println("CurrentAngle: "+ cAngle);
+		System.out.println("CurrentAngle: "+ Math.toDegrees(cAngle));
 		double gAngle = Assignment1.angleOf2Points(goal.getPosition(1), goal.getPosition(0));
-		System.out.println("Goal Angle"+ gAngle);
+		System.out.println("Goal Angle"+ Math.toDegrees(gAngle));
 		double angle2Turn = cAngle - gAngle;
-		System.out.println("Trying to turn" + angle2Turn);
+		System.out.println("Trying to turn" + Math.toDegrees(angle2Turn));
 		
 		// List to return
 		List<Point2D> points = cPos.getASVPositions();
@@ -144,13 +152,18 @@ public class Interpolate {
 		double maxAngle = Math.atan(0.001 / radius);
 		
 		double angle;
-		if(maxAngle >= angle2Turn){
+		if(Math.abs(maxAngle) >= Math.abs(angle2Turn)){
 			angle = angle2Turn;
 		} else {
-			angle = maxAngle;
+			angle = Math.signum(angle2Turn) * maxAngle;
 		}
 		
-		System.out.println("#########Turning: " + angle);
+		// Make sure to take the shortest route
+		if(Math.abs(angle2Turn) > 180) {
+			angle = angle * -1;
+		}
+		
+		System.out.println("#########Turning: " + Math.toDegrees(angle));
 
 		// Turn the points
 		Point2D tempPosArray[] = new Point2D[cPos.getASVCount()];

@@ -13,29 +13,45 @@ public class Assignment1 {
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
-			problem.loadProblem("testcases/3ASV-noOb");
+			problem.loadProblem("testcases/7ASV-easy.txt");
 		} catch (Exception x) {
-			System.out.println("The file failed to load. Make sure it was legit");
+			System.out.println("The file failed to load. Make sure it was legit!");
 		}
 		
-		// Generate the Probabilistic Road Map 
-		PRMGraph prm = new PRMGraph(problem.getObstacles(), 0.2, 500);		
+		// Declare vars for use inside the do-while loop.
+		PRMGraph prm; 
+		Astar alg;
+		List<Node> path;
+		Node start, goal;
+		int attempt = 1;
+		do {
+			System.out.println("Pathing Attempt #" + attempt);
+			
+			// Generate the Probabilistic Road Map 
+			prm = new PRMGraph(problem.getObstacles(), 0.2, 500);		
+			
+			// Make and add the beginning and end points to the Graph
+			start = prm.giveInitialState(problem.getInitialState());
+			goal = prm.giveGoalState(problem.getGoalState());
+			
+			// Next we get the path through the map
+			alg = new Astar();
+	
+			// Find a path through the Graph
+			path = alg.findPath(start, goal);
+			
+			// Increment attempts
+			attempt++;
+		} while (path == null);
 		
-		// Make and add the beginning and end points to the Graph
-		Node start = prm.giveInitialState(problem.getInitialState());
-		Node goal = prm.giveGoalState(problem.getGoalState());
-		
-		// Next we get the path through the map
-		Astar alg = new Astar();
-
-		// Find a path through the Graph
-		List<Node> path = alg.findPath(start, goal);
-		System.out.println("PATH: " + path); // Show us the path
+		// We've found a path, so show us
+		System.out.println("We found a path!");
+		System.out.println("PATH: " + path);
 		
 		// Display what we have	with visualHelper
 		VisualHelper visualHelper = new VisualHelper();
 		
-		if(path != null) visualHelper.addLinkedPoints(nodes2Points(path));
+		visualHelper.addLinkedPoints(nodes2Points(path));
 		
 		visualHelper.addPoints(prm.getPoints());
 		visualHelper.addRectangles(Ob2Rec(problem.getObstacles()));
@@ -49,14 +65,9 @@ public class Assignment1 {
 		// Node find what each node should be like
 		System.out.println("Configure each node");
 		Configurator configor = new Configurator(path, problem.getObstacles());
-		if(path != null) configd = configor.giveConfigurations();
+		configd = configor.giveConfigurations();
 		
-		// Interpolation!11!1
-		System.out.println("Interpolate between each node");
-		Interpolate inter = new Interpolate(problem.getObstacles(), path);
-		problem.setPath(inter.makeSolution(start, goal));
-		
-		System.out.println("Displaying shtuff");
+		System.out.println("Displaying Configured Nodes");
 		
 		// Add all the intermediate configs to the picture
 		if(configd) {
@@ -66,7 +77,13 @@ public class Assignment1 {
 					visualHelper.addLinkedPoints(path.get(i).getConfig().getASVPositions());
 				}
 			}
+			visualHelper.repaint();
 		}
+
+		// Interpolation!11!1
+		System.out.println("Interpolate between each node");
+		Interpolate inter = new Interpolate(problem.getObstacles(), path);
+		problem.setPath(inter.makeSolution(start, goal));
 		
 		try {
 			String savename = "testcases/solution.txt";
