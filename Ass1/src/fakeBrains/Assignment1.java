@@ -10,6 +10,8 @@ import visualDebugger.VisualHelper;
 
 public class Assignment1 {
 
+	public static List<Obstacle> obstacles;
+	
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
@@ -17,6 +19,8 @@ public class Assignment1 {
 		} catch (Exception x) {
 			System.out.println("The file failed to load. Make sure it was legit!");
 		}
+		
+		obstacles = problem.getObstacles();
 		
 		// Declare vars for use inside the do-while loop.
 		PRMGraph prm; 
