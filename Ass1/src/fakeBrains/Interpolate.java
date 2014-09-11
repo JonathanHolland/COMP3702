@@ -24,7 +24,7 @@ public class Interpolate {
 		this.obstacles = obstacles;
 		this.path = path;
 		test = new Tester();
-		this.err = 0.001;
+		this.err = 0.000001;
 	}
 
 	/**
@@ -51,23 +51,18 @@ public class Interpolate {
 		while (!endReached) {
 			cPos = cConfig.getASVPositions();
 			List<Point2D> sPos = new ArrayList<Point2D>(cConfig.getASVCount()); // Step Positions
-			double[] listxy;
+
 			
 			switch (switcher%2) {
 				case 0: // Translate
-					listxy = xymove(cPos.get(0).getX(), cPos.get(0).getY(), end
-							.getConfig().getPosition(0));
-					for (int k = 0; k < (cPos.size()); k++) {
-						double x = (cPos.get(k).getX() + listxy[0]); // add x movement
-						double y = (cPos.get(k).getY() + listxy[1]); // add y
-						sPos.add(new Point2D.Double(x,y));
-					}
+					sPos = xyMove(cPos, end);
+					
 					sConfig = new ASVConfig(sPos);
 					
 					break;
 					
 				case 1: //Rotate
-					sPos = rotmove(cConfig, end.getConfig());
+					sPos = rotmove(cConfig, end);
 					if(sPos == null){switcher++; continue;}
 //					System.out.println(sPos);
 					sConfig = new ASVConfig(sPos);
@@ -118,40 +113,63 @@ public class Interpolate {
 
 	/**
 	 * rot move returns 
-	 * @param cPos
+	 * @param cConfig
 	 * @param config
 	 * @return
 	 */
-	private List<Point2D> rotmove(ASVConfig cPos, ASVConfig goal) {
-		// If the gap is really small, say it's the same.
-		if(cPos.maxDistance(goal) <= err) return goal.getASVPositions();
+	private List<Point2D> rotmove(ASVConfig cConfig, Node goalN) {
+		// Get config from goalN for shortcutting
+		ASVConfig goal = goalN.getConfig();
 		
-		// Point 1
-		Point2D f = cPos.getPosition(0);
+		if(cConfig.maxDistance(goal) <= err) return goal.getASVPositions();
+		// A subset of cConfig's Positions
+		List<Point2D> _cPos = new ArrayList<Point2D>();
 		
-		// Check if we need to return
-		double cAngle = Assignment1.angleOf2Points(cPos.getPosition(1), f);
-		System.out.println("CurrentAngle: "+ Math.toDegrees(cAngle));
-		double gAngle = Assignment1.angleOf2Points(goal.getPosition(1), goal.getPosition(0));
-		System.out.println("Goal Angle"+ Math.toDegrees(gAngle));
-		double angle2Turn = cAngle - gAngle;
-		System.out.println("Trying to turn" + Math.toDegrees(angle2Turn));
+		// Figure out which link we're up to
+		double cAngle=0, gAngle=0, angle2Turn;
+		int j, m = cConfig.getASVCount()-1;
+		for(j = 1; j < cConfig.getASVCount(); j++) {
+			cAngle = Assignment1.angleOf2Points(cConfig.getPosition(j), cConfig.getPosition(j-1));
+			System.out.println("CurrentAngle: "+ Math.toDegrees(cAngle));
+			
+			gAngle = Assignment1.angleOf2Points(goal.getPosition(j), goal.getPosition(j-1));
+			System.out.println("Goal Angle: "+ Math.toDegrees(gAngle));
+
+			// if this angle is close, proceed to next points
+			if(cAngle - gAngle <= err) {
+				System.out.println("link " + (j-1) + " to " + j + " is good.");
+				if(j == m) {System.out.println("Moving instead");return xyMove(cConfig.getASVPositions(), goalN);}
+				continue; // This angle is all good :D
+			}
+			System.out.println((cAngle - gAngle) + "is < " + err);
+			break;
+		}
 		
-		// List to return
-		List<Point2D> points = cPos.getASVPositions();
+		// Make a list of points that still need to be altered
+		_cPos = cConfig.getASVPositions().subList(j-1, cConfig.getASVCount()-1); 
+
+		// The Angle we'd need to turn to reach the goal angle
+		angle2Turn = cAngle - gAngle;
+		System.out.println("Trying to turn: " + Math.toDegrees(angle2Turn));
+	
+		// f is the furthest point from _cPos.get(0)
+		Point2D f = _cPos.get(0);
 		
 		// Find the point farthest from point 1
-		for(int i = 1; i < cPos.getASVPositions().size(); i++) {
-			double currentMaxDist = f.distance(cPos.getPosition(0));
-			double newMaxDist = cPos.getPosition(0).distance(cPos.getPosition(i));
-			f = (newMaxDist > currentMaxDist) ? cPos.getPosition(i) : f;
+		for(int i = 1; i < _cPos.size(); i++) {
+			double currentMaxDist = f.distance(_cPos.get(0));
+			double newMaxDist = _cPos.get(0).distance(_cPos.get(i));
+			f = (newMaxDist > currentMaxDist) ? _cPos.get(i) : f;
 		}
 		
 		// Find the angle you can turn this at before it moves > 0.001
-		double radius = f.distance(cPos.getPosition(0));
+		double radius = f.distance(_cPos.get(0));
 		double maxAngle = Math.atan(0.001 / radius);
 		
+		// The amount we will actually turn
 		double angle;
+
+		// Check how much we need to turn
 		if(Math.abs(maxAngle) >= Math.abs(angle2Turn)){
 			angle = angle2Turn;
 		} else {
@@ -163,19 +181,36 @@ public class Interpolate {
 			angle = angle * -1;
 		}
 		
-		System.out.println("#########Turning: " + Math.toDegrees(angle));
+		System.out.println("##Turning: " + Math.toDegrees(angle));
 
-		// Turn the points
-		Point2D tempPosArray[] = new Point2D[cPos.getASVCount()];
-		
+		// Affine Transformation to turn about the current point 
 		AffineTransform rawr = AffineTransform.getRotateInstance(
-				-angle, cPos.getPosition(0).getX(), cPos.getPosition(0).getY());
+					-angle, _cPos.get(0).getX(), _cPos.get(0).getY());
+
+		// Array to hold the turned points
+		Point2D tempPosArray[] = new Point2D[_cPos.size()];
 		
-		rawr.transform(points.toArray(new Point2D[0]), 0, tempPosArray, 0, points.size());
+		rawr.transform(_cPos.toArray(new Point2D[0]), 0, tempPosArray, 0, _cPos.size());
 //		System.out.println("Array " + tempPosArray);
 		return new ArrayList<Point2D>(Arrays.asList(tempPosArray));
 	}
 
+	
+	/**
+	 * xymoveWrapper
+	 */
+	private List<Point2D> xyMove(List<Point2D> cPos, Node endPos) {
+		double[] listxy; List<Point2D> sPos = new ArrayList<Point2D>();
+		
+		listxy = xymove(cPos.get(0).getX(), cPos.get(0).getY(), endPos
+				.getConfig().getPosition(0));
+		for (int k = 0; k < (cPos.size()); k++) {
+			double x = (cPos.get(k).getX() + listxy[0]); // add x movement
+			double y = (cPos.get(k).getY() + listxy[1]); // add y
+			sPos.add(new Point2D.Double(x,y));
+		}
+		return sPos;
+	}
 	/**
 	 * xymove calculates the required x and y distances to move the asv in order
 	 * to not exceed 0.001 and to do so in the direction of the goal
