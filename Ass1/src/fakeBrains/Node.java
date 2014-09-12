@@ -159,16 +159,34 @@ public class Node {
 		double obsx;
 		double obsy;
 		int obscount = 0;
-		for(int i=0;i<Assignment1.obstacles.size();i++) {
+		int outcodeval = 0;
+		for (int i = 0; i < Assignment1.obstacles.size(); i++) {
 			Rectangle2D obs = Assignment1.obstacles.get(i).getRect();
+			// Once we have the center of the obstacle, determine using outcode
+			// which side the node is on (and then add minus the width/2 or
+			// height/2 from the distance - to get edge distance to node)
 			obsx = obs.getCenterX();
 			obsy = obs.getCenterY();
+			outcodeval = obs.outcode(current.getPos());
+
+			if (outcodeval == Rectangle2D.OUT_TOP) {
+				obsy = obsy + (obs.getHeight() / 2);
+			} else if (outcodeval == Rectangle2D.OUT_BOTTOM) {
+				obsy = obsy - (obs.getHeight() / 2);
+			} else if (outcodeval == Rectangle2D.OUT_LEFT) {
+				obsx = obsx - (obs.getWidth() / 2);
+			} else if (outcodeval == Rectangle2D.OUT_RIGHT) {
+				obsx = obsx + (obs.getWidth() / 2);
+			}
+			// This will get the center of one of the four edges closes to the
+			// point, is that close enough?
+
 			distance = current.getPos().distance(obsx, obsy);
-			if(distance>0.2) {
+			if (distance < 0.2) {
 				obscount++;
 			}
 		}
-		this.hcost = current.getPos().distance(end.getPos())+0.05*obscount;
+		this.hcost = current.getPos().distance(end.getPos()) + 0.05 * obscount;
 
 	}
 
