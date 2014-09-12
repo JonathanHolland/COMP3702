@@ -24,7 +24,7 @@ public class Interpolate {
 		this.obstacles = obstacles;
 		this.path = path;
 		test = new Tester();
-		this.err = 0.001;
+		this.err = 0.00001;
 	}
 
 	/**
@@ -56,10 +56,15 @@ public class Interpolate {
 			
 			switch (switcher%2) {
 				case 0: // Translate
-					System.out.println("Translate");
+					System.out.println("__Translate__");
 					
 					// Get the step's asv positions
-					sPos = xyMove(cPos, end);
+					sPos = xyMove(cConfig, end);
+					
+					if(sPos == null) {
+						System.out.println("Rotating instead");
+						sPos = rotmove(cConfig, end);
+					}
 					
 					// Make this steps config from the positions 
 					sConfig = new ASVConfig(sPos);
@@ -67,10 +72,15 @@ public class Interpolate {
 					break;
 					
 				case 1: //Rotate
-					System.out.println("Rotate");
+					System.out.println("__Rotate__");
 					
 					// Get the step's asv positions
 					sPos = rotmove(cConfig, end);
+					
+					if(sPos == null) {
+						System.out.println("Moving instead");
+						sPos = xyMove(cConfig, end);
+					}
 					
 					// Make this step's config from the positions
 					sConfig = new ASVConfig(sPos);
@@ -82,6 +92,7 @@ public class Interpolate {
 				System.out.println("### BAD CONFIG ###");
 				System.out.println(sConfig.getPosition(0).distance(sConfig.getPosition(1)));
 				System.out.println(sConfig.getPosition(2).distance(sConfig.getPosition(1)));
+//				System.exit(-1);
 			}
 			if(test.hasCollision(sConfig, obstacles)) {
 				System.out.println("### COLLISION ###");
@@ -106,10 +117,12 @@ public class Interpolate {
 			// This is not the ideal end pos check
 			if(cConfig.maxDistance(end.getConfig()) < err) {
 				endReached = true;
+				System.out.println("GOOD ENOUGH    " + cConfig.maxDistance(end.getConfig()) + "  &&  " + err);
+			} else {
+				System.out.println("NOT GOOD ENOUGH   " + cConfig.maxDistance(end.getConfig()) + "  &&  " + err);
+				System.out.println("--" + cConfig);
+				System.out.println("--" + end.getConfig());
 			}
-			System.out.println("NOT GOOD ENOUGH   " + cConfig.maxDistance(end.getConfig()) + "  &&  " + err);
-			System.out.println("--" + cConfig);
-			System.out.println("--" + end.getConfig());
 			switcher++; // inc this to choose other option next time
 		}
 		return pathPiece;
@@ -147,13 +160,12 @@ public class Interpolate {
 				
 				// If we've been through all the points however, return a move rather than rotating
 				if(j == m) {
-					System.out.println("Moving instead");
-					return xyMove(cConfig.getASVPositions(), goalN);
+					return null;
 				}
 				
 				continue; // This angle is all good :D
 			}
-			System.out.println((cAngle - gAngle) + " is < " + err);
+			System.out.println((cAngle - gAngle) + " is > " + err);
 			break;
 		}
 		
@@ -189,7 +201,7 @@ public class Interpolate {
 		}
 		
 		// Make sure to take the shortest route
-		if(Math.abs(angle2Turn) > 180) {
+		if(Math.abs(angle2Turn) > Math.toRadians(180)) {
 			angle = angle * -1;
 		}
 		
@@ -214,17 +226,24 @@ public class Interpolate {
 	/**
 	 * xymove Wrapper
 	 */
-	private List<Point2D> xyMove(List<Point2D> cPos, Node endPos) {
+	private List<Point2D> xyMove(ASVConfig cConfig, Node endPos) {
+		List<Point2D> cPos = cConfig.getASVPositions();
 		double[] listxy; 
 		List<Point2D> sPos = new ArrayList<Point2D>();
-		System.out.println("cPos: " + cPos);
+//		System.out.println("cPos: " + cPos);
 		listxy = xymove(cPos.get(0).getX(), cPos.get(0).getY(), endPos.getConfig().getPosition(0));
+		
+		// if listxy is null then we didn't need to translate and thus
+		// should return null to run a rotation instead.
+		if(listxy == null) return null;
+
+		// add the distances returned by listxy to each position
 		for (int k = 0; k < (cPos.size()); k++) {
 			double x = (cPos.get(k).getX() + listxy[0]); // add x movement
 			double y = (cPos.get(k).getY() + listxy[1]); // add y
 			sPos.add(new Point2D.Double(x,y));
 		}
-		System.out.println("sPos: " + sPos);
+//		System.out.println("sPos: " + sPos);
 		return sPos;
 	}
 	/**
@@ -269,11 +288,24 @@ public class Interpolate {
 		double thetaa = Math.atan(resy / resx);
 		double thetab = (0.5 * Math.PI) - thetaa;
 
+		double distance2move = (endpos.distance(x,y) < err) ? 0.0 : endpos.distance(x,y);
+		double hypotenuse;
+		if(distance2move < 0.001) {
+			hypotenuse = distance2move;
+		} else {
+			hypotenuse = 0.001;
+		}
+
+		// if we don't need to move then we want to rotate instead. a null return will do that. :)
+		if(distance2move == 0) return null; 
+		
+		System.out.println("Distance to translate = " + hypotenuse);
 		// Use these angles in the sine rule subbed into pythagoras to find x
-		// and y distances with a hypotenuse of 0.001
+		// and y distances with a hypotenuse the distnace needed to move.
 		double signratio = Math.sin(thetab) / Math.sin(thetaa);
 		xmove = (signratio)
-				/ (Math.sqrt(1000000 * Math.pow(signratio, 2) + 1000000));
+//				/ (Math.sqrt(1000000 * Math.pow(signratio, 2) + 1000000));
+				/ (Math.sqrt(Math.pow((1/hypotenuse), 2) * Math.pow(signratio, 2) + Math.pow((1/hypotenuse), 2)));
 		ymove = (Math.sin(thetaa) * xmove) / Math.sin(thetab);
 
 		if (negx) {
@@ -319,7 +351,7 @@ public class Interpolate {
 
 			// Because it's not reaching the goal - infinite loop
 		}
-
+		solution.add(goal.getConfig());
 		return solution;
 	}
 

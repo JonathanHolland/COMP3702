@@ -313,6 +313,62 @@ public class Tester {
 	}
 
 	/**
+	 * Returns the convexity of a configuration
+	 *
+	 * @param cfg
+	 *            the configuration to test.
+	 * @return +1 or -1 for differing directions of convexity
+	 */
+	public int whichConvex(ASVConfig cfg) {
+		List<Point2D> points = cfg.getASVPositions();
+		points.add(points.get(0));
+		points.add(points.get(1));
+
+		int requiredSign = 0;
+		double totalTurned = 0;
+		Point2D p0 = points.get(0);
+		Point2D p1 = points.get(1);
+		double angle = Math.atan2(p1.getY() - p0.getY(), p1.getX() - p0.getX());
+		for (int i = 2; i < points.size(); i++) {
+			Point2D p2 = points.get(i);
+			double nextAngle = Math.atan2(p2.getY() - p1.getY(),
+					p2.getX() - p1.getX());
+			double turningAngle = normaliseAngle(nextAngle - angle);
+
+			if (turningAngle == Math.PI) {
+				return requiredSign;
+			}
+
+			totalTurned += Math.abs(turningAngle);
+			if (totalTurned > 3 * Math.PI) {
+				return requiredSign;
+			}
+
+			int turnSign;
+			if (turningAngle < -maxError) {
+				turnSign = -1;
+			} else if (turningAngle > maxError) {
+				turnSign = 1;
+			} else {
+				turnSign = 0;
+			}
+
+			if (turnSign * requiredSign < 0) {
+				return requiredSign *-1;
+			} else if (turnSign != 0) {
+				requiredSign = turnSign;
+			}
+
+			p0 = p1;
+			p1 = p2;
+			angle = nextAngle;
+		}
+		return requiredSign;
+	}
+	
+	
+	
+	/**
 	 * Returns whether the given configuration is convex.
 	 *
 	 * @param cfg

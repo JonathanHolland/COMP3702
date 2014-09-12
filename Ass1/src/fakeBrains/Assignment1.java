@@ -12,6 +12,8 @@ public class Assignment1 {
 
 	public static List<Obstacle> obstacles;
 	
+	public static double range;
+	
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
@@ -21,6 +23,7 @@ public class Assignment1 {
 		}
 		
 		obstacles = problem.getObstacles();
+		range = 0.05;
 		
 		// Declare vars for use inside the do-while loop.
 		PRMGraph prm; 
@@ -32,7 +35,7 @@ public class Assignment1 {
 			System.out.println("Pathing Attempt #" + attempt);
 			
 			// Generate the Probabilistic Road Map 
-			prm = new PRMGraph(problem.getObstacles(), 0.2, 500);		
+			prm = new PRMGraph(problem.getObstacles(), range, 4000);		
 			
 			// Make and add the beginning and end points to the Graph
 			start = prm.giveInitialState(problem.getInitialState());

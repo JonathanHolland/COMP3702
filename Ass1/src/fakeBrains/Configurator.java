@@ -135,7 +135,8 @@ public class Configurator {
 			count++;
 			// Create the random points
 			List<Point2D> t = new ArrayList<Point2D>();
-			t.add(n.getPos());
+			t.add(new Point2D.Double(n.getPos().x + R.nextGaussian()*0.05*Assignment1.range, 
+										n.getPos().y + R.nextGaussian()*0.5*Assignment1.range));
 			for(int i = 0; i < (num-1)/2; i++) {
 				Point2D a = t.get(t.size()-1);
 				Point2D tP = new Point2D.Double(a.getX()+0.05, a.getY());
@@ -150,16 +151,13 @@ public class Configurator {
 			}
 			
 			ASVConfig tC = new ASVConfig(t);
-			boolean turnedConcave = false;
+			int convexity = test.whichConvex(p.get(0).getConfig());
 			if(test.fitsBounds(tC) && !test.hasCollision(tC, o) && test.hasEnoughArea(tC) && test.isConvex(tC) && test.hasValidBoomLengths(tC)){ 
 				for(int i=1;i<tC.getASVCount()-1;i++) {
 					double ab = Assignment1.angleOf2Points(tC.getASVPositions().get(i-1),tC.getASVPositions().get(i));
 					double bc = Assignment1.angleOf2Points(tC.getASVPositions().get(i),tC.getASVPositions().get(i+1));
-					if((ab-bc)<0) {
-						turnedConcave = true;
-					}
 				}
-				if (!turnedConcave) {
+				if (test.whichConvex(tC) == convexity) {
 					possibleConfigs.add(tC);
 				}
 				
@@ -172,6 +170,8 @@ public class Configurator {
 		
 		System.out.println("Made 100 Valid configs in: " + count + "\npicking best now");
 		
+		VisualHelper v = new VisualHelper();
+		
 		ASVConfig closest;
 		closest = possibleConfigs.get(0);
 		for(int i = 1; i < possibleConfigs.size(); i++) {
@@ -180,7 +180,10 @@ public class Configurator {
 			
 			// If the distance is shorter, make closest it
 			closest = (newMaxDistance < currentMinDistance)	? possibleConfigs.get(i) : closest;
+			
+			v.addLinkedPoints(possibleConfigs.get(i).getASVPositions());
 		}
+		v.repaint();
 		
 		return new ASVConfig(closest);
 	}
