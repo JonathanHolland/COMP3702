@@ -1,8 +1,7 @@
 package fakeBrains;
 
 import java.util.*;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
 import java.math.*;
 
 import problem.ProblemSpec;
@@ -165,26 +164,33 @@ public class Node {
 			// Once we have the center of the obstacle, determine using outcode
 			// which side the node is on (and then add minus the width/2 or
 			// height/2 from the distance - to get edge distance to node)
-			obsx = obs.getCenterX();
-			obsy = obs.getCenterY();
+			Point2D tL = new Point2D.Double(obs.getMinX(), obs.getMaxY());
+			Point2D tR = new Point2D.Double(obs.getMaxX(), obs.getMaxY());
+			Point2D bL = new Point2D.Double(obs.getMinX(), obs.getMinY());
+			Point2D bR = new Point2D.Double(obs.getMaxX(), obs.getMinY());
+			
+			Line2D obsLine = null;
+			
 			outcodeval = obs.outcode(current.getPos());
-
+			
 			if (outcodeval == Rectangle2D.OUT_TOP) {
-				obsy = obsy + (obs.getHeight() / 2);
+				obsLine = new Line2D.Double(tL, tR);
 			} else if (outcodeval == Rectangle2D.OUT_BOTTOM) {
-				obsy = obsy - (obs.getHeight() / 2);
+				obsLine = new Line2D.Double(bL, bR);
 			} else if (outcodeval == Rectangle2D.OUT_LEFT) {
-				obsx = obsx - (obs.getWidth() / 2);
+				obsLine = new Line2D.Double(tL, bL);
 			} else if (outcodeval == Rectangle2D.OUT_RIGHT) {
-				obsx = obsx + (obs.getWidth() / 2);
+				obsLine = new Line2D.Double(tR, bR);
 			}
 			// This will get the center of one of the four edges closes to the
 			// point, is that close enough?
 
-			distance = current.getPos().distance(obsx, obsy);
-			if (distance < 0.1) {
-				obsnearby.add(distance);
-				obscount++;
+			if(obsLine != null) {
+				distance = obsLine.ptSegDist(this.getPos());
+				if (distance < 0.1) {
+					obsnearby.add(distance);
+					obscount++;
+				}
 			}
 		}
 		System.out.println(obscount);

@@ -70,7 +70,6 @@ public class Assignment1 {
 		boolean configd = false;
 		
 		// Node find what each node should be like
-		System.out.println("Configure each node");
 		Configurator configor = new Configurator(path, problem.getObstacles());
 		configd = configor.giveConfigurations();
 		

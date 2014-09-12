@@ -40,6 +40,8 @@ public class Configurator {
 	 * @return true if success
 	 */
 	public boolean giveConfigurations(){
+		System.out.print("Configuring Nodes -> ");
+		
 		// Shortcut goal node
 		Node goal = p.get(p.size()-1);
 		
@@ -60,7 +62,7 @@ public class Configurator {
 			// If there is no collision at this node then there's no worry :D
 			// Just give current prev's shifted config
 			if(!test.hasCollision(t, o) && test.fitsBounds(t)){
-//				System.out.println("Translated");
+				System.out.print("T");
 				current.giveASVConfig(new ASVConfig(t));
 				prev = current;
 				continue;
@@ -74,12 +76,13 @@ public class Configurator {
 			
 			if(t2 != null) {
 				if(t2.maxDistance(prev.getConfig()) < rCon.maxDistance(prev.getConfig())) {
-					System.out.println("Chose Rotated Shape");
+					System.out.print("R");
 					current.giveASVConfig(new ASVConfig(t2));
 					prev = current;
 					continue;
 				}
 			}
+			System.out.print("G");
 			current.giveASVConfig(new ASVConfig(rCon));			
 			
 			if(!test.hasCollision(rCon, o) && test.fitsBounds(rCon)){
@@ -97,7 +100,7 @@ public class Configurator {
 			}
 		}
 		
-		
+		System.out.print(" -> ");
 		return true;
 	}
 
@@ -160,7 +163,7 @@ public class Configurator {
 			}
 		}
 		
-		System.out.println("Made 100 Valid configs in: " + count + "\npicking best now");
+//		System.out.println("Made " + possibleConfigs.size() + " Valid configs in: " + count + "\npicking best now");
 		
 //		VisualHelper v = new VisualHelper();
 		
