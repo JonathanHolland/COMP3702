@@ -56,54 +56,44 @@ public class Interpolate {
 			
 			switch (switcher%2) {
 				case 0: // Translate
-					System.out.println("__Translate__");
+					System.out.print("Translate > ");
 					
 					// Get the step's asv positions
 					sPos = xyMove(cConfig, end);
 					
 					if(sPos == null) {
-						System.out.println("Rotating instead");
+						System.out.print("Rotating instead > ");
 						sPos = rotmove(cConfig, end);
 					}
-					
-					// Make this steps config from the positions 
-					sConfig = new ASVConfig(sPos);
-					
-					// check and handle obstacle interactions
-					obHandler(sConfig);
-					
 					break;
 					
 				case 1: //Rotate
-					System.out.println("__Rotate__");
+					System.out.print("Rotate > ");
 					
 					// Get the step's asv positions
 					sPos = rotmove(cConfig, end);
 					
 					if(sPos == null) {
-						System.out.println("Moving instead");
+						System.out.print("Moving instead > ");
 						sPos = xyMove(cConfig, end);
 					}
-					
-					// Make this step's config from the positions
-					sConfig = new ASVConfig(sPos);
-					
-					// check and handle obstacle interactions
-					obHandler(sConfig);
-
 					break;
 			}
 			
+			// Make this step's config from the positions
+			sConfig = new ASVConfig(sPos);
+			
+			// check and handle obstacle interactions
+			obHandler(sConfig);
+
 			// Check is legit
 			if(!test.hasValidBoomLengths(sConfig)){
 				System.out.println("### BAD CONFIG ###");
 				System.out.println(sConfig.getPosition(0).distance(sConfig.getPosition(1)));
 				System.out.println(sConfig.getPosition(2).distance(sConfig.getPosition(1)));
-//				System.exit(-1);
 			}
 			if(test.hasCollision(sConfig, obstacles)) {
-				System.out.println("### COLLISION ###");
-				System.out.println(Configurator.asvObstacleCheck(sConfig));
+				System.out.print("### COLLISION ### -- " + Configurator.asvObstacleCheck(sConfig));
 			}
 			
 			// // Before adding the asv configuration, check if it hit any
@@ -124,27 +114,33 @@ public class Interpolate {
 			// This is not the ideal end pos check
 			if(cConfig.maxDistance(end.getConfig()) < err) {
 				endReached = true;
-				System.out.println("GOOD ENOUGH    " + cConfig.maxDistance(end.getConfig()) + "  &&  " + err);
+				System.out.println("    GOOD ENOUGH    " + cConfig.maxDistance(end.getConfig()) + "  &&  " + err);
 			} else {
-				System.out.println("NOT GOOD ENOUGH   " + cConfig.maxDistance(end.getConfig()) + "  &&  " + err);
-				System.out.println("--" + cConfig);
-				System.out.println("--" + end.getConfig());
+				System.out.println("    NOT GOOD ENOUGH   " + cConfig.maxDistance(end.getConfig()) + "  &&  " + err);
+				System.out.println("      " + cConfig);
+				System.out.println("      " + end.getConfig());
 			}
 			switcher++; // inc this to choose other option next time
 		}
 		return pathPiece;
 	}
 
+	/**
+	 * 
+	 * @param sConfig
+	 * @return boolean
+	 */
 	private boolean obHandler(ASVConfig sConfig) {
+		// If there are no collisions let's move on :)
 		if(!test.hasCollision(sConfig, obstacles)) {
 			return true;
 		}
-		System.out.println("COLLISION AND HALT");
+		System.out.println("CAUGHT COLLISION");
 		return false;
 	}
 
 	/**
-	 * rot move returns 
+	 * rot move returns a list of points?
 	 * @param cConfig
 	 * @param config
 	 * @return
@@ -164,14 +160,14 @@ public class Interpolate {
 		int j, m = cConfig.getASVCount()-1;
 		for(j = 1; j < cConfig.getASVCount(); j++) {
 			cAngle = Assignment1.angleOf2Points(cConfig.getPosition(j), cConfig.getPosition(j-1));
-			System.out.println("CurrentAngle: "+ Math.toDegrees(cAngle));
+//			System.out.print("CurrentAngle_"+ Math.toDegrees(cAngle) + " -> ");
 			
 			gAngle = Assignment1.angleOf2Points(goal.getPosition(j), goal.getPosition(j-1));
-			System.out.println("Goal Angle: "+ Math.toDegrees(gAngle));
+//			System.out.print("GoalAngle_"+ Math.toDegrees(gAngle) + " -> ");
 
 			// if this angle is close, proceed to next points
 			if(Math.abs(cAngle - gAngle) <= err) {
-				System.out.println("link " + (j-1) + " to " + j + " is good.");
+				System.out.print("p" + (j-1) + "p" + j + "_isGood > ");
 				
 				// If we've been through all the points however, return a move rather than rotating
 				if(j == m) {
@@ -180,7 +176,7 @@ public class Interpolate {
 				
 				continue; // This angle is all good :D
 			}
-			System.out.println((cAngle - gAngle) + " is > " + err);
+			System.out.print("Try2Turn p" + (j-1) + "p" + j);
 			break;
 		}
 		
@@ -189,7 +185,7 @@ public class Interpolate {
 
 		// The Angle we'd need to turn to reach the goal angle
 		angle2Turn = cAngle - gAngle;
-		System.out.println("Trying to turn: " + Math.toDegrees(angle2Turn));
+		System.out.print("_" + Math.toDegrees(angle2Turn) + "degs > ");
 	
 		// f is the furthest point from _cPos.get(0)
 		Point2D f = _cPos.get(0);
@@ -220,7 +216,7 @@ public class Interpolate {
 			angle = angle * -1;
 		}
 		
-		System.out.println("##Turning: " + Math.toDegrees(angle));
+		System.out.println("ActualTurn_" + Math.toDegrees(angle));
 
 		// Affine Transformation to turn about the current point 
 		AffineTransform rawr = AffineTransform.getRotateInstance(
@@ -232,7 +228,7 @@ public class Interpolate {
 		rawr.transform(_cPos.toArray(new Point2D[0]), 0, tempPosArray, 0, _cPos.size());
 
 		List<Point2D> toReturn = new ArrayList<Point2D>(cConfig.getASVPositions().subList(0, j-1));
-		System.out.println("Ensure no doubles 'cause awks:\n" + toReturn + "\n" + _cPos);
+//		System.out.println("Ensure no doubles 'cause awks:\n" + toReturn + "\n" + _cPos);
 		toReturn.addAll(Arrays.asList(tempPosArray));
 		return toReturn;
 	}

@@ -161,11 +161,15 @@ public class Configurator {
 			if(count > 2000000 && possibleConfigs.size() > 20) {
 				break;
 			}
+			if(count > 20000000 && possibleConfigs.size() > 1) {
+				System.out.print(" > UpperLimit > ");
+				break;
+			}
 		}
 		
 //		System.out.println("Made " + possibleConfigs.size() + " Valid configs in: " + count + "\npicking best now");
 		
-//		VisualHelper v = new VisualHelper();
+		VisualHelper v = new VisualHelper();
 		
 		ASVConfig closest;
 		closest = possibleConfigs.get(0);
@@ -176,9 +180,9 @@ public class Configurator {
 			// If the distance is shorter, make closest it
 			closest = (newMaxDistance < currentMinDistance)	? possibleConfigs.get(i) : closest;
 			
-//			v.addLinkedPoints(possibleConfigs.get(i).getASVPositions());
+			v.addLinkedPoints(possibleConfigs.get(i).getASVPositions());
 		}
-//		v.repaint();
+		v.repaint();
 		
 		return new ASVConfig(closest);
 	}

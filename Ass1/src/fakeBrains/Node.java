@@ -193,7 +193,7 @@ public class Node {
 				}
 			}
 		}
-		System.out.println(obscount);
+		
 		double hcostintermediate = current.getPos().distance(end.getPos());
 		while(obscount!=0) {
 			hcostintermediate += (Math.exp(1/obsnearby.get(obscount-1)));
