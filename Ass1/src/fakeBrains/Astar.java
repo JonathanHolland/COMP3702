@@ -7,7 +7,7 @@ import java.awt.geom.*;
 public class Astar {
 
 	 /**
-     *
+     * Finds a path! (durr)
      */
     public List<Node> findPath(Node first, Node end) throws NoSuchNodeException {
     	PriorityQueue<Node> pQueue = new PriorityQueue(20, new NodeComparator());
@@ -60,6 +60,13 @@ public class Astar {
         return null; // unreachable
     }
 
+    
+    /**
+     * Works backwards from the first node to find the path.
+     * @param first
+     * @param current
+     * @return
+     */
 	private List<Node> calcPath(Node first, Node current) {
 		List<Node> path = new ArrayList<Node>();
 		Node nodeNext;

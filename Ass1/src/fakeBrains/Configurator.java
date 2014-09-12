@@ -69,29 +69,21 @@ public class Configurator {
 			// Now check if we could fit purely with rotation
 			ASVConfig t2 = checkRotations(t, current.getPos());
 			
-			// if t2 != null we have a valid solution and can continue
-			if(t2 != null) {
-//				System.out.println("Rotated");
-				current.giveASVConfig(new ASVConfig(t2));
-				prev = current;
-				continue;
-			}
-			
-			/* If we're still here that means no matter how we rotate this
-			 * config it's not fitting.
-			 * Let's figure out which ASVs are causing the pain and shift
-			 * them slightly
-			 */
-			
-			/* SCREW THAT */
-			/* LETS JUST RANDOMISE A CONFIG UNTIL ONE FITS */
-
+			// Randomly Generate a config at our position
 			ASVConfig rCon = makeConfig(current);
 			
-			if (!test.hasValidBoomLengths(rCon)) System.out.println("Not valid boomlengths");
+			if(t2 != null) {
+				if(t2.maxDistance(prev.getConfig()) < rCon.maxDistance(prev.getConfig())) {
+					System.out.println("Chose Rotated Shape");
+					current.giveASVConfig(new ASVConfig(t2));
+					prev = current;
+					continue;
+				}
+			}
+			current.giveASVConfig(new ASVConfig(rCon));			
 			
 			if(!test.hasCollision(rCon, o) && test.fitsBounds(rCon)){
-				System.out.println("Generated");
+//				System.out.println("Generated");
 				current.giveASVConfig(new ASVConfig(rCon));
 				prev = current;
 				continue;
@@ -170,7 +162,7 @@ public class Configurator {
 		
 		System.out.println("Made 100 Valid configs in: " + count + "\npicking best now");
 		
-		VisualHelper v = new VisualHelper();
+//		VisualHelper v = new VisualHelper();
 		
 		ASVConfig closest;
 		closest = possibleConfigs.get(0);
@@ -181,9 +173,9 @@ public class Configurator {
 			// If the distance is shorter, make closest it
 			closest = (newMaxDistance < currentMinDistance)	? possibleConfigs.get(i) : closest;
 			
-			v.addLinkedPoints(possibleConfigs.get(i).getASVPositions());
+//			v.addLinkedPoints(possibleConfigs.get(i).getASVPositions());
 		}
-		v.repaint();
+//		v.repaint();
 		
 		return new ASVConfig(closest);
 	}

@@ -69,6 +69,9 @@ public class Interpolate {
 					// Make this steps config from the positions 
 					sConfig = new ASVConfig(sPos);
 					
+					// check and handle obstacle interactions
+					obHandler(sConfig);
+					
 					break;
 					
 				case 1: //Rotate
@@ -84,6 +87,10 @@ public class Interpolate {
 					
 					// Make this step's config from the positions
 					sConfig = new ASVConfig(sPos);
+					
+					// check and handle obstacle interactions
+					obHandler(sConfig);
+
 					break;
 			}
 			
@@ -126,6 +133,14 @@ public class Interpolate {
 			switcher++; // inc this to choose other option next time
 		}
 		return pathPiece;
+	}
+
+	private boolean obHandler(ASVConfig sConfig) {
+		if(!test.hasCollision(sConfig, obstacles)) {
+			return true;
+		}
+		System.out.println("COLLISION AND HALT");
+		return false;
 	}
 
 	/**
@@ -331,7 +346,7 @@ public class Interpolate {
 	 */
 	public List<ASVConfig> makeSolution(Node start, Node goal) {
 		List<ASVConfig> solution = new ArrayList<ASVConfig>();
-
+		solution.add(start.getConfig());
 		int i = 1;
 		Node current = path.get(i++);
 
