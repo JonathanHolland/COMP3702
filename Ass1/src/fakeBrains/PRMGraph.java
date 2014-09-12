@@ -38,9 +38,13 @@ public class PRMGraph {
 		Node.setNodeIndex(0);
 		
 		// Make the points
+		System.out.print("Making points -> ");
 		makePoints(mapSize, pointCount);
+		System.out.print("Converting to Nodes -> ");
 		this.nodes = convertPoints2Nodes(points);
+		System.out.print("Linking Nodes -> ");
 		connectNodes();
+		System.out.println("DONE");
 	}
 	
 	/* Alternate constructor for when you don't want to change mapsize */
