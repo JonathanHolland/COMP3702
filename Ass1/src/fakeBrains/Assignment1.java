@@ -35,7 +35,7 @@ public class Assignment1 {
 			System.out.println("Pathing Attempt #" + attempt);
 			
 			// Generate the Probabilistic Road Map 
-			prm = new PRMGraph(problem.getObstacles(), range, 4000);		
+			prm = new PRMGraph(problem.getObstacles(), range, 2000);		
 			
 			// Make and add the beginning and end points to the Graph
 			start = prm.giveInitialState(problem.getInitialState());

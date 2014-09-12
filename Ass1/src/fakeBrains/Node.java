@@ -2,7 +2,6 @@ package fakeBrains;
 
 import java.util.*;
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.awt.geom.Rectangle2D;
 import java.math.*;
 
@@ -105,7 +104,7 @@ public class Node {
 	}
 
 	public double getCost() {
-		return cost + hcost;
+		return this.cost + this.hcost;
 	}
 
 	public static void setNodeIndex(int num) {
@@ -155,11 +154,12 @@ public class Node {
 		// reference to our node positions from our path which are the mass
 		// centers of the configs) but also to include distances to nearby
 		// obstacles
-		double distance;
+		Double distance;
 		double obsx;
 		double obsy;
 		int obscount = 0;
 		int outcodeval = 0;
+		ArrayList<Double> obsnearby =  new ArrayList<Double>();
 		for (int i = 0; i < Assignment1.obstacles.size(); i++) {
 			Rectangle2D obs = Assignment1.obstacles.get(i).getRect();
 			// Once we have the center of the obstacle, determine using outcode
@@ -182,12 +182,19 @@ public class Node {
 			// point, is that close enough?
 
 			distance = current.getPos().distance(obsx, obsy);
-			if (distance < 0.2) {
+			if (distance < 0.1) {
+				obsnearby.add(distance);
 				obscount++;
 			}
 		}
-		this.hcost = current.getPos().distance(end.getPos()) + 0.05 * obscount;
-
+		System.out.println(obscount);
+		double hcostintermediate = current.getPos().distance(end.getPos());
+		while(obscount!=0) {
+			hcostintermediate += (Math.exp(1/obsnearby.get(obscount-1)));
+			obscount--;
+		}
+		
+		this.hcost = hcostintermediate;
 	}
 
 	public void giveASVConfig(ASVConfig asvConfig) {
