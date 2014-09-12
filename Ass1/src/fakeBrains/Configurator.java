@@ -132,7 +132,7 @@ public class Configurator {
 			List<Point2D> t = new ArrayList<Point2D>();
 			t.add(new Point2D.Double(n.getPos().x + R.nextGaussian()*0.05*Assignment1.range, 
 										n.getPos().y + R.nextGaussian()*0.5*Assignment1.range));
-			for(int i = 0; i < (num-1)/2; i++) {
+			for(int i = 0; i < (num)/2; i++) {
 				Point2D a = t.get(t.size()-1);
 				Point2D tP = new Point2D.Double(a.getX()+0.05, a.getY());
 				Interpolate.rotateAroundPoint(tP, 360*R.nextDouble(), a);
@@ -144,7 +144,6 @@ public class Configurator {
 				Interpolate.rotateAroundPoint(tP, 360*R.nextDouble(), a);
 				t.add(0,tP);
 			}
-			
 			ASVConfig tC = new ASVConfig(t);
 			int convexity = test.whichConvex(p.get(0).getConfig());
 			if(test.fitsBounds(tC) && !test.hasCollision(tC, o) && test.hasEnoughArea(tC) && test.isConvex(tC) && test.hasValidBoomLengths(tC)){ 
