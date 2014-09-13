@@ -23,6 +23,12 @@ public class Assignment1 {
 		}
 		
 		obstacles = problem.getObstacles();
+		// add edges of map to obstacles
+		obstacles.add(new Obstacle(0.0, 0.0, 1.0, 0.0001));
+		obstacles.add(new Obstacle(0.0, 0.0, 0.0001, 1));
+		obstacles.add(new Obstacle(0.0, 1.0, 1.0, 0.0001));
+		obstacles.add(new Obstacle(1.0, 1.0, 0.0001, 1.0));
+		
 		range = 0.05;
 		
 		// Declare vars for use inside the do-while loop.
