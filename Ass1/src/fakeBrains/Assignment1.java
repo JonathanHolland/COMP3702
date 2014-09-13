@@ -17,13 +17,27 @@ public class Assignment1 {
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
+<<<<<<< HEAD
 			problem.loadProblem("testcases/7ASV-MkII.txt");
+=======
+			problem.loadProblem("testcases/6ASV-6OBS.txt");
+>>>>>>> a67bd786f62a3ddb48a616b69226b20bc93101b1
 		} catch (Exception x) {
 			System.out.println("The file failed to load. Make sure it was legit!");
 		}
 		
 		obstacles = problem.getObstacles();
+<<<<<<< HEAD
 		range = 0.02;
+=======
+		// add edges of map to obstacles
+		obstacles.add(new Obstacle(0.0, 0.0, 1.0, 0.0001));
+		obstacles.add(new Obstacle(0.0, 0.0, 0.0001, 1));
+		obstacles.add(new Obstacle(0.0, 1.0, 1.0, 0.0001));
+		obstacles.add(new Obstacle(1.0, 1.0, 0.0001, 1.0));
+		
+		range = 0.05;
+>>>>>>> a67bd786f62a3ddb48a616b69226b20bc93101b1
 		
 		// Declare vars for use inside the do-while loop.
 		PRMGraph prm; 
