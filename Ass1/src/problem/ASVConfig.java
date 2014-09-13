@@ -206,4 +206,8 @@ public class ASVConfig {
 		}
 		return new Point2D.Double(x/this.getASVCount(), y/this.getASVCount());
 	}
+
+	public void setASVPositions(List<Point2D> ASVPositions) {
+		this.asvPositions = ASVPositions;
+	}
 }

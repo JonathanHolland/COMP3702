@@ -731,4 +731,13 @@ public class Tester {
 		}
 		System.exit(numFailures);
 	}
+
+	public Obstacle getCollision(ASVConfig cfg, List<Obstacle> obstacles) {
+		for (Obstacle o : obstacles) {
+			if (hasCollision(cfg, o)) {
+				return o;
+			}
+		}
+		return null;
+	}
 }

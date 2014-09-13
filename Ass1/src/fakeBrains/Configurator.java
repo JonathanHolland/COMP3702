@@ -147,10 +147,6 @@ public class Configurator {
 			ASVConfig tC = new ASVConfig(t);
 			int convexity = test.whichConvex(p.get(0).getConfig());
 			if(test.fitsBounds(tC) && !test.hasCollision(tC, o) && test.hasEnoughArea(tC) && test.isConvex(tC) && test.hasValidBoomLengths(tC)){ 
-				for(int i=1;i<tC.getASVCount()-1;i++) {
-					double ab = Assignment1.angleOf2Points(tC.getASVPositions().get(i-1),tC.getASVPositions().get(i));
-					double bc = Assignment1.angleOf2Points(tC.getASVPositions().get(i),tC.getASVPositions().get(i+1));
-				}
 				if (test.whichConvex(tC) == convexity) {
 					possibleConfigs.add(tC);
 				}
@@ -168,7 +164,7 @@ public class Configurator {
 		
 //		System.out.println("Made " + possibleConfigs.size() + " Valid configs in: " + count + "\npicking best now");
 		
-		VisualHelper v = new VisualHelper();
+//		VisualHelper v = new VisualHelper();
 		
 		ASVConfig closest;
 		closest = possibleConfigs.get(0);
@@ -179,9 +175,9 @@ public class Configurator {
 			// If the distance is shorter, make closest it
 			closest = (newMaxDistance < currentMinDistance)	? possibleConfigs.get(i) : closest;
 			
-			v.addLinkedPoints(possibleConfigs.get(i).getASVPositions());
+//			v.addLinkedPoints(possibleConfigs.get(i).getASVPositions());
 		}
-		v.repaint();
+//		v.repaint();
 		
 		return new ASVConfig(closest);
 	}

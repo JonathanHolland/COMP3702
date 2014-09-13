@@ -17,13 +17,13 @@ public class Assignment1 {
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
-			problem.loadProblem("testcases/4ASV.txt");
+			problem.loadProblem("testcases/7ASV-MkII.txt");
 		} catch (Exception x) {
 			System.out.println("The file failed to load. Make sure it was legit!");
 		}
 		
 		obstacles = problem.getObstacles();
-		range = 0.05;
+		range = 0.02;
 		
 		// Declare vars for use inside the do-while loop.
 		PRMGraph prm; 
@@ -35,7 +35,7 @@ public class Assignment1 {
 			System.out.println("Pathing Attempt #" + attempt);
 			
 			// Generate the Probabilistic Road Map 
-			prm = new PRMGraph(problem.getObstacles(), range, 2000);		
+			prm = new PRMGraph(problem.getObstacles(), range, 6000);		
 			
 			// Make and add the beginning and end points to the Graph
 			start = prm.giveInitialState(problem.getInitialState());
@@ -60,7 +60,8 @@ public class Assignment1 {
 		
 		visualHelper.addLinkedPoints(nodes2Points(path));
 		
-		visualHelper.addPoints(prm.getPoints());
+//		visualHelper.addPoints(prm.getPoints());
+		visualHelper.addPoints(nodes2Points(path));
 		visualHelper.addRectangles(Ob2Rec(problem.getObstacles()));
 		visualHelper.addLinkedPoints(start.getConfig().getASVPositions());
 		visualHelper.addLinkedPoints(goal.getConfig().getASVPositions());
@@ -89,7 +90,13 @@ public class Assignment1 {
 		// Interpolation!11!1
 		System.out.println("Interpolate between each node");
 		Interpolate inter = new Interpolate(problem.getObstacles(), path);
-		problem.setPath(inter.makeSolution(start, goal));
+		Interpolate.v = visualHelper;
+		try {
+			problem.setPath(inter.makeSolution(start, goal));
+		} catch (badInterpolationException e1) {
+			System.err.println("BAD ERROR AND QUIT");
+			System.exit(0);
+		}
 		
 		try {
 			String savename = "testcases/solution.txt";
