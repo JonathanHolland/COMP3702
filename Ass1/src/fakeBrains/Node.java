@@ -164,36 +164,29 @@ public class Node {
 			// Once we have the center of the obstacle, determine using outcode
 			// which side the node is on (and then add minus the width/2 or
 			// height/2 from the distance - to get edge distance to node)
-			Point2D tL = new Point2D.Double(obs.getMinX(), obs.getMaxY());
-			Point2D tR = new Point2D.Double(obs.getMaxX(), obs.getMaxY());
-			Point2D bL = new Point2D.Double(obs.getMinX(), obs.getMinY());
-			Point2D bR = new Point2D.Double(obs.getMaxX(), obs.getMinY());
-			
-			Line2D obsLine = null;
-			
+			obsx = obs.getCenterX();
+			obsy = obs.getCenterY();
 			outcodeval = obs.outcode(current.getPos());
-			
+
 			if (outcodeval == Rectangle2D.OUT_TOP) {
-				obsLine = new Line2D.Double(tL, tR);
+				obsy = obsy + (obs.getHeight() / 2);
 			} else if (outcodeval == Rectangle2D.OUT_BOTTOM) {
-				obsLine = new Line2D.Double(bL, bR);
+				obsy = obsy - (obs.getHeight() / 2);
 			} else if (outcodeval == Rectangle2D.OUT_LEFT) {
-				obsLine = new Line2D.Double(tL, bL);
+				obsx = obsx - (obs.getWidth() / 2);
 			} else if (outcodeval == Rectangle2D.OUT_RIGHT) {
-				obsLine = new Line2D.Double(tR, bR);
+				obsx = obsx + (obs.getWidth() / 2);
 			}
 			// This will get the center of one of the four edges closes to the
 			// point, is that close enough?
 
-			if(obsLine != null) {
-				distance = obsLine.ptSegDist(this.getPos());
-				if (distance < 0.1) {
-					obsnearby.add(distance);
-					obscount++;
-				}
+			distance = current.getPos().distance(obsx, obsy);
+			if (distance < 0.1) {
+				obsnearby.add(distance);
+				obscount++;
 			}
 		}
-		
+		System.out.println(obscount);
 		double hcostintermediate = current.getPos().distance(end.getPos());
 		while(obscount!=0) {
 			hcostintermediate += (Math.exp(1/obsnearby.get(obscount-1)));
