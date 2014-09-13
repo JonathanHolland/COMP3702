@@ -17,7 +17,7 @@ public class Assignment1 {
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
-			problem.loadProblem("testcases/4ASV.txt");
+			problem.loadProblem("testcases/6ASV-6OBS.txt");
 		} catch (Exception x) {
 			System.out.println("The file failed to load. Make sure it was legit!");
 		}
