@@ -18,7 +18,11 @@ public class Interpolate {
 
 	private Tester test;
 	
+	static public VisualHelper v;
+	
 	double err;
+	
+	static int switcher = 0; // To tell when to rotate or move
 
 	public Interpolate(List<Obstacle> obstacles, List<Node> path) {
 		this.obstacles = obstacles;
@@ -37,8 +41,9 @@ public class Interpolate {
 	 * @param end
 	 *            - the node to end at
 	 * @return the list of the states created in between start and end
+	 * @throws Exception 
 	 */
-	public List<ASVConfig> pathBetween(Node start, Node end) {
+	public List<ASVConfig> pathBetween(Node start, Node end) throws Exception {
 		// List of configs to return
 		List<ASVConfig> pathPiece = new ArrayList<ASVConfig>();
 
@@ -46,8 +51,7 @@ public class Interpolate {
 		ASVConfig cConfig = start.getConfig(); // currentConfig
 		List<Point2D> cPos; // Current Positions
 		boolean endReached = false; // loop condition
-		
-		int switcher = 0; // To tell when to rotate or move
+		switcher = 0;
 		while (!endReached) {
 			cPos = cConfig.getASVPositions(); // current Positions
 			
@@ -84,7 +88,7 @@ public class Interpolate {
 			sConfig = new ASVConfig(sPos);
 			
 			// check and handle obstacle interactions
-			obHandler(sConfig);
+			obHandler(cConfig, sConfig);
 
 			// Check is legit
 			if(!test.hasValidBoomLengths(sConfig)){
@@ -114,13 +118,15 @@ public class Interpolate {
 			// This is not the ideal end pos check
 			if(cConfig.maxDistance(end.getConfig()) < err) {
 				endReached = true;
-				System.out.println("    GOOD ENOUGH    " + cConfig.maxDistance(end.getConfig()) + "  &&  " + err);
+				System.out.println("  GOOD ENOUGH    " + cConfig.maxDistance(end.getConfig()) + "  &&  " + err);
 			} else {
-				System.out.println("    NOT GOOD ENOUGH   " + cConfig.maxDistance(end.getConfig()) + "  &&  " + err);
-				System.out.println("      " + cConfig);
-				System.out.println("      " + end.getConfig());
+				System.out.println("  NOT GOOD ENOUGH   " + cConfig.maxDistance(end.getConfig()) + "  &&  " + err);
+				System.out.println("    " + cConfig);
+				System.out.println("    " + end.getConfig());
 			}
 			switcher++; // inc this to choose other option next time
+			v.addLinkedPoints(cConfig.getASVPositions());
+			v.repaint();
 		}
 		return pathPiece;
 	}
@@ -128,16 +134,130 @@ public class Interpolate {
 	/**
 	 * 
 	 * @param sConfig
+	 * @param sConfig2 
 	 * @return boolean
+	 * @throws Exception 
 	 */
-	private boolean obHandler(ASVConfig sConfig) {
+	private boolean obHandler(ASVConfig cConfig, ASVConfig sConfig) throws Exception {
 		// If there are no collisions let's move on :)
 		if(!test.hasCollision(sConfig, obstacles)) {
 			return true;
 		}
 		System.out.println("CAUGHT COLLISION");
+		if(test.hasCollision(cConfig, obstacles)) {
+			throw new Exception("Config errors");
+		}
+		// What get the positions of the different configs
+		List<Point2D> cPos = cConfig.getASVPositions();
+		List<Point2D> sPos = sConfig.getASVPositions();
+		
+		// Which obstacle are we colliding with?
+		Obstacle ob = test.getCollision(sConfig, obstacles);
+		
+		// Turning Point or collision
+		Point2D tPoint = null;
+		
+		// Lets check each point to see which failed and pull the point it
+		// failed at out of the quagmire
+		for(int j = 1; j < sConfig.getASVCount(); j++) {
+			// a Temporary newLine
+			Line2D nL = new Line2D.Double(sPos.get(j-1), sPos.get(j));
+
+			// Something to store the points in
+			Point2D points[] = new Point2D[4];
+			
+			// Get the points the lines could intersect at
+			points = getIntersectionPoint(nL, ob.getRect());
+			for(int i = 0; i < 4; i++) {
+				if(points[i] == null) continue;
+				tPoint = points[i];
+				break;
+			}
+		}
+		
+		// This should never trigger, but yeah
+		if(tPoint == null) {System.out.println("SOMETHING IS BAD"); System.exit(-1);}	
+		
+		switch(switcher%2) {
+			case 0: // Try to rotate around the point
+				System.out.println("Rotate around obstacle");
+				
+				// f is the furthest point from _cPos.get(0)
+				Point2D f = cPos.get(0);
+				
+				// Find the point farthest point from tPoint
+				for(int i = 1; i < cPos.size(); i++) {
+					double currentMaxDist = f.distance(tPoint);
+					double newMaxDist = cPos.get(i).distance(tPoint);
+					f = (newMaxDist > currentMaxDist) ? cPos.get(i) : f;
+				}
+				
+				List<Line2D> rawr1 = new ArrayList<Line2D>();
+				rawr1.add(new Line2D.Double(f, tPoint));
+				v.addLines(rawr1);
+				
+				// Find the angle you can turn this at before it moves > 0.001
+				double radius = f.distance(tPoint);
+				double maxAngle = Math.atan(0.001 / radius);
+				
+				// The amount we will actually turn
+				double angle = maxAngle;
+				
+				// Affine Transformation to turn about the current point 
+				AffineTransform rawr = AffineTransform.getRotateInstance(
+						-angle,tPoint.getX(), tPoint.getY());
+				
+				// Array to hold the turned points
+				Point2D tempPosArray[] = new Point2D[cPos.size()];
+				rawr.transform(cPos.toArray(new Point2D[0]), 0, tempPosArray, 0, cPos.size());
+				sConfig.setASVPositions(Arrays.asList(tempPosArray));
+				
+				if(test.hasCollision(sConfig, obstacles)) {switcher++; System.out.println("Switch2_moving"); return obHandler(cConfig, sConfig);}
+				break;
+				
+			case 1: // Try to move along the obstacle
+				System.out.println("Move along obstacle");
+				List<Point2D> _sPos = new ArrayList<Point2D>();
+				
+				//move directly away from the obstacle
+				double[] listxy = xymove(ob.getRect().getCenterX(), ob.getRect().getCenterY(), tPoint);
+				
+				if(listxy == null) {switcher++; System.out.println("Switch2_rotation"); return obHandler(cConfig, sConfig);}
+				
+				for (int k = 0; k < (cPos.size()); k++) {
+					double x = (cPos.get(k).getX() + listxy[0]); // add x movement
+					double y = (cPos.get(k).getY() + listxy[1]); // add y
+					_sPos.add(new Point2D.Double(x,y));
+				}
+				
+				sConfig.setASVPositions(_sPos);
+				
+				break;
+		}
+
+		
+//		System.out.println("Configs");
+//		System.out.println("c " + cConfig);
+//		System.out.println(sConfig);
+
+//		v.addLinkedPoints(cConfig.getASVPositions());
+		List<Point2D> tempP = new ArrayList<Point2D>();
+		tempP.add(tPoint);
+//		v.addPoints(tempP);
+//		v.repaint();
+//		v.waitKey();
+		// Try to rotate the cConfig in either direction around tPoint.
+		// Preferably in the same direction as you need to be turning though
+		// Move the config along the surface of the obstacle
+		// Figure out which rotation would rotate us away from the obstacle
+		
+//		System.exit(0);
 		return false;
+		
 	}
+	
+	
+	
 
 	/**
 	 * rot move returns a list of points?
@@ -339,8 +459,9 @@ public class Interpolate {
 	 * is meant to spit out the over-all solution
 	 * 
 	 * @return solution - every single ASVConfig moved through to reach the goal
+	 * @throws badInterpolationException 
 	 */
-	public List<ASVConfig> makeSolution(Node start, Node goal) {
+	public List<ASVConfig> makeSolution(Node start, Node goal) throws badInterpolationException {
 		List<ASVConfig> solution = new ArrayList<ASVConfig>();
 		solution.add(start.getConfig());
 		int i = 1;
@@ -350,7 +471,12 @@ public class Interpolate {
 		while (previous != goal) {
 
 			// Move between the 2
-			solution.addAll(pathBetween(previous, current));
+			try {
+				solution.addAll(pathBetween(previous, current));
+			} catch (Exception e1) {
+				System.out.println("Error between " + previous + " & " + current);
+				throw new badInterpolationException();
+			}
 
 			// Update things for the next round
 			previous = current;
@@ -370,5 +496,81 @@ public class Interpolate {
 		AffineTransform t = AffineTransform.getRotateInstance(Math.toRadians(deg), centerPoint.getX(), centerPoint.getY());
 		return t.transform(point,point);
 	}
+	
+	
+	/**
+	 * From interwebs
+	 * @param line
+	 * @param rectangle
+	 * @return
+	 */
+	public Point2D[] getIntersectionPoint(Line2D line, Rectangle2D rectangle) {
 
+        Point2D[] p = new Point2D[4];
+
+        // Top line
+        p[0] = getIntersectionPoint(line,
+                        new Line2D.Double(
+                        rectangle.getX(),
+                        rectangle.getY(),
+                        rectangle.getX() + rectangle.getWidth(),
+                        rectangle.getY()));
+        // Bottom line
+        p[1] = getIntersectionPoint(line,
+                        new Line2D.Double(
+                        rectangle.getX(),
+                        rectangle.getY() + rectangle.getHeight(),
+                        rectangle.getX() + rectangle.getWidth(),
+                        rectangle.getY() + rectangle.getHeight()));
+        // Left side...
+        p[2] = getIntersectionPoint(line,
+                        new Line2D.Double(
+                        rectangle.getX(),
+                        rectangle.getY(),
+                        rectangle.getX(),
+                        rectangle.getY() + rectangle.getHeight()));
+        // Right side
+        p[3] = getIntersectionPoint(line,
+                        new Line2D.Double(
+                        rectangle.getX() + rectangle.getWidth(),
+                        rectangle.getY(),
+                        rectangle.getX() + rectangle.getWidth(),
+                        rectangle.getY() + rectangle.getHeight()));
+
+        if(p == null) System.out.print("asdfasdhflaiushdfs");
+        return p;
+    }
+
+	/**
+	 * From interwebs
+	 * @param lineA
+	 * @param lineB
+	 * @return
+	 */
+	public Point2D getIntersectionPoint(Line2D lineA, Line2D lineB) {
+
+		if(!lineA.intersectsLine(lineB)) return null;
+		
+        double x1 = lineA.getX1();
+        double y1 = lineA.getY1();
+        double x2 = lineA.getX2();
+        double y2 = lineA.getY2();
+
+        double x3 = lineB.getX1();
+        double y3 = lineB.getY1();
+        double x4 = lineB.getX2();
+        double y4 = lineB.getY2();
+
+        Point2D p = null;
+
+        double d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        if (d != 0) {
+            double xi = ((x3 - x4) * (x1 * y2 - y1 * x2) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
+            double yi = ((y3 - y4) * (x1 * y2 - y1 * x2) - (y1 - y2) * (x3 * y4 - y3 * x4)) / d;
+
+            p = new Point2D.Double(xi, yi);
+
+        }
+        return p;
+    }
 }

@@ -52,9 +52,10 @@ public class Assignment1 {
 	
 			// Find a path through the Graph
 			path = alg.findPath(start, goal);
-			
+
 			// Increment attempts
 			attempt++;
+			range += 0.001;
 		} while (path == null);
 		
 		// We've found a path, so show us
@@ -66,7 +67,8 @@ public class Assignment1 {
 		
 		visualHelper.addLinkedPoints(nodes2Points(path));
 		
-		visualHelper.addPoints(prm.getPoints());
+//		visualHelper.addPoints(prm.getPoints());
+		visualHelper.addPoints(nodes2Points(path));
 		visualHelper.addRectangles(Ob2Rec(problem.getObstacles()));
 		visualHelper.addLinkedPoints(start.getConfig().getASVPositions());
 		visualHelper.addLinkedPoints(goal.getConfig().getASVPositions());
@@ -95,7 +97,13 @@ public class Assignment1 {
 		// Interpolation!11!1
 		System.out.println("Interpolate between each node");
 		Interpolate inter = new Interpolate(problem.getObstacles(), path);
-		problem.setPath(inter.makeSolution(start, goal));
+		Interpolate.v = new VisualHelper();
+		try {
+			problem.setPath(inter.makeSolution(start, goal));
+		} catch (badInterpolationException e1) {
+			System.err.println("BAD ERROR AND QUIT");
+//			System.exit(0);
+		}
 		
 		try {
 			String savename = "testcases/solution.txt";
