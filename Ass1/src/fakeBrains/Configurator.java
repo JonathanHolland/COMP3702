@@ -78,6 +78,7 @@ public class Configurator {
 				if(t2.maxDistance(prev.getConfig()) < rCon.maxDistance(prev.getConfig())) {
 					System.out.print("R");
 					current.giveASVConfig(new ASVConfig(t2));
+					prev.giveASVConfig((new ASVConfig(prev.getPos(), prev)));
 					prev = current;
 					continue;
 				}
@@ -178,7 +179,6 @@ public class Configurator {
 //			v.addLinkedPoints(possibleConfigs.get(i).getASVPositions());
 		}
 //		v.repaint();
-		
 		return new ASVConfig(closest);
 	}
 	

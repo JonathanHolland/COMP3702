@@ -125,6 +125,8 @@ public class Interpolate {
 				System.out.println("    " + end.getConfig());
 			}
 			switcher++; // inc this to choose other option next time
+			v.addLinkedPoints(cConfig.getASVPositions());
+			v.repaint();
 		}
 		return pathPiece;
 	}
@@ -189,6 +191,7 @@ public class Interpolate {
 					double newMaxDist = cPos.get(i).distance(tPoint);
 					f = (newMaxDist > currentMaxDist) ? cPos.get(i) : f;
 				}
+				
 				List<Line2D> rawr1 = new ArrayList<Line2D>();
 				rawr1.add(new Line2D.Double(f, tPoint));
 				v.addLines(rawr1);
@@ -233,9 +236,9 @@ public class Interpolate {
 		}
 
 		
-		System.out.println("Configs");
-		System.out.println("c " + cConfig);
-		System.out.println(sConfig);
+//		System.out.println("Configs");
+//		System.out.println("c " + cConfig);
+//		System.out.println(sConfig);
 
 //		v.addLinkedPoints(cConfig.getASVPositions());
 		List<Point2D> tempP = new ArrayList<Point2D>();

@@ -17,7 +17,7 @@ public class Assignment1 {
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
-			problem.loadProblem("testcases/6ASV-6OBS.txt");
+			problem.loadProblem("testcases/4ASV.txt");
 		} catch (Exception x) {
 			System.out.println("The file failed to load. Make sure it was legit!");
 		}
@@ -38,10 +38,10 @@ public class Assignment1 {
 		Node start, goal;
 		int attempt = 1;
 		do {
-			System.out.println("Pathing Attempt #" + attempt);
+			System.out.println("Pathing Attempt #" + attempt + " w/ r=" + range);
 			
 			// Generate the Probabilistic Road Map 
-			prm = new PRMGraph(problem.getObstacles(), range, 6000);		
+			prm = new PRMGraph(problem.getObstacles(), range, 10000);		
 			
 			// Make and add the beginning and end points to the Graph
 			start = prm.giveInitialState(problem.getInitialState());
@@ -52,9 +52,10 @@ public class Assignment1 {
 	
 			// Find a path through the Graph
 			path = alg.findPath(start, goal);
-			
+
 			// Increment attempts
 			attempt++;
+			range += 0.001;
 		} while (path == null);
 		
 		// We've found a path, so show us
@@ -96,12 +97,12 @@ public class Assignment1 {
 		// Interpolation!11!1
 		System.out.println("Interpolate between each node");
 		Interpolate inter = new Interpolate(problem.getObstacles(), path);
-		Interpolate.v = visualHelper;
+		Interpolate.v = new VisualHelper();
 		try {
 			problem.setPath(inter.makeSolution(start, goal));
 		} catch (badInterpolationException e1) {
 			System.err.println("BAD ERROR AND QUIT");
-			System.exit(0);
+//			System.exit(0);
 		}
 		
 		try {
