@@ -113,7 +113,7 @@ public class PRMGraph {
 			double ran2 = rand.nextDouble();
 			Point2D.Double temp = new Point2D.Double((mapSize.x * ran1), (mapSize.y * ran2));
 			for(int k = 0; k < obstacles.size(); k++){
-				Rectangle2D tempRect = Tester.grow(obstacles.get(k).getRect(), 0.005);
+				Rectangle2D tempRect = Tester.grow(obstacles.get(k).getRect(), 0.1);
 				if(tempRect.contains(temp.x, temp.y)) badSpot = true;
 			}
 			if(badSpot){

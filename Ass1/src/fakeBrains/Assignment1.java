@@ -30,6 +30,7 @@ public class Assignment1 {
 		obstacles.add(new Obstacle(1.0, 1.0, 0.0001, 1.0));
 		
 		range = 0.05;
+		range = 0.03;
 		
 		// Declare vars for use inside the do-while loop.
 		PRMGraph prm; 
@@ -38,10 +39,10 @@ public class Assignment1 {
 		Node start, goal;
 		int attempt = 1;
 		do {
-			System.out.println("Pathing Attempt #" + attempt);
+			System.out.println("Pathing Attempt #" + attempt + " w/ r=" + range);
 			
 			// Generate the Probabilistic Road Map 
-			prm = new PRMGraph(problem.getObstacles(), range, 2000);		
+			prm = new PRMGraph(obstacles, range, 4000);		
 			
 			// Make and add the beginning and end points to the Graph
 			start = prm.giveInitialState(problem.getInitialState());
