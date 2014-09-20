@@ -17,7 +17,7 @@ public class Assignment1 {
 	public static void main(String[] args) throws NoSuchNodeException {
 		ProblemSpec problem = new ProblemSpec();
 		try {
-			problem.loadProblem("testcases/E/11ASV-c1.txt");
+			problem.loadProblem("testcases/C/4ASV-c1.txt");
 		} catch (Exception x) {
 			System.out.println("The file failed to load. Make sure it was legit!");
 		}
@@ -29,7 +29,6 @@ public class Assignment1 {
 		obstacles.add(new Obstacle(0.0, 1.0, 1.0, 0.0001));
 		obstacles.add(new Obstacle(1.0, 1.0, 0.0001, 1.0));
 		
-		range = 0.05;
 		range = 0.03;
 		
 		// Declare vars for use inside the do-while loop.
@@ -89,7 +88,7 @@ public class Assignment1 {
 			for(int i = 0; i < path.size(); i++) {
 //				System.out.println(path.get(i).getConfig().getASVPositions());
 				if(path.get(i).getConfig().getASVPositions() != null) {
-					visualHelper.addLinkedPoints(path.get(i).getConfig().getASVPositions());
+//					visualHelper.addLinkedPoints(path.get(i).getConfig().getASVPositions());
 				}
 			}
 			visualHelper.repaint();
