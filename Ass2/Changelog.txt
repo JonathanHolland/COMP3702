@@ -1,0 +1,16 @@
+
+20/9/2014	V1.0	Initial Release
+
+22/9/2014	V1.1	RaceSimTools.java Bug Fixes + new functions
+- Bug fixed in sampleNextPlayer. Old probabilities were being used.
+- New function: nextPlayers and nextStates (transition probability functions)
+- Player, Distractor and Opponent now implement interface Actor (needed for nextStates function)
+- A few other bug fixes here and there
+
+22/9/2014	V1.2	Changes to match updated task sheet 
+- Added isObstacle property to Player
+- Added TO and TC actions
+- Added tour timing
+- Fixed a bug in RaceSimTools.stateToString
+- Fixed a line in StLucia test track
+
