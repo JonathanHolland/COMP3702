@@ -141,12 +141,21 @@ public class Tour {
 
 		@SuppressWarnings("unchecked")
 		ArrayList<Cycle> temp = (ArrayList<Cycle>) purchasedCycles.clone();
+		ArrayList<String> ids = new ArrayList<String>();
 		for (Player p : players) {
 
-			// Ensure starting positions are set correctly
+			// Ensure that no two players with the same id exists.
+			if (ids.contains(p.getId())) {
+				System.out.println("Error: Multiple players with same id.");
+				return false;
+			} else {
+				ids.add(p.getId());
+			}
+			
+			// Ensure starting positions is set correctly w.r.t. id
 			if (!p.getPosition().equals(
 					track.getStartingPositions().get(p.getId()))) {
-				System.out.println("Error: Invalid starting position.");
+				System.out.println("Error: Invalid starting position or id.");
 				return false;
 			}
 			

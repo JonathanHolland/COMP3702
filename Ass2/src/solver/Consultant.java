@@ -26,7 +26,7 @@ public class Consultant {
 	 * @param tour
 	 */
 	public void solveTour(Tour tour) {
-		// rawr
+		
 		// You should get information from the tour using the getters, and
 		// make your plan.
 
