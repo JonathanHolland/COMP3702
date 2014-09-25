@@ -9,7 +9,7 @@ public class Player  implements Actor {
 	private String id;
 	private Cycle cycle;
 	private GridCell position;
-	private double damageCost;
+	private double damageCost;	// Damage cost gained this turn
 	private boolean isObstacle;
 	
 	public Player(String id, Cycle cycle, GridCell position) {
@@ -41,6 +41,11 @@ public class Player  implements Actor {
 		return cycle;
 	}
 	
+	/**
+	 * Returns the damage cost received this turn. I.e. if a player received
+	 * damage several turns ago but not in this turn, 0 is returned.
+	 * @return
+	 */
 	public double getDamageCost() {
 		return damageCost;
 	}

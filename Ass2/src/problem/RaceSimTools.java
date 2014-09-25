@@ -119,11 +119,12 @@ public class RaceSimTools {
 		}
 		
 		// Generate next turn's player states
+		boolean adv1Plus = state.getPlayers().size() > 1;
 		List<Player> newPlayers = new ArrayList<Player>();
 		for (int i = 0; i < actions.size(); i++) {
 			Player player = state.getPlayers().get(i);
 			newPlayers.add(sampleNextPlayer(player, track,
-					state.getDistractors(), actions.get(i), random));
+					state.getDistractors(), actions.get(i), random, adv1Plus));
 		}
 	
 		// Generate next turn's opponent states
@@ -166,11 +167,15 @@ public class RaceSimTools {
 	 * @param distractors List of distractors
 	 * @param action
 	 * @param random A random number generator
+	 * @param adv1Plus If true, TO action is allowed. Should be true iff 
+	 * number of cycles in the race > 1.
 	 * @return new randomly selected player state
 	 */
 	public static Player sampleNextPlayer(Player player, Track track,
-			List<Distractor> distractors, Action action, Random random) {
-		Map<Player, Double> np = nextPlayers(player, action, track, distractors);
+			List<Distractor> distractors, Action action, Random random, 
+			boolean adv1Plus) {
+		Map<Player, Double> np = nextPlayers(player, action, track, distractors,
+				adv1Plus);
 		return chooseRandom(np, random);
 	}
 	
@@ -203,6 +208,7 @@ public class RaceSimTools {
 		int numPlayers = state.getPlayers().size();
 		int numOpponents = state.getOpponents().size();
 		int numDistractors = state.getDistractors().size();
+		boolean adv1Plus = numPlayers > 1;
 		
 		// Check number of actions matches number of player cycles
 		if (actions.size() != numPlayers) {
@@ -222,7 +228,7 @@ public class RaceSimTools {
 		for (int i = 0; i < actions.size(); i++) {
 			Player currentPlayer = state.getPlayers().get(i);
 			Map<Player, Double> np = nextPlayers(currentPlayer, actions.get(i),
-					track, state.getDistractors());
+					track, state.getDistractors(), adv1Plus);
 			ArrayList<Node<Actor>> newLeaves = new ArrayList<Node<Actor>>();
 			ArrayList<Double> newLeafProb = new ArrayList<Double>();
 			for (int j = 0; j < leaves.size(); j++) {
@@ -344,10 +350,12 @@ public class RaceSimTools {
 	 * @param action
 	 * @param track
 	 * @param distractors
+	 * @param adv1Plus If true, TO action is allowed. Should be true iff 
+	 * number of cycles in the race > 1.
 	 * @return Map<Player, Double> where the Double is the probability
 	 */
 	public static Map<Player, Double> nextPlayers(Player player, Action action,
-			Track track, List<Distractor> distractors) {
+			Track track, List<Distractor> distractors, boolean adv1Plus) {
 		
 		// Ensure action is valid for this player's cycle
 		Cycle.Speed speed = player.getCycle().getSpeed();
@@ -358,6 +366,8 @@ public class RaceSimTools {
 		} else if (action == Action.FF && speed == Cycle.Speed.SLOW) {
 			action = Action.FS;
 		} else if (player.isObstacle() && action != Action.TC) {
+			action = Action.ST;
+		} else if (action == Action.TO && !adv1Plus) {
 			action = Action.ST;
 		}
 				
