@@ -6,13 +6,14 @@ import problem.*;
 
 public class Scout {
 	
-	Map<Track, Integer> cyclesForTracks = new HashMap<Track, Integer>();
+	// I'll have to figure out what the integers mean.
+	Map<Track, Integer> cyclesForTracks; 
 	
 	/**
 	 * Something to initialise the class
 	 */
 	void Scout() {
-		
+		cyclesForTracks = new HashMap<Track, Integer>();
 	}
 	
 	/**
@@ -20,7 +21,7 @@ public class Scout {
 	 * what type of bike would be best for each one.
 	 * @param tracks
 	 */
-	void tracks(List<Track> tracks) {
+	void tracks(List<Track> tracks, List<Cycle> cycles) {
 		
 	}
 	
