@@ -1,8 +1,10 @@
 package solver;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import problem.Action;
@@ -31,6 +33,37 @@ public class Consultant {
 		// for example the Scout and Monte class
 		
 		Scout s = new Scout();
+		// Run tracks function inside Scout
+		s.tracks(tour.getAvailableTracks(), tour.getPurchasableCycles());
+		// Select the 3 highest net worths from s now
+		Map<Track, Cycle> first;
+		double firstValue = 0;
+		Map<Track, Cycle> second;
+		double secondValue = 0;
+		Map<Track, Cycle> third;
+		double thirdValue = 0;
+		
+		Iterator<Entry<Map<Track, Cycle>, Double>> iterator = s.cyclesForTracks.entrySet().iterator();
+		while(iterator.hasNext()) {
+			Entry<Map<Track, Cycle>, Double> entry = iterator.next();	
+			Double value = entry.getValue();
+			if(value>firstValue) {
+				firstValue =  value;
+				first = entry.getKey();
+			} else if(value>secondValue) {
+				secondValue = value;
+				second = entry.getKey();
+			} else if(value>thirdValue) {
+				thirdValue = value;
+				third = entry.getKey();
+			}
+		}
+		
+		System.out.println(firstValue);
+		System.out.println(secondValue);
+		System.out.println(thirdValue);
+		
+		
 		Monte m = new Monte();
 		
 		
