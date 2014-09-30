@@ -27,6 +27,14 @@ public class Consultant {
 	 */
 	public void solveTour(Tour tour) {
 		
+		// Set up variables and things we need here, 
+		// for example the Scout and Monte class
+		
+		Scout s = new Scout();
+		Monte m = new Monte();
+		
+		
+		
 		// You should get information from the tour using the getters, and
 		// make your plan.
 
@@ -69,14 +77,14 @@ public class Consultant {
 			// Decide on your next action here. tour.getLatestRaceState() 
 			// will probably be helpful.
 			
+			
 			// Example: Output current position of player
 			RaceState state = tour.getLatestRaceState();
 			System.out.println("Player position: " + 
-					state.getPlayers().get(0).getPosition());
+					state.getPlayers().get(0).getPosition());			
 			
-			// Example: Keep moving forward slowly
 			ArrayList<Action> actions = new ArrayList<Action>();
-			actions.add(Action.FS);
+			actions.add(m.getNextAction(tour.getLatestRaceState()));
 			tour.stepTurn(actions);
 			
 			
