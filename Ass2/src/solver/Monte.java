@@ -14,22 +14,28 @@ public class Monte {
 	
 	private Tour tour;
 	
+	MonteNode mNode;
+	
 	/**
 	 * Constructor
 	 */
 	public Monte() {
-
+		
+	}
+	
+	public void firstNode(Player player, Track track) {
+		mNode = new MonteNode(player, track);
 	}
 	
 	public Action getNextAction(RaceState state) {
 		startTimer();
 		int iters = 0;
 		while(!outOfTime(1000)) {
+			mNode.bestAction();
 			iters++;
 		}
-		
 		System.out.println("Completed iterations: " + iters);
-		return Action.FS; // Return best action
+		return mNode.select().action; // Return best action
 	}
 	
 	/**
