@@ -66,21 +66,21 @@ public class Scout {
 				}
 				
 				if(bike.isReliable()) {
-					reliableFactor = 10*distractorNo;
+					reliableFactor = 0;
 				} else {
-					reliableFactor = -10*distractorNo;
+					reliableFactor = distractorNo*75;
 				}
 				
 				if(bike.isWild()) {
-					wildFactor = 10*obscount;
+					wildFactor = 0;
 				} else {
-					wildFactor = -10*obscount;
+					wildFactor = obscount*50;
 				}
 				// Minus the price from the winnings to get overall net
 				// Then include a weighting for the size of the map, the speed of the bike, the reliability/
 				// wildness and the number of distractors/opponents
-				
-				Double net = winnings-price+speedFactor+reliableFactor+wildFactor-mapSizeFactor-enemiesFactor;
+				Double net = winnings-price-reliableFactor-wildFactor - enemiesFactor*1/speedFactor + 1000; 
+//				Double net = winnings-price+speedFactor+reliableFactor+wildFactor-mapSizeFactor-enemiesFactor;
 				trackCycle.put(tracke, bike);
 				cyclesForTracks.put(trackCycle, net);
 			}
