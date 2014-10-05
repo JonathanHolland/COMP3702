@@ -3,7 +3,10 @@ package problem;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A class for managing tours
@@ -25,6 +28,8 @@ public class Tour {
 	private double money;
 	/** List of cycles purchased */
 	private ArrayList<Cycle> purchasedCycles;
+	/** Tracks registered, and number of players registered for it */
+	private Map<Track, Integer> registeredTracks;
 	/** List of RaceSims. For runnning simulations and for recording history */
 	private List<RaceSim> raceSims;
 	/** History of tracks raced */
@@ -51,6 +56,7 @@ public class Tour {
 		maxRaces = 3;
 		money = setup.getStartupMoney();
 		purchasedCycles = new ArrayList<Cycle>();
+		registeredTracks = new HashMap<Track, Integer>();
 		status = Status.PREPARING;
 		raceSims = new ArrayList<RaceSim>();
 		trackHistory = new ArrayList<Track>();
@@ -71,7 +77,7 @@ public class Tour {
 				purchasable.add(c);
 			}
 		}
-		return purchasable;
+		return Collections.unmodifiableList(purchasable);
 	}
 	
 	/**
@@ -81,13 +87,13 @@ public class Tour {
 	 */
 	public boolean buyCycle(Cycle cycle) {
 		if (raceNo != 0 || status != Status.PREPARING) {
-			System.out.println("You can only buy cycles at the start of the tour");
+			System.out.println("Error: You can only buy cycles at the start of the tour");
 			return false;
 		} else if (cycle.getPrice() > money) {
-			System.out.println("Insufficient money to buy this cycle");
+			System.out.println("Error: Insufficient money to buy this cycle");
 			return false;
 		} else if (!getPurchasableCycles().contains(cycle)) {
-			System.out.println("Cycle is not available for purchase");
+			System.out.println("Error: Cycle is not available for purchase");
 			return false;
 		}
 		purchasedCycles.add(cycle);
@@ -97,8 +103,47 @@ public class Tour {
 		return true;
 	}
 	
+	/**
+	 * Register for a track. Can only be done before any race.
+	 * @param track The track to register for. 
+	 * @param numPlayers The number of players to register for
+	 * @return true iff success
+	 */
+	public boolean registerTrack(Track track, int numPlayers) {
+		if (raceNo != 0 || status != Status.PREPARING) {
+			System.out.println("Error: You can only register at the start of the tour");
+			return false;
+		} else if (!setup.getTracks().contains(track)) {
+			System.out.println("Error: Invalid track");
+			return false;
+		} else if (registeredTracks.size() >= maxRaces) {
+			System.out.println("Error: Already registered for max number of races");
+			return false;
+		} else if (registeredTracks.containsKey(track)) {
+			System.out.println("Error: Already registered this track.");
+			return false;
+		}
+		int maxPlayers = track.getStartingPositions().size();
+		if (numPlayers < 1 || numPlayers > maxPlayers) {
+			System.out.println("Error: Invalid number of players for registration");
+			return false;
+		}
+		double cost = track.getRegistrationFee() * numPlayers;
+		if (cost > money) {
+			System.out.println("Error: Insufficient money to register");
+			return false;
+		}
+		
+		registeredTracks.put(track, numPlayers);
+		money -= cost;
+		System.out.println("Successfully registered for " + numPlayers  +
+				" player(s) in track " + track.getFileNameNoPath() + 
+				". $" + money + " remaining.");
+		return true;
+	}
+	
 	public List<Cycle> getPurchasedCycles() {
-		return purchasedCycles;
+		return Collections.unmodifiableList(purchasedCycles);
 	}
 	
 	public double getCurrentMoney() {
@@ -106,24 +151,39 @@ public class Tour {
 	}
 	
 	/** 
-	 * Returns list of tracks that can be chosen. A track can only be chosen if
-	 * the current amount of money > the track's registration fee, and 
-	 * the track has not been raced on before
-	 * @return
+	 * Returns list of tracks that can be registered for.
+	 * @return List<Track>
 	 */
-	public List<Track> getAvailableTracks() {
-		List<Track> result = new ArrayList<Track>();
-		for (Track t : setup.getTracks()) {
-			if (t.getRegistrationFee() <= money && !trackHistory.contains(t)) {
-				result.add(t);
+	public List<Track> getTracks() {
+		return Collections.unmodifiableList(setup.getTracks());
+	}
+	
+	/**
+	 * Returns list of tracks that have been registered for but not raced on
+	 * @return List<Track>
+	 */
+	public List<Track> getUnracedTracks() {
+		List<Track> unraced = new ArrayList<Track>();
+		for (Track t : registeredTracks.keySet()) {
+			if (!trackHistory.contains(t)) {
+				unraced.add(t);
 			}
 		}
-		return result;
+		return unraced;
+	}
+	
+	/**
+	 * Returns registered tracks and number of players registered for each track
+	 * @return Map<Track, Integer>, where the integer is the number of players
+	 * registered for the track
+	 */
+	public Map<Track, Integer> getRegisteredTracks() {
+		return Collections.unmodifiableMap(registeredTracks);
 	}
 	
 	/**
 	 * Start a race
-	 * @param track The chosen track. Must be in getAvailableTracks()
+	 * @param track The chosen track. Must be registered
 	 * @param players The players, with the cycles and start positions set
 	 * @return true iff race was started successfully
 	 */
@@ -131,11 +191,17 @@ public class Tour {
 		if (status != Status.PREPARING) {
 			System.out.println("Error: Not in PREPARING state.");
 			return false;
-		} else if (!getAvailableTracks().contains(track)) {
-			System.out.println("Error: Track not available.");
+		} else if (!registeredTracks.containsKey(track)) {
+			System.out.println("Error: Track not registered.");
+			return false;
+		} else if (trackHistory.contains(track)) {
+			System.out.println("Error: This track has already been raced.");
 			return false;
 		} else if (players.isEmpty()) {
 			System.out.println("Error: Need at least one player");
+			return false;
+		} else if (players.size() > registeredTracks.get(track)) {
+			System.out.println("Error: Too many players to start");
 			return false;
 		}
 
@@ -180,15 +246,17 @@ public class Tour {
 			}
 		}
 		
+		// Create initial RaceState
 		RaceState startState = new RaceState(players, track.getOpponents(),
 				track.getDistractors());
+		
+		// Create a new RaceSim for this race
 		raceSims.add(new RaceSim(startState, track));
+		
 		raceNo++;
 		trackHistory.add(track);
 		status = Status.RACING;
-		money -= track.getRegistrationFee() * players.size();
-		System.out.println("Started race on track " + track.getFileNameNoPath()
-				+ ". Current money: $" + money);
+		System.out.println("Started race on track " + track.getFileNameNoPath());
 		
 		// Calculate time taken to prepare
 		prepareTimes.add(System.currentTimeMillis() - timeStamp);
@@ -221,7 +289,7 @@ public class Tour {
 		RaceSim currentSim = raceSims.get(raceSims.size() - 1);
 		currentSim.stepTurn(actions);
 		if (currentSim.isFinished()) {
-			if (raceNo == maxRaces) {
+			if (raceNo >= registeredTracks.size()) {
 				status = Status.FINISHED;
 			} else {
 				status = Status.PREPARING;
@@ -249,7 +317,7 @@ public class Tour {
 	/**
 	 * Return the latest race state. Returns null if no race state exists 
 	 * in history.
-	 * @return latest race state. 
+	 * @return latest RaceState. 
 	 */
 	public RaceState getLatestRaceState() {
 		if (raceSims.isEmpty()) {
