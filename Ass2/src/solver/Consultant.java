@@ -34,7 +34,7 @@ public class Consultant {
 		
 		Scout s = new Scout();
 		// Run tracks function inside Scout
-		s.tracks(tour.getAvailableTracks(), tour.getPurchasableCycles());
+		s.best(tour.getAvailableTracks(), tour.getPurchasableCycles());
 		// Select the 3 highest net worths from s now
 		Map<Track, Cycle> first = null;
 		double firstValue = 0;
