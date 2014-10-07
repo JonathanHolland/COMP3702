@@ -18,39 +18,25 @@ public class MonteNode {
 	static int nActions = 4; // may need to be bigger
 	
 	RaceState state;
-	RaceSim sim;
 	Track track;
-	List<Player> players = new ArrayList<Player>();
+	
 	Action action;
 	double nVisits, totValue;
 	MonteNode children[];
 	
-	public MonteNode(Player player, Track track) {
-		this.track = track;
-		players.add(player);
+	public MonteNode(Tour tour) {
+		state = tour.getLatestRaceState();
+		track = tour.getCurrentTrack();
+	}
+	
+	public MonteNode(Action action, RaceState state) {
+		this.action = action;
 		
-		this.state = new RaceState(players, track.getOpponents(), track.getDistractors());
-		this.sim = new RaceSim(state, track);
 	}
 
-	public MonteNode(Action action, RaceSim sim) {
-		this.action = action;
-		this.sim = new RaceSim(sim.getCurrentState(), sim.getTrack());
-		List<Action> A = new ArrayList<Action>();
-		A.add(action);
-		sim.stepTurn(A); // Progress the simulation to be 
-	}
-	
-	public MonteNode(Action action, Cycle cycle, Track track) {
-		this.action = action;
-		if(cycle.getSpeed() == Speed.FAST) {
-			nActions = 6;
-		} else if(cycle.getSpeed() == Speed.MEDIUM) {
-			nActions = 5;
-		}
-	}
-	
-	public void bestAction() {
+
+
+	public void exploitExpand() {
 		List<MonteNode> visited = new LinkedList<MonteNode>(); // make a list of visited things
         MonteNode cur = this;
         visited.add(this); // add us to the visited list
@@ -92,7 +78,7 @@ public class MonteNode {
     public void expand() {
         children = new MonteNode[nActions]; // make a new node for each possible action
         for (int i=0; i<nActions; i++) {
-            children[i] = new MonteNode(actions[i], sim);
+            children[i] = new MonteNode(actions[i], state);
         }
     }
     
@@ -101,21 +87,24 @@ public class MonteNode {
      * @param n
      * @return
      */
+    
+    // This function is broke at the moment because sim isn't a variable.
+    // But this is where you play the game into the future to see if this is a valid route.
     public double rollOut(MonteNode n) {
     	// Make a timeout period
-    	int count = sim.getTrack().getNumCols()+3;
-        
-    	// make the Actions list
-    	List<Action> A = new ArrayList<Action>();
-    	A.add(Action.FS);
-    	while(!sim.isFinished() || count-- > 0) {
-        	sim.stepTurn(A);
-        }
-    	
-    	if(sim.getCurrentStatus() == RaceState.Status.WON) {
-    		return sim.getTrack().getPrize() - sim.getTotalDamageCost();
-    	}
-        return -sim.getTotalDamageCost();
+//    	int count = sim.getTrack().getNumCols()+3;
+//        
+//    	// make the Actions list
+//    	List<Action> A = new ArrayList<Action>();
+//    	A.add(Action.FS);
+//    	while(!sim.isFinished() || count-- > 0) {
+//        	sim.stepTurn(A);
+//        }
+//    	
+//    	if(sim.getCurrentStatus() == RaceState.Status.WON) {
+//    		return sim.getTrack().getPrize() - sim.getTotalDamageCost();
+//    	}
+        return 1;
     }
     
     public boolean hasChildren() {

@@ -84,7 +84,7 @@ public class Consultant {
 			
 			// Example: Keep moving forward slowly
 			ArrayList<Action> actions = new ArrayList<Action>();
-			actions.add(Action.FS);
+			actions.add(Action.FM);
 			tour.stepTurn(actions);
 			
 			
