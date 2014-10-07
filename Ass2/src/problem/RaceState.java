@@ -50,6 +50,14 @@ public class RaceState {
 	public int getTurnNo() {
 		return turnNo;
 	}
+	
+	public double getTotalDamageCost() {
+		double sum = 0;
+		for (Player p : players) {
+			sum += p.getDamageCost();
+		}
+		return sum;
+	}
 
 	@Override
 	public int hashCode() {

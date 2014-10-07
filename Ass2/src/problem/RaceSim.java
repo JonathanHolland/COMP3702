@@ -28,6 +28,18 @@ public class RaceSim {
 		totalDamageCost = 0;
 	}
 	
+	public RaceSim(List<RaceState> stateHistory,
+			List<ArrayList<Action>> actionHistory, Track track) {
+		this.stateHistory = stateHistory;
+		this.actionHistory = actionHistory;
+		this.track = track;
+		random = new Random();
+		totalDamageCost = 0;
+		for (RaceState r : stateHistory) {
+			totalDamageCost += r.getTotalDamageCost();
+		}
+	}
+	
 	/**
 	 * Samples a new RaceState and adds it to the stateHistory
 	 * @param actions

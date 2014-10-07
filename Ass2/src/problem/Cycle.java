@@ -83,6 +83,24 @@ public class Cycle {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(name + ": " + speed.toString() + ", ");
+		if (reliable) {
+			sb.append("reliable, ");
+		} else {
+			sb.append("not reliable, ");
+		}
+		if (wild) {
+			sb.append("wild, ");
+		} else {
+			sb.append("not wild, ");
+		}
+		sb.append("$" + price);
+		return sb.toString();
+	}
 	
 	
 }

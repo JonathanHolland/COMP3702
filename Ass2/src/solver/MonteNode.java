@@ -50,7 +50,7 @@ public class MonteNode {
 		}
 	}
 	
-	public  Action bestAction() {
+	public void bestAction() {
 		List<MonteNode> visited = new LinkedList<MonteNode>(); // make a list of visited things
         MonteNode cur = this;
         visited.add(this); // add us to the visited list
@@ -68,7 +68,6 @@ public class MonteNode {
             // System.out.println(node);
             node.updateStats(value);
         }
-		return null;
 	}
 	
 	public MonteNode select() {
