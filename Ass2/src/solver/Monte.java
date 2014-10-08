@@ -23,15 +23,12 @@ public class Monte {
 		
 	}
 	
-	public void firstNode(Player player, Track track) {
-		mNode = new MonteNode(player, track);
-	}
-	
-	public Action getNextAction(RaceState state) {
+	public Action getNextAction(Tour tour) {
+		mNode = new MonteNode(tour);
 		startTimer();
 		int iters = 0;
 		while(!outOfTime(1000)) {
-			mNode.bestAction();
+			mNode.exploitExpand();
 			iters++;
 		}
 		System.out.println("Completed iterations: " + iters);

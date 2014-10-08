@@ -10,6 +10,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -74,6 +75,7 @@ public class Track {
 			line = input.readLine();
 			lineNo++;
 			s = new Scanner(line);
+			s.useLocale(Locale.ENGLISH);
 			numRows = s.nextInt();
 			numCols = s.nextInt();
 			numOpponents = s.nextInt();
@@ -124,6 +126,7 @@ public class Track {
 						lineNo++;
 						GridCell cell = new GridCell(row, col);
 						s = new Scanner(line);
+						s.useLocale(Locale.ENGLISH);
 						EnumMap<Action, Double> actionMap = 
 								new EnumMap<Action, Double>(Action.class);
 						actionMap.put(Action.FS, s.nextDouble());
@@ -147,6 +150,7 @@ public class Track {
 				line = input.readLine();
 				lineNo++;
 				s = new Scanner(line);
+				s.useLocale(Locale.ENGLISH);
 				double appearProb = s.nextDouble();
 				s.close();
 				distractors.add(new Distractor(id, appearProb, false,
