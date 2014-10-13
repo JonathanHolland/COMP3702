@@ -66,7 +66,7 @@ public class Track {
 		this.fileName = fileName;
 		File file = new File(fileName);
 		fileNameNoPath = file.getName();
-		System.out.println("Loading " + fileName);
+		System.out.print("Loading " + fileName + "...  ");
 		BufferedReader input = new BufferedReader(new FileReader(fileName));
 		String line = "";
 		int lineNo = 0;
@@ -87,7 +87,8 @@ public class Track {
 			map = new ArrayList<ArrayList<CellType>>();
 			playerStarts = new HashMap<String, GridCell>();
 			Map<String, GridCell> opponentStarts = new HashMap<String, GridCell>();
-			Map<String, GridCell> distractorStarts = new HashMap<String, GridCell>();
+			Map<String, ArrayList<GridCell>> distractorStarts = 
+					new HashMap<String, ArrayList<GridCell>>();
 			for (int row = 0; row < numRows; row++) {
 				line = input.readLine();
 				lineNo++;
@@ -108,7 +109,11 @@ public class Track {
 					} else if (c >= 'A' && c <= 'J') {
 						opponentStarts.put(Character.toString(c), cell);
 					} else if (Character.isLowerCase(c)) {
-						distractorStarts.put(Character.toString(c), cell);
+						String cs = Character.toString(c);
+						if (!distractorStarts.containsKey(cs)) {
+							distractorStarts.put(cs, new ArrayList<GridCell>());
+						}
+						distractorStarts.get(cs).add(cell);
 					}
 				}
 				map.add(mapRow);
@@ -153,8 +158,9 @@ public class Track {
 				s.useLocale(Locale.ENGLISH);
 				double appearProb = s.nextDouble();
 				s.close();
-				distractors.add(new Distractor(id, appearProb, false,
-						distractorStarts.get(id)));				
+				for (GridCell g : distractorStarts.get(id)) {
+					distractors.add(new Distractor(id, appearProb, false, g));	
+				}			
 			}			
 		} catch (InputMismatchException e) {
 			throw new IOException(String.format(
@@ -219,6 +225,14 @@ public class Track {
 	 */
 	public String getFileNameNoPath() {
 		return fileNameNoPath;
+	}
+
+	/**
+	 * Returns the name of this track, (no path / extension)
+	 * @return name of track
+	 */
+	public String getName() {
+		return getFileNameNoPath().split("\\.(?=[^\\.]+$)")[0];
 	}
 
 	/**

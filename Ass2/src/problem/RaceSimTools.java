@@ -93,7 +93,7 @@ public class RaceSimTools {
 		}
 		for (GridCell eo : extraObstacles) {
 			if (eo.equals(g)) {
-				return false;
+				return true;
 			}
 		}
 		return track.getCellType(g) == Track.CellType.OBSTACLE;
@@ -174,9 +174,77 @@ public class RaceSimTools {
 	public static Player sampleNextPlayer(Player player, Track track,
 			List<Distractor> distractors, Action action, Random random, 
 			boolean adv1Plus) {
-		Map<Player, Double> np = nextPlayers(player, action, track, distractors,
-				adv1Plus);
-		return chooseRandom(np, random);
+		action = restrictToValidActions(player, action, adv1Plus);
+
+		boolean isWild = player.getCycle().isWild();
+		GridCell cell = player.getPosition();
+
+		boolean willBeObstacle = player.isObstacle();
+		GridCell nextCell = cell;
+		double damageCost = 0;
+		if (action == Action.TO) {
+			willBeObstacle = (random.nextDouble() <= TO_SUCCESS_PROBABILITY);
+		} else if (action == Action.TC) {
+			willBeObstacle = false;
+		} else if (action == Action.NE || action == Action.SE) {
+			double r = random.nextDouble();
+			if (r <= 0.7) { // Success
+				nextCell = cell.shifted(action == Action.NE ? Direction.NE : Direction.SE);
+			} else if (r <= 0.8) { // Fail and go N/S
+				nextCell = cell.shifted(action == Action.NE ? Direction.N : Direction.S);
+			} else if (r <= 0.9) { // Fail and go East
+				nextCell = cell.shifted(Direction.E);
+			} else {
+				nextCell = cell;
+			}
+			if (!withinBounds(nextCell, track)) {
+				nextCell = cell;
+			} else if (isObstacle(nextCell, track)) {
+				damageCost += getObstacleDamage(player.getCycle());
+				if (!isWild) {
+					nextCell = cell;
+				}
+			}
+		} else if (action == Action.ST) {
+			nextCell = cell;
+		} else {
+			// Handle FS, FM, FF
+			int maxMoves;
+			switch (action) {
+			case FS:
+				maxMoves = 1;
+				break;
+			case FM: 
+				maxMoves = 2;
+				break;
+			case FF:
+				maxMoves = 3;
+				break;
+			default:
+				maxMoves = 0;
+				break;
+			}
+			GridCell temp = cell;
+			for (int i = 0; i < maxMoves; i++) {
+				GridCell nextTemp = temp.shifted(Direction.E);
+				if (!withinBounds(nextTemp, track)) {
+					break;
+				}
+				if (isObstacle(nextTemp, track)) {
+					damageCost += getObstacleDamage(player.getCycle());
+					if (!isWild) {
+						break;
+					}
+				}
+				temp = nextTemp;
+			}
+			nextCell = temp;
+		}
+		if (isDistracted(nextCell, distractors)) {
+			damageCost += getDistractorDamage(player.getCycle());
+		}
+		
+		return new Player(player.getId(), player.getCycle(), nextCell, damageCost, willBeObstacle);
 	}
 	
 	/**
@@ -189,12 +257,22 @@ public class RaceSimTools {
 	 */
 	public static Opponent sampleNextOpponent(Opponent opponent, 
 			List <Player> players, Track track, Random random) {
-		Map<Opponent, Double> no = nextOpponents(opponent, players, track);
-		return chooseRandom(no, random);		
+		// Get extra obstacles due to player cycles being in obstacle mode
+		List<GridCell> extraObstacles = new ArrayList<GridCell>();
+		for (Player p : players) {
+			if (p.isObstacle()) {
+				extraObstacles.add(p.getPosition());
+			}
+		}
+		
+		GridCell cell = opponent.getPosition();
+		Action desiredAction = chooseRandom(opponent.getPolicy().get(cell), random);
+		GridCell nextCell = furthestMove(cell, desiredAction, track, extraObstacles, false);
+		return new Opponent(opponent.getId(), opponent.getPolicy(), nextCell);
 	}
 	
 	/**
-	 * Returns a probability distribution over the next possible states. 
+	 * Returns a probability distribution over the next possible states.
 	 * Essentially a transition probability function. WARNING: quite untested
 	 * @param state The current RaceState
 	 * @param actions List of actions (one for each player)
@@ -292,9 +370,9 @@ public class RaceSimTools {
 				for (int j = 0; j < numPlayers; j++) {
 					ancPlayers.add((Player) it.next());
 				}
-				Map<Opponent, Double> no = nextOpponents(o, ancPlayers, track);
-				for (Map.Entry<Opponent, Double> entry : no.entrySet()) {
-					Node<Actor> child = new Node<Actor>(entry.getKey());
+				Map<GridCell, Double> no = nextOpponentPositions(o, ancPlayers, track);
+				for (Map.Entry<GridCell, Double> entry : no.entrySet()) {
+					Node<Actor> child = new Node<Actor>(new Opponent(o.getId(), o.getPolicy(), entry.getKey()));
 					parent.addChild(child);
 					newLeaves.add(child);
 					newLeafProb.add(leafProb.get(i) * entry.getValue());
@@ -359,20 +437,11 @@ public class RaceSimTools {
 		return result;		
 	}
 	
+	
 	/**
-	 * Returns the probability distribution over possible player states for
-	 * the next turn
-	 * @param player
-	 * @param action
-	 * @param track
-	 * @param distractors
-	 * @param adv1Plus If true, TO action is allowed. Should be true iff 
-	 * number of cycles in the race > 1.
-	 * @return Map<Player, Double> where the Double is the probability
+	 * Restricts the action to make sure it is a valid action for the current player/track.
 	 */
-	public static Map<Player, Double> nextPlayers(Player player, Action action,
-			Track track, List<Distractor> distractors, boolean adv1Plus) {
-		
+	public static Action restrictToValidActions(Player player, Action action, boolean adv1Plus) {
 		// Ensure action is valid for this player's cycle
 		Cycle.Speed speed = player.getCycle().getSpeed();
 		if (action == Action.FM && speed == Cycle.Speed.SLOW) {
@@ -386,6 +455,25 @@ public class RaceSimTools {
 		} else if (action == Action.TO && !adv1Plus) {
 			action = Action.ST;
 		}
+		return action;
+	}
+	
+	/**
+	 * Returns the probability distribution over possible player states for
+	 * the next turn
+	 * @param player
+	 * @param action
+	 * @param track
+	 * @param distractors
+	 * @param adv1Plus If true, TO action is allowed. Should be true iff 
+	 * number of cycles in the race > 1.
+	 * @return Map<Player, Double> where the Double is the probability
+	 */
+	public static Map<Player, Double> nextPlayers(Player player, Action action,
+			Track track, List<Distractor> distractors, boolean adv1Plus) {
+		// Restrict the speed
+		action = restrictToValidActions(player, action, adv1Plus);
+
 				
 		boolean isWild = player.getCycle().isWild();
 		Map<Player, Double> result = new HashMap<Player, Double>();
@@ -518,7 +606,7 @@ public class RaceSimTools {
 	}
 	
 	/**
-	 * Returns the probability distribution over possible opponent states for 
+	 * Returns the probability distribution over possible opponent cells for
 	 * the next turn
 	 * @param opponent
 	 * @param players List of players, to check if any are in obstacle mode
@@ -526,7 +614,7 @@ public class RaceSimTools {
 	 * @param distractors
 	 * @return Map<Opponent, Double> where the Double is the probability
 	 */
-	public static Map<Opponent, Double> nextOpponents(Opponent opponent,
+	public static Map<GridCell, Double> nextOpponentPositions(Opponent opponent,
 			List<Player> players, Track track) {
 
 		// Get extra obstacles due to player cycles being in obstacle mode
@@ -537,7 +625,7 @@ public class RaceSimTools {
 			}
 		}
 		
-		Map<Opponent, Double> result = new HashMap<Opponent, Double>();		
+		Map<GridCell, Double> cellDistribution = new HashMap<GridCell, Double>();
 		RandomPolicy policy = opponent.getPolicy();
 		GridCell currentPos = opponent.getPosition();
 		
@@ -548,17 +636,17 @@ public class RaceSimTools {
 			GridCell g = furthestMove(currentPos, action, track, extraObstacles,
 					false);
 			Opponent o = new Opponent(opponent.getId(), opponent.getPolicy(), g);
-			if (result.containsKey(o)) {
-				result.put(o, result.get(o) + entry.getValue());
+			if (cellDistribution.containsKey(g)) {
+				cellDistribution.put(g, cellDistribution.get(g) + entry.getValue());
 			} else {
-				result.put(o, entry.getValue());
+				cellDistribution.put(g, entry.getValue());
 			}
 		}
 		
-		if (result.isEmpty()) {
+		if (cellDistribution.isEmpty()) {
 			System.out.println("ERROR: No opponent states for the next turn");
 		}
-		return result;
+		return cellDistribution;
 	}
 	
 	/**
@@ -701,33 +789,24 @@ public class RaceSimTools {
 				new HashMap<GridCell, ArrayList<String>>();
 		for (Player a : state.getPlayers()) {
 			if (!things.containsKey(a.getPosition())) {
-				ArrayList<String> b = new ArrayList<String>();
-				b.add(a.getId());
-				things.put(a.getPosition(), b);
-			} else {
-				things.get(a.getPosition()).add(a.getId());
+				things.put(a.getPosition(), new ArrayList<String>());
 			}
+			things.get(a.getPosition()).add(a.getId());
 		}
 		for (Opponent a : state.getOpponents()) {
 			if (!things.containsKey(a.getPosition())) {
-				ArrayList<String> b = new ArrayList<String>();
-				b.add(a.getId());
-				things.put(a.getPosition(), b);
-			} else {
-				things.get(a.getPosition()).add(a.getId());
+				things.put(a.getPosition(), new ArrayList<String>());
 			}
+			things.get(a.getPosition()).add(a.getId());
 		}
 		for (Distractor a : state.getDistractors()) {
 			if (!a.hasAppeared()) {
 				continue;
 			}
 			if (!things.containsKey(a.getPosition())) {
-				ArrayList<String> b = new ArrayList<String>();
-				b.add(a.getId());
-				things.put(a.getPosition(), b);
-			} else {
-				things.get(a.getPosition()).add(a.getId());
+				things.put(a.getPosition(), new ArrayList<String>());
 			}
+			things.get(a.getPosition()).add(a.getId());
 		}
 		for (int row = 0; row < track.getNumRows(); row++) {
 			for (int col = 0; col < track.getNumCols(); col++) {

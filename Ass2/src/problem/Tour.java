@@ -15,6 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.Scanner;
 
 /**
@@ -33,6 +34,7 @@ public class Tour {
 	private int raceNo;
 	/** Maximum number of races in the tour */
 	private int maxRaces;
+	
 	/** The current amount of money */
 	private double money;
 	/** List of cycles purchased */
@@ -49,6 +51,8 @@ public class Tour {
 	private List<Long> raceTimes;
 	private Long timeStamp;
 	
+	private Random random;
+
 	/** 
 	 * The current status. Status is PREPARING before each race, RACING during
 	 * the race, and FINISHED after the final race.
@@ -72,7 +76,31 @@ public class Tour {
 		prepareTimes = new ArrayList<Long>();
 		raceTimes = new ArrayList<Long>();
 		timeStamp = System.currentTimeMillis();
-		System.out.println("Tour created. Starting money: $" + money);
+		System.out.printf("\nTour created. Starting money: $%.2f\n", money);
+		random = new Random();
+	}
+	
+	/**
+	 * Finish the preparation phase and complete the Tour without entering
+	 * any races at all
+	 */
+	public void skipTour() {
+		if (status != Status.PREPARING) {
+			System.out.println("ERROR: You can't skip the tour after already starting a race!");
+			return;
+		}
+		System.out.println("Skipping the Tour entirely!");
+		status = Status.FINISHED;
+		finishTour();
+	}
+	
+	/**
+	 * Wraps up the Tour upon completion.
+	 */
+	private void finishTour() {
+		System.out.println();
+		System.out.println("Tour completed!");
+		System.out.printf("Profit: $%.2f\n", money - setup.getStartupMoney());
 	}
 	
 	/**
@@ -107,8 +135,7 @@ public class Tour {
 		}
 		purchasedCycles.add(cycle);
 		money -= cycle.getPrice();
-		System.out.println("Successfully purchased " + cycle.getName() + 
-				". $" + money + " remaining");
+		System.out.printf("Successfully purchased %s.  $%.2f remaining\n", cycle.getName(), money); 
 		return true;
 	}
 	
@@ -145,9 +172,8 @@ public class Tour {
 		
 		registeredTracks.put(track, numPlayers);
 		money -= cost;
-		System.out.println("Successfully registered for " + numPlayers  +
-				" player(s) in track " + track.getFileNameNoPath() + 
-				". $" + money + " remaining.");
+		System.out.printf("Successfully registered for %d player(s) in track %s.  $%.2f remaining.\n",
+				numPlayers, track.getFileNameNoPath(), money); 
 		return true;
 	}
 	
@@ -260,7 +286,7 @@ public class Tour {
 				track.getDistractors());
 		
 		// Create a new RaceSim for this race
-		raceSims.add(new RaceSim(startState, track));
+		raceSims.add(new RaceSim(startState, track, random));
 		
 		raceNo++;
 		trackHistory.add(track);
@@ -307,19 +333,19 @@ public class Tour {
 			if (currentSim.getCurrentStatus() == RaceState.Status.WON) {
 				money += currentSim.getTrack().getPrize();
 				System.out.println("Race finished. You won!");
-				System.out.println("Damage costs: $" + currentSim.getTotalDamageCost()
-						+ " Prize money: " + currentSim.getTrack().getPrize() 
-						+ " Current money: " + money);
+				System.out.printf("Damage costs: $%.2f  Prize money: $%.2f  Current money: $%.2f\n",
+						currentSim.getTotalDamageCost(), currentSim.getTrack().getPrize(), money);
 			} else {
 				System.out.println("Race finished. You lost.");
-				System.out.println(
-						"Damage costs: $" + currentSim.getTotalDamageCost()
-						+ " Current money: $" + money);
+				System.out.printf("Damage costs: $%.2f  Current money: $%.2f\n", currentSim.getTotalDamageCost(), money);
 			}
 			
 			// Calculate time taken for race
 			raceTimes.add(System.currentTimeMillis() - timeStamp);
 			timeStamp = System.currentTimeMillis();			
+		}
+		if (isFinished()) {
+			finishTour();
 		}
 	}
 	
@@ -411,7 +437,7 @@ public class Tour {
 	 * @return Track
 	 */
 	public Track getTrack(int raceIndex) {
-		if (raceIndex < 0 || raceIndex > raceSims.size()) {
+		if (raceIndex < 0 || raceIndex >= raceSims.size()) {
 			System.out.println("Error: cannot get track; race does not exist");
 			return null;
 		}
@@ -703,7 +729,8 @@ public class Tour {
 								playerPos.put(String.valueOf(c), cell);										
 							}
 							for (Distractor d : track.getDistractors()) {
-								if (c == d.getId().charAt(0)) {
+								if (c == d.getId().charAt(0) && 
+										cell.equals(d.getPosition())) {
 									distractors.add(d.getAppeared(true));
 								}
 							}
@@ -712,7 +739,8 @@ public class Tour {
 								for (Distractor d : track.getDistractors()) {
 									boolean alreadyAdded = false;
 									for (Distractor d2 : distractors) {
-										if (d2.getId().equals(d.getId())) {
+										if (d2.getId().equals(d.getId()) &&
+												d2.getPosition().equals(d.getPosition())) {
 											alreadyAdded = true;
 											break;
 										}
@@ -760,7 +788,7 @@ public class Tour {
 				}
 				
 				// Add the race
-				raceSims.add(new RaceSim(stateHistory, actionHistory, track));
+				raceSims.add(new RaceSim(stateHistory, actionHistory, track, random));
 				
 				// Next line is unnecessary
 				line = input.readLine();

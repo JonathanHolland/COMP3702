@@ -1,6 +1,5 @@
 package visualiser;
 
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -18,6 +17,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -26,6 +26,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JApplet;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -39,11 +40,17 @@ import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JToggleButton;
+import javax.swing.ListSelectionModel;
 import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import problem.Action;
 import problem.Player;
@@ -51,6 +58,7 @@ import problem.RaceSim;
 import problem.RaceState;
 import problem.Setup;
 import problem.Tour;
+import problem.Track;
 import solver.Consultant;
 
 public class Visualiser {
@@ -64,13 +72,16 @@ public class Visualiser {
 	List<ArrayList<Action>> actionHistory;
 	private VisualisationPanel vp;
 
+	/** A check box to control whether the game automatically scrolls. */
+	private JCheckBox autoscrollCheckBox;
+
 	private JPanel infoPanel;
 	private JTable scoreTable;
 	private JTextArea infoTextArea;
 
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
-	private JMenuItem loadSetupItem,loadTourItem, writeOutputItem, solveItem,
+	private JMenuItem loadSetupItem, loadTourItem, writeOutputItem, solveItem,
 			exitItem;
 	private JMenu gameMenu;
 	private JMenuItem playPauseItem, resetItem, backItem, forwardItem,
@@ -90,7 +101,10 @@ public class Visualiser {
 	}
 
 	private JButton playPauseButton, resetButton, backButton, forwardButton,
-			stepButton;
+			stepButton, prevRaceButton, nextRaceButton;
+	private ImageIcon rewindIcon = createImageIcon("bb.gif", "Rewind");
+	private ImageIcon fastForwardIcon = createImageIcon("ff.gif",
+			"Fast Forward");
 	private ImageIcon playIcon = createImageIcon("play.gif", "Play");
 	private ImageIcon pauseIcon = createImageIcon("pause.gif", "Pause");
 	private ImageIcon resetIcon = createImageIcon("reset.gif", "Reset");
@@ -102,10 +116,10 @@ public class Visualiser {
 	private boolean playing;
 	private boolean wasPlaying;
 
-	private static final int FRAME_PERIOD_MIN = 100;
+	private static final int FRAME_PERIOD_MIN = 50;
 	private static final int FRAME_PERIOD_MAX = 2000;
 	private static final int FRAME_PERIOD_INIT = 1000;
-	
+
 	private Timer animationTimer;
 
 	private File defaultPath;
@@ -122,17 +136,17 @@ public class Visualiser {
 			} else if (cmd.equals("Write output")) {
 				writeOutput();
 			} else if (cmd.equals("Play")) {
-				//vp.playPauseAnimation();
+				// vp.playPauseAnimation();
 			} else if (cmd.equals("Pause")) {
-				//vp.playPauseAnimation();
+				// vp.playPauseAnimation();
 			} else if (cmd.equals("Reset")) {
-				//vp.resetGame();
+				// vp.resetGame();
 			} else if (cmd.equals("Back one step")) {
 				setFrameNumber(frameNumber - 1);
 			} else if (cmd.equals("Forward one step")) {
 				setFrameNumber(frameNumber + 1);
 			} else if (cmd.equals("Simulate one step")) {
-				//vp.stepRace();
+				// vp.stepRace();
 			} else if (cmd.equals("Next race")) {
 				setRaceNumber(raceNumber + 1);
 			} else if (cmd.equals("Previous race")) {
@@ -165,7 +179,7 @@ public class Visualiser {
 	}
 
 	private AbstractTableModel tableDataModel = new AbstractTableModel() {
-		
+
 		/** Required UID */
 		private static final long serialVersionUID = 2401048818869542809L;
 
@@ -205,15 +219,15 @@ public class Visualiser {
 					if (frameNumber - 1 < 0) {
 						return "-";
 					} else {
-						return actionHistory.get(frameNumber - 1).get(
-								playerIndex).toString();
+						return actionHistory.get(frameNumber - 1)
+								.get(playerIndex).toString();
 					}
 				} else if (row == 2) {
 					if (frameNumber >= actionHistory.size()) {
 						return "-";
 					} else {
-						return actionHistory.get(frameNumber).get(
-								playerIndex).toString();
+						return actionHistory.get(frameNumber).get(playerIndex)
+								.toString();
 					}
 				} else if (row == 3) {
 					return player.getCycle().toString();
@@ -279,10 +293,31 @@ public class Visualiser {
 		}
 	};
 
+	private ActionListener autoscrollListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			vp.setAutoscroll(autoscrollCheckBox.isSelected());
+		}
+	};
+
 	private ActionListener playPauseListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			playPauseAnimation();
+		}
+	};
+
+	private ActionListener prevRaceListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			setRaceNumber(raceNumber - 1);
+		}
+	};
+
+	private ActionListener nextRaceListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			setRaceNumber(raceNumber + 1);
 		}
 	};
 
@@ -303,7 +338,7 @@ public class Visualiser {
 	private ActionListener stepListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			//vp.stepRace();
+			// vp.stepRace();
 		}
 	};
 
@@ -334,12 +369,20 @@ public class Visualiser {
 		} catch (IOException e) {
 		}
 	}
-	
-	private void createComponents() {
 
+	private void createComponents() {
 		vp = new VisualisationPanel();
 		JPanel wp = new JPanel(new BorderLayout());
-		wp.add(vp, BorderLayout.CENTER);
+
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setViewportView(vp);
+		vp.setScrollPane(scrollPane);
+		autoscrollCheckBox = new JCheckBox("Autoscroll");
+		autoscrollCheckBox.setSelected(false);
+		autoscrollCheckBox.addActionListener(autoscrollListener);
+
+		wp.add(scrollPane, BorderLayout.CENTER);
+		wp.add(autoscrollCheckBox, BorderLayout.SOUTH);
 		container.setLayout(new BorderLayout());
 		wp.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createEmptyBorder(5, 10, 10, 10),
@@ -350,13 +393,14 @@ public class Visualiser {
 		infoPanel.setLayout(new BorderLayout());
 		infoTextArea = new JTextArea();
 		infoTextArea.setEditable(false);
+		infoTextArea.setPreferredSize(new Dimension(250, 90));
 		updateInfoText();
-		//JScrollPane textScrollPane = new JScrollPane(infoTextArea);
-		//JPanel p = new JPanel();
-		//p.add(infoTextArea);
+		// JScrollPane textScrollPane = new JScrollPane(infoTextArea);
+		// JPanel p = new JPanel();
+		// p.add(infoTextArea);
 		infoPanel.add(infoTextArea, BorderLayout.WEST);
 		scoreTable = new JTable(tableDataModel);
-		//JScrollPane tableScrollPane = new JScrollPane(scoreTable);
+		// JScrollPane tableScrollPane = new JScrollPane(scoreTable);
 		infoPanel.add(scoreTable, BorderLayout.CENTER);
 		infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
 
@@ -388,16 +432,16 @@ public class Visualiser {
 		loadSetupItem.setMnemonic(KeyEvent.VK_S);
 		loadSetupItem.addActionListener(menuListener);
 		fileMenu.add(loadSetupItem);
-		
+
 		loadTourItem = new JMenuItem("Load tour result");
 		loadTourItem.setMnemonic(KeyEvent.VK_T);
 		loadTourItem.addActionListener(menuListener);
 		fileMenu.add(loadTourItem);
-	
+
 		solveItem = new JMenuItem("Solve new tour result");
 		solveItem.setMnemonic(KeyEvent.VK_N);
 		solveItem.addActionListener(menuListener);
-		fileMenu.add(solveItem);		
+		fileMenu.add(solveItem);
 
 		writeOutputItem = new JMenuItem("Write output");
 		writeOutputItem.setMnemonic(KeyEvent.VK_W);
@@ -445,21 +489,21 @@ public class Visualiser {
 		forwardItem.addActionListener(menuListener);
 		forwardItem.setEnabled(false);
 		gameMenu.add(forwardItem);
-		
+
 		nextRaceItem = new JMenuItem("Next race");
 		nextRaceItem.addActionListener(menuListener);
 		nextRaceItem.setEnabled(false);
 		gameMenu.add(nextRaceItem);
-		
+
 		prevRaceItem = new JMenuItem("Previous race");
 		prevRaceItem.addActionListener(menuListener);
 		prevRaceItem.setEnabled(false);
 		gameMenu.add(prevRaceItem);
-		
+
 		showLinesItem = new JMenuItem("Show opponent policy lines");
 		showLinesItem.addActionListener(menuListener);
 		gameMenu.add(showLinesItem);
-		
+
 		hideLinesItem = new JMenuItem("Hide opponent policy lines");
 		hideLinesItem.addActionListener(menuListener);
 		gameMenu.add(hideLinesItem);
@@ -514,6 +558,10 @@ public class Visualiser {
 		playPauseButton.addActionListener(playPauseListener);
 		resetButton = new JButton(resetIcon);
 		resetButton.addActionListener(resetListener);
+		nextRaceButton = new JButton(fastForwardIcon);
+		nextRaceButton.addActionListener(nextRaceListener);
+		prevRaceButton = new JButton(rewindIcon);
+		prevRaceButton.addActionListener(prevRaceListener);
 
 		gameControls.add(new JSeparator(JSeparator.HORIZONTAL));
 		gameControls.add(Box.createRigidArea(new Dimension(0, 2)));
@@ -521,6 +569,7 @@ public class Visualiser {
 		gameControls.add(Box.createRigidArea(new Dimension(0, 2)));
 		gameControls.add(manualSlider);
 		gameControls.add(Box.createRigidArea(new Dimension(0, 5)));
+
 		JPanel p2 = new JPanel();
 		p2.setLayout(new BoxLayout(p2, BoxLayout.LINE_AXIS));
 		p2.add(backButton);
@@ -532,8 +581,24 @@ public class Visualiser {
 		p2.add(playPauseButton);
 		p2.add(Box.createRigidArea(new Dimension(5, 0)));
 		p2.add(resetButton);
-		p2.add(framePeriodPanel);
-		gameControls.add(p2);
+
+		JPanel p3 = new JPanel();
+		p3.setLayout(new BoxLayout(p3, BoxLayout.LINE_AXIS));
+		p3.add(prevRaceButton);
+		p3.add(Box.createRigidArea(new Dimension(5, 0)));
+		p3.add(nextRaceButton);
+
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.PAGE_AXIS));
+		buttonPanel.add(p2);
+		buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+		buttonPanel.add(p3);
+
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.setLayout(new BorderLayout());
+		bottomPanel.add(buttonPanel, BorderLayout.WEST);
+		bottomPanel.add(framePeriodPanel, BorderLayout.CENTER);
+		gameControls.add(bottomPanel);
 		gameControls.setBorder(BorderFactory.createEmptyBorder(0, 10, 5, 10));
 		container.add(gameControls, BorderLayout.SOUTH);
 	}
@@ -573,7 +638,7 @@ public class Visualiser {
 		}
 		writeOutput(f);
 	}
-	
+
 	private void loadSetup() {
 		JOptionPane.showMessageDialog(container, "Select cycle file",
 				"Load setup", JOptionPane.INFORMATION_MESSAGE);
@@ -616,7 +681,7 @@ public class Visualiser {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void solveTour() {
 		if (setup == null) {
 			JOptionPane.showMessageDialog(container, "Load setup first",
@@ -649,10 +714,10 @@ public class Visualiser {
 		gameControls.setVisible(hasTour);
 		gameMenu.setEnabled(hasTour);
 		writeOutputItem.setEnabled(hasTour);
-		
+
 		vp.repaint();
 	}
-	
+
 	public void setRaceNumber(int raceNumber) {
 		if (raceNumber < 0 || raceNumber >= tour.getNumRaces()) {
 			return;
@@ -666,8 +731,8 @@ public class Visualiser {
 	}
 
 	public void setFrameNumber(int frameNumber) {
-		if (frameNumber < 0 || stateHistory == null ||
-				frameNumber >= stateHistory.size()) {
+		if (frameNumber < 0 || stateHistory == null
+				|| frameNumber >= stateHistory.size()) {
 			return;
 		}
 		this.frameNumber = frameNumber;
@@ -696,26 +761,28 @@ public class Visualiser {
 
 	public void updateControls() {
 		if (!hasTour) {
-			
+
 			return;
 		}
 		boolean canBack = frameNumber > 0;
 		backButton.setEnabled(canBack);
 		backItem.setEnabled(canBack);
 
-		boolean canForward = frameNumber < stateHistory.size() - 1;
+		boolean canForward = stateHistory != null && frameNumber < stateHistory.size() - 1;
 		forwardButton.setEnabled(canForward);
 		forwardItem.setEnabled(canForward);
 
 		boolean canStep = canForward;
 		stepButton.setEnabled(canStep);
 		stepItem.setEnabled(canStep);
-		
+
 		boolean canNextRace = raceNumber < tour.getNumRaces() - 1;
 		nextRaceItem.setEnabled(canNextRace);
-		
+		nextRaceButton.setEnabled(canNextRace);
+
 		boolean canPrevRace = raceNumber > 0;
 		prevRaceItem.setEnabled(canPrevRace);
+		prevRaceButton.setEnabled(canPrevRace);
 	}
 
 	public void updateInfoText() {
@@ -724,29 +791,41 @@ public class Visualiser {
 		if (setup == null) {
 			sb.append("Setup: not loaded" + ls + ls);
 		} else {
-			sb.append("Setup: Cycle file: " + setup.getCycleFileNoPath());
-			sb.append(" Meta-track file: " + setup.getMetaTrackFileNoPath() + ls);
+			sb.append("Setup: " + setup.getCycleFileNoPath());
+			sb.append(" " + setup.getMetaTrackFileNoPath() + ls);
 		}
-		
+
 		if (!hasTour) {
 			sb.append("Tour: not loaded" + ls);
 		} else {
 			sb.append("Tour: loaded" + ls);
 			sb.append("Startup money: $" + setup.getStartupMoney() + ls);
 			sb.append("Final money: $" + tour.getCurrentMoney() + ls);
-			/*sb.append("Total damage this race: $" + tour.getRaceDamageCost(
-					raceNumber) + ls);
-			sb.append("Total tour damage: $" + tour.getTotalDamageCost() + ls);
-			sb.append("Money spent on cycles: $" + tour.getTotalCycleCost() + ls);
-			sb.append("Total spent on registration: $" + 
-					tour.getTotalRegistrationCost() + ls);*/
+			sb.append("Net profit: $" + (tour.getCurrentMoney() - setup.getStartupMoney()) + ls);
+			if (tour.getNumRaces() > 0) {
+				Track track = tour.getTrack(raceNumber);
+				sb.append("Current track: "
+						+ track.getFileNameNoPath().split("\\.")[0]);
+			}
+			/*
+			 * sb.append("Total damage this race: $" + tour.getRaceDamageCost(
+			 * raceNumber) + ls); sb.append("Total tour damage: $" +
+			 * tour.getTotalDamageCost() + ls);
+			 * sb.append("Money spent on cycles: $" + tour.getTotalCycleCost() +
+			 * ls); sb.append("Total spent on registration: $" +
+			 * tour.getTotalRegistrationCost() + ls);
+			 */
 		}
 		infoTextArea.setText(sb.toString());
 	}
-	
 
 	public void updateTable() {
 		tableDataModel.fireTableDataChanged();
+		if (tableDataModel.getColumnCount() > 0) {
+			scoreTable.createDefaultColumnsFromModel();
+			scoreTable.getColumnModel().getColumn(0).setMaxWidth(250);
+			scoreTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+		}
 	}
 
 	public void updateMaximum() {
@@ -792,7 +871,7 @@ public class Visualiser {
 		updateSliderSpacing(manualSlider);
 		updateSliderSpacing(framePeriodSlider);
 	}
-	
+
 	public void playPauseAnimation() {
 		if (!hasTour) {
 			return;
@@ -809,11 +888,11 @@ public class Visualiser {
 	static String defaultCycleFile = "testcases/example/cycle.txt";
 	static String defaultMetaTrackFile = "testcases/example/meta-track.txt";
 	static String defaultOutputFile = "result.txt";
-	
+
 	public static void main(String[] args) {
 		JFrame frame = new JFrame("Assignment 2 visualiser");
 		Visualiser vis = new Visualiser(frame);
-		
+
 		// Load input files
 		String cycleFile = defaultCycleFile;
 		String metaTrackFile = defaultMetaTrackFile;
@@ -828,7 +907,7 @@ public class Visualiser {
 			outputFile = args[2].trim();
 		}
 		Setup setup = new Setup(cycleFile, metaTrackFile);
-		
+
 		// Create and solve tour
 		Consultant consultant = new Consultant();
 		Tour tour = new Tour(setup);
@@ -840,18 +919,16 @@ public class Visualiser {
 		}
 		vis.setSetup(setup);
 		vis.setTour(tour);
-		
-		/*
-		// Print times
-		for (int i = 0; i < tour.getNumRaces(); i++) {
-			double ptSeconds = tour.getPrepareTime(i)/1000.0;
-			double stepTime = (double) tour.getRaceTime(i)/tour.getTurnNo(i);
-			System.out.println("Race " + i + " prepare time: " + ptSeconds +
-					" s, average time per step: " + stepTime + " ms.");
-		}
-		*/
 
-		frame.setSize(800, 600);
+		/*
+		 * // Print times for (int i = 0; i < tour.getNumRaces(); i++) { double
+		 * ptSeconds = tour.getPrepareTime(i)/1000.0; double stepTime = (double)
+		 * tour.getRaceTime(i)/tour.getTurnNo(i); System.out.println("Race " + i
+		 * + " prepare time: " + ptSeconds + " s, average time per step: " +
+		 * stepTime + " ms."); }
+		 */
+
+		frame.setBounds(100, 100, 800, 600);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				System.exit(0);

@@ -80,7 +80,7 @@ public class Setup {
 	}
 	
 	private List<Cycle> loadCycles(String filename) throws IOException {
-		System.out.println("Loading " + filename);
+		System.out.print("Loading " + filename + "...  ");
 		List<Cycle> result = new ArrayList<Cycle>();
 		BufferedReader input = new BufferedReader(new FileReader(filename));
 		String line;
@@ -134,7 +134,7 @@ public class Setup {
 	}
 	
 	private List<Track> loadTracks(String filename) throws IOException {
-		System.out.println("Loading " + filename);
+		System.out.println("Loading " + filename + "... ... ...");
 		List<Track> result = new ArrayList<Track>();
 		File meta = new File(filename);
 		BufferedReader input = new BufferedReader(new FileReader(meta));
@@ -169,7 +169,7 @@ public class Setup {
 		} finally {
 			input.close();
 		}
-		System.out.println("Done");
+		System.out.println("Meta-track loading complete!");
 		return result;
 	}
 }

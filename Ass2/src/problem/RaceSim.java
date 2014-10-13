@@ -19,8 +19,8 @@ public class RaceSim {
 	private Track track;
 	private double totalDamageCost;
 	
-	public RaceSim(RaceState startState, Track track) {
-		random = new Random();
+	public RaceSim(RaceState startState, Track track, Random random) {
+		this.random = random;
 		stateHistory = new ArrayList<RaceState>();
 		stateHistory.add(startState);
 		actionHistory = new ArrayList<ArrayList<Action>>();
@@ -29,7 +29,9 @@ public class RaceSim {
 	}
 	
 	public RaceSim(List<RaceState> stateHistory,
-			List<ArrayList<Action>> actionHistory, Track track) {
+			List<ArrayList<Action>> actionHistory, Track track,
+			Random random) {
+		this.random = random;
 		this.stateHistory = stateHistory;
 		this.actionHistory = actionHistory;
 		this.track = track;

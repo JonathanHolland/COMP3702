@@ -88,10 +88,26 @@ public class MonteNode {
      */
     
     // This function is broke at the moment because sim isn't a variable.
+    // Racesim is now a function in the problem package, is this what you meant?
+    
     // But this is where you play the game into the future to see if this is a valid route.
     public double rollOut(MonteNode n) {
-    	// Make a timeout period
-//    	int count = sim.getTrack().getNumCols()+3;
+    	int count = 0;
+    	for(MonteNode c : n.children) {
+    		if(c.state.getTotalDamageCost()>n.state.getTotalDamageCost()) {
+    			// this is a bad thing
+    			count++;
+    		}
+    	}
+    	// Something like if too many of the possible children end in damage
+    	// return the bad 0 value, otherwise return 1?
+    	if(count>(n.children.size()/3)) {
+    		return 0;
+    	} else {
+    		return 1;
+    	}
+    	
+    	//    	int count = sim.getTrack().getNumCols()+3;
 //        
 //    	// make the Actions list
 //    	List<Action> A = new ArrayList<Action>();
@@ -100,10 +116,13 @@ public class MonteNode {
 //        	sim.stepTurn(A);
 //        }
 //    	
+    	// We shouldn't base it off getting to the finish so soon,
+    	// instead it should just be the damage to move towards the goal?
+    	
 //    	if(sim.getCurrentStatus() == RaceState.Status.WON) {
 //    		return sim.getTrack().getPrize() - sim.getTotalDamageCost();
 //    	}
-        return 1;
+        //return 1;
     }
     
     public boolean hasChildren() {
