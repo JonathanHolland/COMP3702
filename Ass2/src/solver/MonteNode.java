@@ -1,14 +1,11 @@
 package solver;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import mcts.TreeNode;
 import problem.*;
-import problem.Cycle.Speed;
 
 public class MonteNode {
 	static Random r = new Random();
@@ -22,7 +19,7 @@ public class MonteNode {
 	
 	Action action;
 	double nVisits, totValue;
-	MonteNode children[];
+	List<MonteNode> children = new ArrayList<MonteNode>();
 	
 	public MonteNode(Tour tour) {
 		state = tour.getLatestRaceState();
@@ -34,16 +31,18 @@ public class MonteNode {
 		
 	}
 
-
-
 	public void exploitExpand() {
 		List<MonteNode> visited = new LinkedList<MonteNode>(); // make a list of visited things
         MonteNode cur = this;
         visited.add(this); // add us to the visited list
-        while (hasChildren()) {
-            cur = cur.select();
-            System.out.println("Adding: " + cur);
-            visited.add(cur);
+        //System.out.println("Exploit Expand ");
+        while (cur.hasChildren()) {
+            if(!(cur.select() == null)) {
+            	cur = cur.select();
+                //System.out.println("Adding: " + cur);
+                visited.add(cur);
+            }
+        	
         }
         cur.expand();
         MonteNode newNode = cur.select();
@@ -76,9 +75,9 @@ public class MonteNode {
     }
 	
     public void expand() {
-        children = new MonteNode[nActions]; // make a new node for each possible action
+    	children = new ArrayList<MonteNode>(); // make a new node for each possible action
         for (int i=0; i<nActions; i++) {
-            children[i] = new MonteNode(actions[i], state);
+            children.add(new MonteNode(actions[i], state));
         }
     }
     
@@ -108,7 +107,7 @@ public class MonteNode {
     }
     
     public boolean hasChildren() {
-        return children != null;
+        return (!children.isEmpty());
     }
     
     public void updateStats(double value) {

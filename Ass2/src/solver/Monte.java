@@ -12,8 +12,6 @@ public class Monte {
 
 	private long startTime;
 	
-	private Tour tour;
-	
 	MonteNode mNode;
 	
 	/**
@@ -27,7 +25,7 @@ public class Monte {
 		mNode = new MonteNode(tour);
 		startTimer();
 		int iters = 0;
-		while(!outOfTime(1000)) {
+		while(!outOfTime(500)) {
 			mNode.exploitExpand();
 			iters++;
 		}

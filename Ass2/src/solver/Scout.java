@@ -3,7 +3,6 @@ package solver;
 import java.util.*;
 
 import problem.*;
-import problem.Cycle.Speed;
 
 public class Scout {
 	
@@ -11,9 +10,6 @@ public class Scout {
 	// and the associated net winnings value as an Integer
 	Map<Map<Track,Cycle>, Double> cyclesForTracks; 
 	
-	/**
-	 * Something to initialise the class
-	 */
 	Scout() {
 		cyclesForTracks = new HashMap<Map<Track,Cycle>, Double>();
 	}
@@ -50,9 +46,9 @@ public class Scout {
 			}
 			for(int j=0; j<cycles.size(); j++) {
 				trackCycle = new HashMap<Track,Cycle>();
-				double speedFactor;
+				double speedFactor = 0;
 				double reliableFactor = 0;
-				double wildFactor;
+				double wildFactor = 0;
 				
 				// "Scout" the cycle on this particular track, and give an average winnings
 				Cycle bike = cycles.get(j);
@@ -71,7 +67,7 @@ public class Scout {
 				} else {
 					// Go through the distractors and find the likelihood of them appearing
 					// Add this to the reliable factor
-					for(int k=0; j<distractorNo; k++){
+					for(int k=0; k<distractorNo; k++){
 						reliableFactor += trk.getDistractors().get(k).getAppearProbability()*75;	
 					}
 				}
@@ -88,16 +84,14 @@ public class Scout {
 				// Then include a weighting for the size of the map, the speed of the bike, the reliability/
 				// wildness and the number of distractors/opponents	
 				
-				Double net = winnings-price-reliableFactor-wildFactor-enemiesFactor*1/speedFactor; 
-// 1st			Double net = winnings-price+speedFactor+reliableFactor+wildFactor-mapSize-enemiesFactor;
+				Double net = (winnings-price-reliableFactor-wildFactor-enemiesFactor*1/speedFactor)+1000; 
 				
+				System.out.println("----------- One bike/track added ------------");
 				trackCycle.put(trk, bike);
 				cyclesForTracks.put(trackCycle, net);
+				System.out.println(cyclesForTracks.size());
 			}
 		}
-		
-		
-		
 	}
 	
 }
