@@ -24,6 +24,14 @@ public class MonteNode {
 	public MonteNode(Tour tour) {
 		state = tour.getLatestRaceState();
 		track = tour.getCurrentTrack();
+		
+		// Make sure we can go really fast
+		Cycle.Speed cSpeed = state.getPlayers().get(0).getCycle().getSpeed();
+		if(cSpeed == Cycle.Speed.FAST) {
+			nActions = nActions + 2; // We have access to both FM and FF
+		} else if(cSpeed == Cycle.Speed.MEDIUM) {
+			nActions++; // we have access to FM
+		}
 	}
 	
 	public MonteNode(Action action, RaceState state) {
