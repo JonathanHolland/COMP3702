@@ -29,64 +29,18 @@ public class Consultant {
 		Scout s = new Scout();
 		
 		// Run the "best" function inside Scout to find the best track/cycle combinations
-		s.best(tour.getTracks(), tour.getPurchasableCycles());
-		
-		// Select the 3 highest net worths from s now
-		double firstValue = -1000.0;
-		double secondValue = -1000.0;
-		double thirdValue = -1000.0;
-		Track firstTrack = null;
-		Track secondTrack = null;
-		Track thirdTrack = null;
-		Cycle firstCycle = null;
-		
-		boolean first = false;
-		boolean second = false;
-		
-		
-		Iterator<Entry<Map<Track, Cycle>, Double>> iterator = s.cyclesForTracks.entrySet().iterator();
-		
-		Track t = null;
-		Cycle c = null;
-		while(iterator.hasNext()) {
-			Entry<Map<Track, Cycle>, Double> entry = iterator.next();
-			Double value = entry.getValue();
-			Iterator<Entry<Track,Cycle>> it = entry.getKey().entrySet().iterator();
-			while(it.hasNext()) {
-				Entry<Track,Cycle> entry2 = it.next();
-				t = entry2.getKey();
-				c = entry2.getValue();
-				
-			}
-			if(value>firstValue) {
-				firstValue =  value;
-				firstTrack = t;
-				firstCycle = c;
-				first = true;
-			} 
-			else if((value>secondValue) && !firstTrack.equals(t) && c.equals(firstCycle) && first) {
-				secondValue = value;
-				secondTrack = t;
-				second = true;
-			}
-			else if((value>thirdValue) && !firstTrack.equals(t) && c.equals(firstCycle)) {
-				thirdTrack = t;
-			}
-		}
-		
-		System.out.println(firstValue);
-		System.out.println(firstCycle.getName());
-		System.out.println(firstTrack.getFileNameNoPath());
-		System.out.println(secondTrack.getFileNameNoPath());
-		System.out.println(thirdTrack.getFileNameNoPath());
-		
+		s.selection(tour);
+		Cycle best = s.getCycle();
+		Track firstTrack = s.getTracks().get(0);
+		Track secondTrack = s.getTracks().get(1);
+		Track thirdTrack = s.getTracks().get(2);
 		
 		// Initiate the MCTS method for movement within a race
 		Monte m = new Monte();
 		
 		// Buy the 3 cycles listed in the three best matches
 		List<Cycle> cycle = new ArrayList<Cycle>();
-		cycle.add(firstCycle);
+		cycle.add(best);
 //		cycle.add(secondCycle);
 //		cycle.add(thirdCycle);
 		

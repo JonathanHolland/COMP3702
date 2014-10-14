@@ -1,6 +1,8 @@
 package solver;
 
 import java.util.*;
+import java.util.Map.Entry;
+import java.util.List;
 
 import problem.*;
 
@@ -8,10 +10,13 @@ public class Scout {
 	
 	// The final map to store a mapping of each track and cycle combo
 	// and the associated net winnings value as an Integer
-	Map<Map<Track,Cycle>, Double> cyclesForTracks; 
+	Map<Map<Track,Cycle>, Double> cyclesForTracks;
+	Cycle bestCycle;
+	List<Track> bestTracks;
 	
 	Scout() {
 		cyclesForTracks = new HashMap<Map<Track,Cycle>, Double>();
+		bestTracks = new ArrayList<Track>();
 	}
 	
 	/**
@@ -93,5 +98,91 @@ public class Scout {
 			}
 		}
 	}
-	
+	void selection(Tour tour){
+		best(tour.getTracks(), tour.getPurchasableCycles());
+		
+		// Select the 3 highest net worths from s now
+		double firstValue = -1000.0;
+		double secondValue = -1000.0;
+		double thirdValue = -1000.0;
+		Track firstTrack = null;
+		Track secondTrack = null;
+		Track thirdTrack = null;
+		Cycle firstCycle = null;
+		
+		Iterator<Entry<Map<Track, Cycle>, Double>> iterator = cyclesForTracks.entrySet().iterator();
+		Track t = null;
+		Cycle c = null;
+		while(iterator.hasNext()) {
+			Entry<Map<Track, Cycle>, Double> entry = iterator.next();
+			Double value = entry.getValue();
+			Iterator<Entry<Track,Cycle>> it = entry.getKey().entrySet().iterator();
+			while(it.hasNext()) {
+				Entry<Track,Cycle> entry2 = it.next();
+				t = entry2.getKey();
+				c = entry2.getValue();
+				if(value>firstValue) {
+					firstValue =  value;
+					firstTrack = t;
+					//System.out.println(firstTrack.getFileNameNoPath());
+					firstCycle = c;
+				}
+			}
+			
+		}
+		bestCycle = firstCycle;
+		//bestTracks.add(firstTrack);
+		System.out.println(firstTrack.getFileNameNoPath());
+		iterator = cyclesForTracks.entrySet().iterator();
+		t = null;
+		c = null;
+		while(iterator.hasNext()) {
+			Entry<Map<Track, Cycle>, Double> entry = iterator.next();
+			Double value = entry.getValue();
+			Iterator<Entry<Track,Cycle>> it = entry.getKey().entrySet().iterator();
+			while(it.hasNext()) {
+				Entry<Track,Cycle> entry2 = it.next();
+				t = entry2.getKey();
+				c = entry2.getValue();
+				if((value>secondValue) && !firstTrack.equals(t) && c.equals(firstCycle)) {
+					secondValue = value;
+					secondTrack = t;
+				}
+			}
+		}
+		System.out.println(secondTrack.getFileNameNoPath());
+		
+		iterator = cyclesForTracks.entrySet().iterator();
+		t = null;
+		c = null;
+		while(iterator.hasNext()) {
+			Entry<Map<Track, Cycle>, Double> entry = iterator.next();
+			Double value = entry.getValue();
+			Iterator<Entry<Track,Cycle>> it = entry.getKey().entrySet().iterator();
+			while(it.hasNext()) {
+				Entry<Track,Cycle> entry2 = it.next();
+				t = entry2.getKey();
+				c = entry2.getValue();
+				if((value>thirdValue) && !firstTrack.equals(t) && !secondTrack.equals(t) &&
+						c.equals(firstCycle)) {
+					thirdTrack = t;
+					thirdValue = value;
+				}
+			}	
+		}
+		System.out.println(thirdTrack.getFileNameNoPath());
+		
+		System.out.println(firstValue);
+		System.out.println(firstCycle.getName());
+		bestTracks.add(firstTrack);
+		bestTracks.add(secondTrack);
+		bestTracks.add(thirdTrack);
+		
+	}
+	Cycle getCycle() {
+		return bestCycle;
+	}
+	List<Track> getTracks() {
+		return bestTracks;
+	}
 }
