@@ -109,12 +109,7 @@ public class Scout {
 		Track thirdTrack = null;
 		Cycle firstCycle = null;
 		
-		boolean first = false;
-		boolean second = false;
-		
-		
 		Iterator<Entry<Map<Track, Cycle>, Double>> iterator = cyclesForTracks.entrySet().iterator();
-		
 		Track t = null;
 		Cycle c = null;
 		while(iterator.hasNext()) {
@@ -128,14 +123,15 @@ public class Scout {
 				if(value>firstValue) {
 					firstValue =  value;
 					firstTrack = t;
+					//System.out.println(firstTrack.getFileNameNoPath());
 					firstCycle = c;
-					
-				} 
+				}
 			}
+			
 		}
 		bestCycle = firstCycle;
-		bestTracks.add(firstTrack);
-		//System.out.println(firstTrack.getFileNameNoPath());
+		//bestTracks.add(firstTrack);
+		System.out.println(firstTrack.getFileNameNoPath());
 		iterator = cyclesForTracks.entrySet().iterator();
 		t = null;
 		c = null;
@@ -147,16 +143,13 @@ public class Scout {
 				Entry<Track,Cycle> entry2 = it.next();
 				t = entry2.getKey();
 				c = entry2.getValue();
-				if((value>secondValue) && !firstTrack.equals(t) && c.equals(firstCycle) && first) {
+				if((value>secondValue) && !firstTrack.equals(t) && c.equals(firstCycle)) {
 					secondValue = value;
 					secondTrack = t;
-					second = true;
-					bestTracks.set(1, t);
 				}
 			}
 		}
-		bestTracks.add(secondTrack);
-		//System.out.println(secondTrack.getFileNameNoPath());
+		System.out.println(secondTrack.getFileNameNoPath());
 		
 		iterator = cyclesForTracks.entrySet().iterator();
 		t = null;
@@ -169,14 +162,13 @@ public class Scout {
 				Entry<Track,Cycle> entry2 = it.next();
 				t = entry2.getKey();
 				c = entry2.getValue();
-				if((value>thirdValue) && !firstTrack.equals(t) && c.equals(firstCycle)) {
+				if((value>thirdValue) && !firstTrack.equals(t) && !secondTrack.equals(t) &&
+						c.equals(firstCycle)) {
 					thirdTrack = t;
-					bestTracks.set(2, t);
 				}
 			}	
 		}
-		bestTracks.add(thirdTrack);
-		//System.out.println(thirdTrack.getFileNameNoPath());
+		System.out.println(thirdTrack.getFileNameNoPath());
 		
 		System.out.println(firstValue);
 		System.out.println(firstCycle.getName());
