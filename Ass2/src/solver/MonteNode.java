@@ -26,17 +26,12 @@ public class MonteNode {
 		this.tour = tour;
 		state = tour.getLatestRaceState();
 		track = tour.getCurrentTrack();
-		System.out.print("MCTS: "); 
 		// Make sure we can go really fast
 		Cycle.Speed cSpeed = state.getPlayers().get(0).getCycle().getSpeed();
 		if(cSpeed == Cycle.Speed.FAST) {
 			nActions = 6; // We have access to both FM and FF
-			System.out.print("FAS - ");
 		} else if(cSpeed == Cycle.Speed.MEDIUM) {
 			nActions = 5; // we have access to FM
-			System.out.print("MED - ");
-		} else {
-			System.out.print("SLO - \n");
 		}
 	}
 	
@@ -129,7 +124,7 @@ public class MonteNode {
     	if(sim.getCurrentStatus() == RaceState.Status.WON) {
     		return sim.getTrack().getPrize() - sim.getTotalDamageCost();
     	}
-        return sim.getTotalDamageCost();
+        return 1 - sim.getTotalDamageCost();
     	
 //    	count = 0;
 //    	for(MonteNode c : n.children) {
