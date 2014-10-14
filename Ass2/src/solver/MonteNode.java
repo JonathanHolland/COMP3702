@@ -26,13 +26,17 @@ public class MonteNode {
 		this.tour = tour;
 		state = tour.getLatestRaceState();
 		track = tour.getCurrentTrack();
-		
+		System.out.print("MCTS: "); 
 		// Make sure we can go really fast
 		Cycle.Speed cSpeed = state.getPlayers().get(0).getCycle().getSpeed();
 		if(cSpeed == Cycle.Speed.FAST) {
 			nActions = 6; // We have access to both FM and FF
+			System.out.print("FAS - ");
 		} else if(cSpeed == Cycle.Speed.MEDIUM) {
 			nActions = 5; // we have access to FM
+			System.out.print("MED - ");
+		} else {
+			System.out.print("SLO - \n");
 		}
 	}
 	
@@ -59,8 +63,6 @@ public class MonteNode {
         visited.add(newNode);
         double value = rollOut(newNode);
         for (MonteNode node : visited) {
-            // would need extra logic for n-player game
-            // System.out.println(node);
             node.updateStats(value);
         }
 	}
@@ -195,6 +197,12 @@ public class MonteNode {
     	} else {
     		return new GridCell(p.getRow(), p.getCol());
     	}
+    }
+    
+    @Override
+    public String toString() {
+    	GridCell pos = state.getPlayers().get(0).getPosition();
+    	return "P" + pos.getRow() + "," + pos.getCol() + "-A_" + action + "-C" + children.size();
     }
 	
 }

@@ -91,12 +91,13 @@ public class Scout {
 				
 				Double net = (winnings-price-reliableFactor-wildFactor-enemiesFactor*1/speedFactor)+1000; 
 				
-				System.out.println("----------- One bike/track added ------------");
+//				System.out.println("----------- One bike/track added ------------");
 				trackCycle.put(trk, bike);
 				cyclesForTracks.put(trackCycle, net);
-				System.out.println(cyclesForTracks.size());
+//				System.out.println(cyclesForTracks.size());
 			}
 		}
+		System.out.println("--------Evaluated bike/track combos----------");
 	}
 	void selection(Tour tour){
 		best(tour.getTracks(), tour.getPurchasableCycles());

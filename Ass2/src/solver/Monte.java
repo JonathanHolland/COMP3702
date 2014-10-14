@@ -29,12 +29,12 @@ public class Monte {
 			mNode.exploitExpand();
 			iters++;
 		}
-		System.out.println("Completed iterations: " + iters);
+		System.out.print("RESULT: iters_" + iters + " - ");
 		Action bestAction = mNode.select().action;
-		System.out.println("Chose: " + bestAction);
-		System.out.println("Default chose: " + mNode.defaultPolicy(tour.getLatestRaceState()));
-//		return bestAction; // Return best action
-		return mNode.defaultPolicy(tour.getLatestRaceState());
+		System.out.print("MCTS_" + bestAction + " - ");
+		System.out.println("DPOL_" + mNode.defaultPolicy(tour.getLatestRaceState()));
+		return bestAction; // Return best action
+//		return mNode.defaultPolicy(tour.getLatestRaceState());
 	}
 	
 	/**

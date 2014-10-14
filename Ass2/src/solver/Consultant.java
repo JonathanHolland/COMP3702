@@ -61,9 +61,9 @@ public class Consultant {
 		
 		// for the tour, run through the three tracks
 		while (!tour.isFinished()) {
-			System.out.println("unfinished loop");
+			System.out.println("The Race/Tour Continues");
 			if (tour.isPreparing()) {
-				System.out.println("preparing loop");
+				System.out.println("Preparation Time");
 				// Race hasn't started. Choose a track, then prepare your
 				// players by choosing their cycles and start positions
 				
