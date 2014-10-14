@@ -25,12 +25,16 @@ public class Monte {
 		mNode = new MonteNode(tour);
 		startTimer();
 		int iters = 0;
-		while(!outOfTime(500)) {
+		while(!outOfTime(100)) {
 			mNode.exploitExpand();
 			iters++;
 		}
 		System.out.println("Completed iterations: " + iters);
-		return mNode.select().action; // Return best action
+		Action bestAction = mNode.select().action;
+		System.out.println("Chose: " + bestAction);
+		System.out.println("Default chose: " + mNode.defaultPolicy(tour.getLatestRaceState()));
+//		return bestAction; // Return best action
+		return mNode.defaultPolicy(tour.getLatestRaceState());
 	}
 	
 	/**

@@ -16,27 +16,29 @@ public class MonteNode {
 	
 	RaceState state;
 	Track track;
+	Tour tour;
 	
 	Action action;
 	double nVisits, totValue;
 	List<MonteNode> children = new ArrayList<MonteNode>();
 	
 	public MonteNode(Tour tour) {
+		this.tour = tour;
 		state = tour.getLatestRaceState();
 		track = tour.getCurrentTrack();
 		
 		// Make sure we can go really fast
 		Cycle.Speed cSpeed = state.getPlayers().get(0).getCycle().getSpeed();
 		if(cSpeed == Cycle.Speed.FAST) {
-			nActions = nActions + 2; // We have access to both FM and FF
+			nActions = 6; // We have access to both FM and FF
 		} else if(cSpeed == Cycle.Speed.MEDIUM) {
-			nActions++; // we have access to FM
+			nActions = 5; // we have access to FM
 		}
 	}
 	
-	public MonteNode(Action action, RaceState state) {
+	public MonteNode(Action action, Tour tour) {
 		this.action = action;
-		
+		this.tour = tour;
 	}
 
 	public void exploitExpand() {
@@ -85,7 +87,7 @@ public class MonteNode {
     public void expand() {
     	children = new ArrayList<MonteNode>(); // make a new node for each possible action
         for (int i=0; i<nActions; i++) {
-            children.add(new MonteNode(actions[i], state));
+            children.add(new MonteNode(actions[i], tour));
         }
     }
     
@@ -100,37 +102,47 @@ public class MonteNode {
     
     // But this is where you play the game into the future to see if this is a valid route.
     public double rollOut(MonteNode n) {
-    	int count = 0;
-    	for(MonteNode c : n.children) {
-    		if(c.state.getTotalDamageCost()>n.state.getTotalDamageCost()) {
-    			// this is a bad thing
-    			count++;
-    		}
-    	}
-    	// Something like if too many of the possible children end in damage
-    	// return the bad 0 value, otherwise return 1?
-    	if(count>(n.children.size()/3)) {
-    		return 0;
-    	} else {
-    		return 1;
+    	int count = tour.getCurrentTrack().getNumCols()*2;
+    	int raceIndex = tour.getRaceIndex();
+    	
+    	// Make a simulator from the current tour data
+    	RaceSim sim = new RaceSim(new ArrayList<RaceState>(tour.getStateHistory(raceIndex)), 
+    			new ArrayList<ArrayList<Action>>(tour.getActionHistory(raceIndex)), tour.getCurrentTrack(), new Random());
+    	
+    	
+    	List<Action> A = new ArrayList<Action>();
+    	A.add(n.action);
+    	while(count-- > 0 && !sim.isFinished()) {
+    		sim.stepTurn(A);
+    		A.clear();
+    		A.add(defaultPolicy(sim.getCurrentState()));
+        }
+    	if(!sim.isFinished()) {
+    		System.out.println("We didn't reach the end in time");
     	}
     	
-    	//    	int count = sim.getTrack().getNumCols()+3;
-//        
-//    	// make the Actions list
-//    	List<Action> A = new ArrayList<Action>();
-//    	A.add(Action.FS);
-//    	while(!sim.isFinished() || count-- > 0) {
-//        	sim.stepTurn(A);
-//        }
-//    	
     	// We shouldn't base it off getting to the finish so soon,
     	// instead it should just be the damage to move towards the goal?
     	
-//    	if(sim.getCurrentStatus() == RaceState.Status.WON) {
-//    		return sim.getTrack().getPrize() - sim.getTotalDamageCost();
+    	if(sim.getCurrentStatus() == RaceState.Status.WON) {
+    		return sim.getTrack().getPrize() - sim.getTotalDamageCost();
+    	}
+        return sim.getTotalDamageCost();
+    	
+//    	count = 0;
+//    	for(MonteNode c : n.children) {
+//    		if(c.state.getTotalDamageCost()>n.state.getTotalDamageCost()) {
+//    			// this is a bad thing
+//    			count++;
+//    		}
 //    	}
-        //return 1;
+//    	// Something like if too many of the possible children end in damage
+//    	// return the bad 0 value, otherwise return 1?
+//    	if(count>(n.children.size()/3)) {
+//    		return 0;
+//    	} else {
+//    		return 1;
+//    	}
     }
     
     public boolean hasChildren() {
@@ -142,5 +154,47 @@ public class MonteNode {
         totValue += value;
     }
 	
+    public Action defaultPolicy(RaceState state) {
+    	GridCell p = state.getPlayers().get(0).getPosition();
+    	int r = track.getNumRows(), c = track.getNumCols();
+    	
+    	if(track.getCellType(posIfMove(Action.FS)) == Track.CellType.OBSTACLE) {
+    		try { // could error
+				if(track.getCellType(posIfMove(Action.NE)) != Track.CellType.OBSTACLE) {
+	    			return Action.NE;
+    		}
+    		} catch (Exception ex) {}
+    		
+    		try { // could error
+    			if(track.getCellType(posIfMove(Action.SE)) != Track.CellType.OBSTACLE){
+    				return Action.SE;
+    		}
+    		} catch (Exception ex) {}
+    	}
+    	if(c > p.getCol()+2 && track.getCellType(posIfMove(Action.FM)) == Track.CellType.OBSTACLE) {
+    		return Action.FS;
+    	}
+    	if(c > p.getCol()+3 && track.getCellType(posIfMove(Action.FF)) == Track.CellType.OBSTACLE) {
+    		return Action.FM;
+    	}
+    	return Action.FF;
+    }
+    
+    private GridCell posIfMove(Action a) {
+    	GridCell p = state.getPlayers().get(0).getPosition();
+    	if(a == Action.FF) {
+    		return new GridCell(p.getRow(), p.getCol()+3);
+    	} else if(a == Action.FM) {
+    		return new GridCell(p.getRow(), p.getCol()+2);
+    	} else if(a == Action.FS) {
+    		return new GridCell(p.getRow(), p.getCol()+1);
+    	} else if(a == Action.NE) {
+    		return new GridCell(p.getRow()-1, p.getCol()+1);
+    	} else if(a == Action.SE) {
+    		return new GridCell(p.getRow()+1, p.getCol()+1);
+    	} else {
+    		return new GridCell(p.getRow(), p.getCol());
+    	}
+    }
 	
 }

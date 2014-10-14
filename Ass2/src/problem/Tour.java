@@ -820,6 +820,8 @@ public class Tour {
 		return raceSims.get(raceSims.size() - 1);
 	}
 	
-	
+	public int getRaceIndex() {
+		return raceSims.size() -1;
+	}
 
 }
