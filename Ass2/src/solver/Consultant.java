@@ -32,15 +32,16 @@ public class Consultant {
 		s.best(tour.getTracks(), tour.getPurchasableCycles());
 		
 		// Select the 3 highest net worths from s now
-		double firstValue = 0.0;
-		double secondValue = 0.0;
-		double thirdValue = 0.0;
+		double firstValue = -1000.0;
+		double secondValue = -1000.0;
+		double thirdValue = -1000.0;
 		Track firstTrack = null;
 		Track secondTrack = null;
 		Track thirdTrack = null;
 		Cycle firstCycle = null;
-		Cycle secondCycle = null;
-		Cycle thirdCycle = null;
+		
+		boolean first = false;
+		boolean second = false;
 		
 		
 		Iterator<Entry<Map<Track, Cycle>, Double>> iterator = s.cyclesForTracks.entrySet().iterator();
@@ -55,30 +56,28 @@ public class Consultant {
 				Entry<Track,Cycle> entry2 = it.next();
 				t = entry2.getKey();
 				c = entry2.getValue();
+				
 			}
 			if(value>firstValue) {
 				firstValue =  value;
 				firstTrack = t;
 				firstCycle = c;
-			} else if(value>secondValue && !firstTrack.equals(t)) {
+				first = true;
+			} 
+			else if((value>secondValue) && !firstTrack.equals(t) && c.equals(firstCycle) && first) {
 				secondValue = value;
 				secondTrack = t;
-				secondCycle = c;
-			} else if(value>thirdValue && !firstTrack.equals(t) && !secondTrack.equals(t)) {
-				thirdValue = value;
+				second = true;
+			}
+			else if((value>thirdValue) && !firstTrack.equals(t) && c.equals(firstCycle)) {
 				thirdTrack = t;
-				thirdCycle = c;
 			}
 		}
 		
 		System.out.println(firstValue);
 		System.out.println(firstCycle.getName());
 		System.out.println(firstTrack.getFileNameNoPath());
-		System.out.println(secondValue);
-		System.out.println(secondCycle.getName());
 		System.out.println(secondTrack.getFileNameNoPath());
-		System.out.println(thirdValue);
-		System.out.println(thirdCycle.getName());
 		System.out.println(thirdTrack.getFileNameNoPath());
 		
 		
@@ -88,18 +87,18 @@ public class Consultant {
 		// Buy the 3 cycles listed in the three best matches
 		List<Cycle> cycle = new ArrayList<Cycle>();
 		cycle.add(firstCycle);
-		cycle.add(secondCycle);
-		cycle.add(thirdCycle);
+//		cycle.add(secondCycle);
+//		cycle.add(thirdCycle);
 		
 		// Make sure we don't buy another bike if the same one is in another best match
 		// i.e. with another track
 		tour.buyCycle(cycle.get(0));
-		if(!cycle.get(0).equals(cycle.get(1))) {
-			tour.buyCycle(cycle.get(1));
-		} 
-		if(!cycle.get(2).equals(cycle.get(0)) && !cycle.get(2).equals(cycle.get(1))) {
-			tour.buyCycle(cycle.get(2));
-		} 
+//		if(!cycle.get(0).equals(cycle.get(1))) {
+//			tour.buyCycle(cycle.get(1));
+//		} 
+//		if(!cycle.get(2).equals(cycle.get(0)) && !cycle.get(2).equals(cycle.get(1))) {
+//			tour.buyCycle(cycle.get(2));
+//		} 
 		
 		// before running the tour, register the three tracks
 		tour.registerTrack(firstTrack, 1);
@@ -122,9 +121,9 @@ public class Consultant {
 						track.getStartingPositions();
 				String id = "";
 				GridCell startPosition = null;				
-				for (Map.Entry<String, GridCell> entry : startingPositions.entrySet()) {
-					id = entry.getKey();
-					startPosition = entry.getValue();
+				for (Map.Entry<String, GridCell> entry1 : startingPositions.entrySet()) {
+					id = entry1.getKey();
+					startPosition = entry1.getValue();
 					break;
 				}
 				Cycle raceCycle;
@@ -133,9 +132,9 @@ public class Consultant {
 				if (firstTrack.equals(track)) {
 					raceCycle = cycle.get(0);
 				} else if (secondTrack.equals(track)) {
-					raceCycle = cycle.get(1);
+					raceCycle = cycle.get(0);
 				} else {
-					raceCycle = cycle.get(2);
+					raceCycle = cycle.get(0);
 				}
 				
 				players.add(new Player(id, raceCycle, startPosition));
