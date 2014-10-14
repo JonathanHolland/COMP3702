@@ -80,7 +80,7 @@ public class Scout {
 				if(bike.isWild()) {
 					wildFactor = 0;
 				} else {
-					wildFactor = obscount/mapSize*300; // Change this 300 through testing
+					wildFactor = obscount/mapSize*10000; // Change this 300 through testing
 				}
 				
 				//
@@ -98,13 +98,17 @@ public class Scout {
 			}
 		}
 	}
+	/**
+	 * Select the best 3 tracks for a single bike
+	 * @param tour
+	 */
 	void selection(Tour tour){
 		best(tour.getTracks(), tour.getPurchasableCycles());
 		
 		// Select the 3 highest net worths from s now
-		double firstValue = -1000.0;
-		double secondValue = -1000.0;
-		double thirdValue = -1000.0;
+		double firstValue = -10000.0;
+		double secondValue = -10000.0;
+		double thirdValue = -10000.0;
 		Track firstTrack = null;
 		Track secondTrack = null;
 		Track thirdTrack = null;
@@ -179,9 +183,17 @@ public class Scout {
 		bestTracks.add(thirdTrack);
 		
 	}
+	/**
+	 * Return the best Cycle chosen by selection
+	 * @return
+	 */
 	Cycle getCycle() {
 		return bestCycle;
 	}
+	/**
+	 * Return the best 3 tracks chosen by selection
+	 * @return
+	 */
 	List<Track> getTracks() {
 		return bestTracks;
 	}
