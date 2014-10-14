@@ -16,6 +16,7 @@ public class Scout {
 	
 	Scout() {
 		cyclesForTracks = new HashMap<Map<Track,Cycle>, Double>();
+		bestTracks = new ArrayList<Track>();
 	}
 	
 	/**
@@ -165,6 +166,7 @@ public class Scout {
 				if((value>thirdValue) && !firstTrack.equals(t) && !secondTrack.equals(t) &&
 						c.equals(firstCycle)) {
 					thirdTrack = t;
+					thirdValue = value;
 				}
 			}	
 		}
@@ -172,6 +174,9 @@ public class Scout {
 		
 		System.out.println(firstValue);
 		System.out.println(firstCycle.getName());
+		bestTracks.add(firstTrack);
+		bestTracks.add(secondTrack);
+		bestTracks.add(thirdTrack);
 		
 	}
 	Cycle getCycle() {
