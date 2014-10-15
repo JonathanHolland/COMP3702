@@ -1,4 +1,3 @@
-3 600
+2 600
 colDeLaCroix.txt
 lesFouchies.txt
-boisDeChaux.txt

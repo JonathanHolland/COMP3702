@@ -10,8 +10,8 @@ import problem.*;
 public class MonteNode {
 	static Random r = new Random();
 	// A list of all possible actions
-	static final Action actions[] = {Action.FS, Action.NE, Action.SE, Action.FM, Action.FF};
-	static double epsilon = 1e-6;
+	static final Action actions[] = {Action.FS, Action.FM, Action.FF, Action.NE, Action.SE};
+	static double epsilon = 0.001;
 	static int nActions =3; // may need to be bigger
 	
 	RaceState state;
@@ -19,7 +19,7 @@ public class MonteNode {
 	Tour tour;
 	
 	Action action;
-	double nVisits, totValue;
+	double nVisits, totValue = 0, speds = 1;
 	List<MonteNode> children = new ArrayList<MonteNode>();
 	
 	public MonteNode(Tour tour) {
@@ -30,8 +30,10 @@ public class MonteNode {
 		Cycle.Speed cSpeed = state.getPlayers().get(0).getCycle().getSpeed();
 		if(cSpeed == Cycle.Speed.FAST) {
 			nActions = 5; // We have access to both FM and FF
+			speds = 3;
 		} else if(cSpeed == Cycle.Speed.MEDIUM) {
 			nActions = 4; // we have access to FM
+			speds = 2;
 		}
 	}
 	
@@ -63,6 +65,31 @@ public class MonteNode {
         }
 	}
 	
+	public Action getNextMove() {
+		Monte t = new Monte();
+		double bestScore = -Double.MAX_VALUE;
+		Action bestAction = Action.ST;
+		int n = 0;
+		for (MonteNode mNode : children) {
+			n++;
+			double score = 0;
+			t.startTimer();
+			int itr = 20;
+			while(itr-- > 0) {
+				mNode.totValue += rollOut(mNode);
+			}
+			if ((mNode.totValue / 20) > bestScore) {
+				bestScore = mNode.totValue / 20;
+				bestAction = mNode.action;
+			}
+		}
+		System.out.println("Children values: ");
+		for(MonteNode mN : children) {
+			System.out.println(mN.action + ": " + mN.totValue / 20);
+		}
+		return bestAction;
+	}
+	
 	public MonteNode select() {
         MonteNode selected = null;
         double bestValue = -1 * Double.MAX_VALUE;
@@ -84,9 +111,17 @@ public class MonteNode {
 	
     public void expand() {
     	children = new ArrayList<MonteNode>(); // make a new node for each possible action
-        for (int i=0; i<nActions; i++) {
+    	GridCell p = tour.getLatestRaceState().getPlayers().get(0).getPosition();
+    	if(p.getRow() != 0) {
+    		children.add(new MonteNode(Action.NE, tour));
+    	}
+    	if(p.getRow() != tour.getCurrentTrack().getNumRows()-1) {
+    		children.add(new MonteNode(Action.SE, tour));
+    	}
+        for (int i=0; i<speds; i++) {
             children.add(new MonteNode(actions[i], tour));
         }
+//        System.out.println(children.get(0));
     }
     
     public MonteNode getMove() {
@@ -135,25 +170,11 @@ public class MonteNode {
     	
     	if(sim.getCurrentStatus() == RaceState.Status.WON) {
 //    		System.out.println("WON");
-    		return sim.getTrack().getPrize() - sim.getTotalDamageCost();
+    		return (sim.getTrack().getPrize() - sim.getTotalDamageCost());
     	}
 //    	System.out.println("LOST");
-        return 1 - sim.getTotalDamageCost();
+        return 0 - sim.getTotalDamageCost();
     	
-//    	count = 0;
-//    	for(MonteNode c : n.children) {
-//    		if(c.state.getTotalDamageCost()>n.state.getTotalDamageCost()) {
-//    			// this is a bad thing
-//    			count++;
-//    		}
-//    	}
-//    	// Something like if too many of the possible children end in damage
-//    	// return the bad 0 value, otherwise return 1?
-//    	if(count>(n.children.size()/3)) {
-//    		return 0;
-//    	} else {
-//    		return 1;
-//    	}
     }
     
     public boolean hasChildren() {
