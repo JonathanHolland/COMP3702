@@ -62,9 +62,9 @@ public class Scout {
 				if(bike.getSpeed().name()=="SLOW") {
 					speedFactor = 20;
 				} else if(bike.getSpeed().name()=="MEDIUM") {
-					speedFactor = 100*enemiesFactor;
+					speedFactor = 50*enemiesFactor;
 				} else {
-					speedFactor = 200*enemiesFactor;
+					speedFactor = 100*enemiesFactor;
 				}
 				
 				if(bike.isReliable()) {
@@ -72,9 +72,14 @@ public class Scout {
 				} else {
 					// Go through the distractors and find the likelihood of them appearing
 					// Add this to the reliable factor
+					System.out.println(distractorNo);
 					for(int k=0; k<distractorNo; k++){
-						reliableFactor += trk.getDistractors().get(k).getAppearProbability()*75;	
+						System.out.println("Reliable Factor");
+						System.out.println(trk.getDistractors().get(k).getAppearProbability());
+						reliableFactor += trk.getDistractors().get(k).getAppearProbability()*75;
+						System.out.println(reliableFactor);
 					}
+					reliableFactor = reliableFactor/mapSize;
 				}
 				// Compare the number of obstacles to how large the track is
 				if(bike.isWild()) {
