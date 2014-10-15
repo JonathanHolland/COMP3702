@@ -49,6 +49,7 @@ public class Scout {
 				}
 				
 			}
+			winnings -= enemiesFactor*200;
 			for(int j=0; j<cycles.size(); j++) {
 				trackCycle = new HashMap<Track,Cycle>();
 				double speedFactor = 0;
@@ -62,9 +63,9 @@ public class Scout {
 				if(bike.getSpeed().name()=="SLOW") {
 					speedFactor = 20;
 				} else if(bike.getSpeed().name()=="MEDIUM") {
-					speedFactor = 100*enemiesFactor;
+					speedFactor = 50*enemiesFactor;
 				} else {
-					speedFactor = 200*enemiesFactor;
+					speedFactor = 100*enemiesFactor;
 				}
 				
 				if(bike.isReliable()) {
@@ -72,9 +73,11 @@ public class Scout {
 				} else {
 					// Go through the distractors and find the likelihood of them appearing
 					// Add this to the reliable factor
+					System.out.println(distractorNo);
 					for(int k=0; k<distractorNo; k++){
-						reliableFactor += trk.getDistractors().get(k).getAppearProbability()*75;	
+						reliableFactor += trk.getDistractors().get(k).getAppearProbability()*75;
 					}
+					reliableFactor = reliableFactor/mapSize;
 				}
 				// Compare the number of obstacles to how large the track is
 				if(bike.isWild()) {
@@ -178,10 +181,16 @@ public class Scout {
 		System.out.println(thirdTrack.getFileNameNoPath());
 		
 		System.out.println(firstValue);
+		System.out.println(secondValue);
+		System.out.println(thirdValue);
 		System.out.println(firstCycle.getName());
 		bestTracks.add(firstTrack);
-		bestTracks.add(secondTrack);
-		bestTracks.add(thirdTrack);
+		if(secondValue > (firstValue - 300)){
+			bestTracks.add(secondTrack);
+			if(thirdValue> (firstValue - 300)){
+				bestTracks.add(thirdTrack);
+			}
+		}
 		
 	}
 	/**
