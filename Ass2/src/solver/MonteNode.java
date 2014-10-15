@@ -10,9 +10,9 @@ import problem.*;
 public class MonteNode {
 	static Random r = new Random();
 	// A list of all possible actions
-	static final Action actions[] = {Action.FS, Action.NE, Action.SE, Action.ST, Action.FM, Action.FF};
+	static final Action actions[] = {Action.FS, Action.NE, Action.SE, Action.FM, Action.FF};
 	static double epsilon = 1e-6;
-	static int nActions = 4; // may need to be bigger
+	static int nActions =3; // may need to be bigger
 	
 	RaceState state;
 	Track track;
@@ -29,9 +29,9 @@ public class MonteNode {
 		// Make sure we can go really fast
 		Cycle.Speed cSpeed = state.getPlayers().get(0).getCycle().getSpeed();
 		if(cSpeed == Cycle.Speed.FAST) {
-			nActions = 6; // We have access to both FM and FF
+			nActions = 5; // We have access to both FM and FF
 		} else if(cSpeed == Cycle.Speed.MEDIUM) {
-			nActions = 5; // we have access to FM
+			nActions = 4; // we have access to FM
 		}
 	}
 	
