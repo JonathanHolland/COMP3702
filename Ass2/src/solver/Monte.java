@@ -26,12 +26,12 @@ public class Monte {
 		System.out.print("MCTS: "); 
 		startTimer();
 		int iters = 0;
-		while(!outOfTime(100)) {
+		while(!outOfTime(200)) {
 			mNode.exploitExpand();
 			iters++;
 		}
 		System.out.print("iters_" + iters + " - ");
-		Action bestAction = mNode.select().action;
+		Action bestAction = mNode.getMove().action;
 		System.out.print("MCTS_" + bestAction + " - ");
 		System.out.println("DPOL_" + mNode.defaultPolicy(tour.getLatestRaceState()));
 		return bestAction; // Return best action

@@ -88,6 +88,16 @@ public class MonteNode {
         }
     }
     
+    public MonteNode getMove() {
+    	MonteNode mostVisited = children.get(0);
+    	for(MonteNode child : children) {
+    		if(child.nVisits >= mostVisited.nVisits) {
+    			mostVisited = child;
+    		}
+    	}
+    	return mostVisited;
+    }
+    
     /**
      * simulate the game into the future
      * @param n
@@ -197,7 +207,8 @@ public class MonteNode {
     @Override
     public String toString() {
     	GridCell pos = state.getPlayers().get(0).getPosition();
-    	return "P" + pos.getRow() + "," + pos.getCol() + "-A_" + action + "-C" + children.size();
+    	return "P" + pos.getRow() + "," + pos.getCol() + "-A_" + action + "-Vis_" + nVisits 
+    			 + "-Val_" + "-C_" + children.size();
     }
 	
 }
