@@ -37,7 +37,7 @@ public class Scout {
 			Track trk = tracks.get(i);
 			winnings = trk.getPrize() - trk.getRegistrationFee();
 			double mapSize = trk.getNumCols()*trk.getNumRows();
-			double enemiesFactor = trk.getNumOpponents();
+			double enemiesFactor = (trk.getNumOpponents())*10;
 			double distractorNo = trk.getDistractors().size();
 			// A counter for the number of obstacles in order to use as weighting for the wildness
 			int obscount = 0;
@@ -62,9 +62,9 @@ public class Scout {
 				if(bike.getSpeed().name()=="SLOW") {
 					speedFactor = 20;
 				} else if(bike.getSpeed().name()=="MEDIUM") {
-					speedFactor = 40;
+					speedFactor = 100*enemiesFactor;
 				} else {
-					speedFactor = 60;
+					speedFactor = 200*enemiesFactor;
 				}
 				
 				if(bike.isReliable()) {
@@ -80,7 +80,7 @@ public class Scout {
 				if(bike.isWild()) {
 					wildFactor = 0;
 				} else {
-					wildFactor = obscount/mapSize*10000; // Change this 300 through testing
+					wildFactor = obscount/mapSize*2000; // Change this 300 through testing
 				}
 				
 				//
@@ -89,7 +89,7 @@ public class Scout {
 				// Then include a weighting for the size of the map, the speed of the bike, the reliability/
 				// wildness and the number of distractors/opponents	
 				
-				Double net = (winnings-price-reliableFactor-wildFactor-enemiesFactor*1/speedFactor)+1000; 
+				Double net = (winnings-price-reliableFactor-wildFactor+speedFactor)+1000; 
 				
 //				System.out.println("----------- One bike/track added ------------");
 				trackCycle.put(trk, bike);
