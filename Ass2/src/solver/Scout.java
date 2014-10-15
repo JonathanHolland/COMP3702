@@ -49,7 +49,7 @@ public class Scout {
 				}
 				
 			}
-			winnings -= enemiesFactor*200;
+//			winnings -= enemiesFactor*200;
 			for(int j=0; j<cycles.size(); j++) {
 				trackCycle = new HashMap<Track,Cycle>();
 				double speedFactor = 0;
@@ -61,11 +61,11 @@ public class Scout {
 				
 				price = bike.getPrice();
 				if(bike.getSpeed().name()=="SLOW") {
-					speedFactor = 20;
+					speedFactor = 10;
 				} else if(bike.getSpeed().name()=="MEDIUM") {
-					speedFactor = 50*enemiesFactor;
+					speedFactor = 10*enemiesFactor;
 				} else {
-					speedFactor = 100*enemiesFactor;
+					speedFactor = 15*enemiesFactor;
 				}
 				
 				if(bike.isReliable()) {
@@ -77,7 +77,7 @@ public class Scout {
 					for(int k=0; k<distractorNo; k++){
 						reliableFactor += trk.getDistractors().get(k).getAppearProbability()*75;
 					}
-					reliableFactor = reliableFactor/mapSize;
+//					reliableFactor = reliableFactor/mapSize;
 				}
 				// Compare the number of obstacles to how large the track is
 				if(bike.isWild()) {
@@ -92,7 +92,7 @@ public class Scout {
 				// Then include a weighting for the size of the map, the speed of the bike, the reliability/
 				// wildness and the number of distractors/opponents	
 				
-				Double net = (winnings-price-reliableFactor-wildFactor+speedFactor)+1000; 
+				Double net = (winnings-price*2-reliableFactor-wildFactor+speedFactor)+1000; 
 				
 //				System.out.println("----------- One bike/track added ------------");
 				trackCycle.put(trk, bike);
@@ -140,7 +140,7 @@ public class Scout {
 		}
 		bestCycle = firstCycle;
 		//bestTracks.add(firstTrack);
-		System.out.println(firstTrack.getFileNameNoPath());
+		//System.out.println(firstTrack.getFileNameNoPath());
 		iterator = cyclesForTracks.entrySet().iterator();
 		t = null;
 		c = null;
@@ -158,7 +158,7 @@ public class Scout {
 				}
 			}
 		}
-		System.out.println(secondTrack.getFileNameNoPath());
+		//System.out.println(secondTrack.getFileNameNoPath());
 		
 		iterator = cyclesForTracks.entrySet().iterator();
 		t = null;
@@ -178,7 +178,7 @@ public class Scout {
 				}
 			}	
 		}
-		System.out.println(thirdTrack.getFileNameNoPath());
+		//System.out.println(thirdTrack.getFileNameNoPath());
 		
 		System.out.println(firstValue);
 		System.out.println(secondValue);
