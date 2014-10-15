@@ -24,16 +24,17 @@ public class Monte {
 	public Action getNextAction(Tour tour) {
 		mNode = new MonteNode(tour);
 		System.out.print("MCTS: "); 
-//		startTimer();
-//		int iters = 0;
-//		while(!outOfTime(50)) {
-//			mNode.exploitExpand();
-//			iters++;
-//		}
-//		System.out.print("iters_" + iters + " - ");
+		startTimer();
+		int iters = 0;
+		while(!outOfTime(50)) {
+			mNode.exploitExpand();
+			iters++;
+		}
+		System.out.print("iters_" + iters + " - ");
 		
 		mNode.expand();
-		Action bestAction = mNode.getNextMove();
+//		Action bestAction = mNode.getNextMove();
+		Action bestAction = mNode.getMove().action;
 		System.out.print("MCTS_" + bestAction + " - ");
 		System.out.println("DPOL_" + mNode.defaultPolicy(tour.getLatestRaceState()));
 		return bestAction; // Return best action

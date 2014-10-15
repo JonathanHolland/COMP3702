@@ -92,7 +92,7 @@ public class Scout {
 				// Then include a weighting for the size of the map, the speed of the bike, the reliability/
 				// wildness and the number of distractors/opponents	
 				
-				Double net = (winnings-price*2-reliableFactor-wildFactor+speedFactor)+1000; 
+				Double net = (winnings-price*3-reliableFactor-wildFactor+speedFactor)+1000; 
 				
 //				System.out.println("----------- One bike/track added ------------");
 				trackCycle.put(trk, bike);
