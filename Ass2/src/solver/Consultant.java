@@ -31,10 +31,9 @@ public class Consultant {
 		// Run the "best" function inside Scout to find the best track/cycle combinations
 		s.selection(tour);
 		Cycle best = s.getCycle();
-		Track firstTrack = s.getTracks().get(0);
-		Track secondTrack = s.getTracks().get(1);
-		Track thirdTrack = s.getTracks().get(2);
-		
+		for(Track t : s.getTracks()){
+			tour.registerTrack(t, 1);
+		}
 		// Initiate the MCTS method for movement within a race
 		Monte m = new Monte();
 		
@@ -55,9 +54,9 @@ public class Consultant {
 //		} 
 		
 		// before running the tour, register the three tracks
-		tour.registerTrack(firstTrack, 1);
-		tour.registerTrack(secondTrack, 1);
-		tour.registerTrack(thirdTrack, 1);
+//		tour.registerTrack(firstTrack, 1);
+//		tour.registerTrack(secondTrack, 1);
+//		tour.registerTrack(thirdTrack, 1);
 		
 		// for the tour, run through the three tracks
 		while (!tour.isFinished()) {
@@ -80,16 +79,16 @@ public class Consultant {
 					startPosition = entry1.getValue();
 					break;
 				}
-				Cycle raceCycle;
+				Cycle raceCycle = cycle.get(0);
 				// Here we want to add the associated cycle for this track
 				// therefore use the track to index it in our map of map>doubles
-				if (firstTrack.equals(track)) {
-					raceCycle = cycle.get(0);
-				} else if (secondTrack.equals(track)) {
-					raceCycle = cycle.get(0);
-				} else {
-					raceCycle = cycle.get(0);
-				}
+//				if (firstTrack.equals(track)) {
+//					raceCycle = cycle.get(0);
+//				} else if (secondTrack.equals(track)) {
+//					raceCycle = cycle.get(0);
+//				} else {
+//					raceCycle = cycle.get(0);
+//				}
 				
 				players.add(new Player(id, raceCycle, startPosition));
 				
