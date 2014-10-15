@@ -885,8 +885,8 @@ public class Visualiser {
 		}
 	}
 
-	static String defaultCycleFile = "testcases/novice/cycle.txt";
-	static String defaultMetaTrackFile = "testcases/novice/meta-track.txt";
+	static String defaultCycleFile = "testcases/tourDuJura/cycle.txt";
+	static String defaultMetaTrackFile = "testcases/tourDuJura/meta-track.txt";
 	static String defaultOutputFile = "result.txt";
 
 	public static void main(String[] args) {

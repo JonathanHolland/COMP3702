@@ -57,14 +57,15 @@ public class MonteNode {
         MonteNode newNode = cur.select();
         visited.add(newNode);
         double value = rollOut(newNode);
+//        System.out.println(value);
         for (MonteNode node : visited) {
-            node.updateStats(value);
+        	node.updateStats(value);
         }
 	}
 	
 	public MonteNode select() {
         MonteNode selected = null;
-        double bestValue = Double.MIN_VALUE;
+        double bestValue = -1 * Double.MAX_VALUE;
         for (MonteNode c : children) {
             double uctValue = 
                     c.totValue / (c.nVisits + epsilon) +
@@ -99,7 +100,7 @@ public class MonteNode {
     
     // But this is where you play the game into the future to see if this is a valid route.
     public double rollOut(MonteNode n) {
-    	int count = tour.getCurrentTrack().getNumCols()*2;
+    	int count = tour.getCurrentTrack().getNumCols()*3;
     	int raceIndex = tour.getRaceIndex();
     	
     	// Make a simulator from the current tour data
@@ -110,6 +111,7 @@ public class MonteNode {
     	List<Action> A = new ArrayList<Action>();
     	A.add(n.action);
     	while(count-- > 0 && !sim.isFinished()) {
+//    		System.out.println(count);
     		sim.stepTurn(A);
     		A.clear();
     		A.add(defaultPolicy(sim.getCurrentState()));
@@ -117,13 +119,15 @@ public class MonteNode {
     	if(!sim.isFinished()) {
     		System.out.println("We didn't reach the end in time");
     	}
-    	
+//    	System.out.println("NOTPRINTING");
     	// We shouldn't base it off getting to the finish so soon,
     	// instead it should just be the damage to move towards the goal?
     	
     	if(sim.getCurrentStatus() == RaceState.Status.WON) {
+//    		System.out.println("WON");
     		return sim.getTrack().getPrize() - sim.getTotalDamageCost();
     	}
+//    	System.out.println("LOST");
         return 1 - sim.getTotalDamageCost();
     	
 //    	count = 0;
@@ -154,26 +158,33 @@ public class MonteNode {
     public Action defaultPolicy(RaceState state) {
     	GridCell p = state.getPlayers().get(0).getPosition();
     	int r = track.getNumRows(), c = track.getNumCols();
+    	List<Distractor> dist = track.getDistractors();
+    	List<GridCell> distPos = new ArrayList<GridCell>();
     	
-    	if(track.getCellType(posIfMove(Action.FS)) == Track.CellType.OBSTACLE) {
+    	for(int i=0;i<dist.size();i++) {
+    		distPos.add(dist.get(i).getPosition());
+    	}
+    	
+    	if(((track.getCellType(posIfMove(Action.FS)) == Track.CellType.OBSTACLE))||(distPos.contains(posIfMove(Action.FS)))) {
     		try { // could error
-				if(track.getCellType(posIfMove(Action.NE)) != Track.CellType.OBSTACLE) {
-	    			return Action.NE;
+				if(((track.getCellType(posIfMove(Action.NE)) != Track.CellType.OBSTACLE))&&(!distPos.contains(posIfMove(Action.NE)))) {
+					return Action.NE;
     		}
     		} catch (Exception ex) {}
     		
     		try { // could error
-    			if(track.getCellType(posIfMove(Action.SE)) != Track.CellType.OBSTACLE){
+    			if(((track.getCellType(posIfMove(Action.SE)) != Track.CellType.OBSTACLE))&&!distPos.contains(posIfMove(Action.SE))){
     				return Action.SE;
     		}
     		} catch (Exception ex) {}
     	}
-    	if(c > p.getCol()+2 && track.getCellType(posIfMove(Action.FM)) == Track.CellType.OBSTACLE) {
+    	if(c > p.getCol()+2 && ((track.getCellType(posIfMove(Action.FM)) == Track.CellType.OBSTACLE)||distPos.contains(posIfMove(Action.FM)))) {
     		return Action.FS;
     	}
-    	if(c > p.getCol()+3 && track.getCellType(posIfMove(Action.FF)) == Track.CellType.OBSTACLE) {
+    	if(c > p.getCol()+3 && ((track.getCellType(posIfMove(Action.FF)) == Track.CellType.OBSTACLE)||distPos.contains(posIfMove(Action.FF)))) {
     		return Action.FM;
     	}
+    	
     	return Action.FF;
     }
     
