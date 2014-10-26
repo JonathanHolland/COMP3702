@@ -32,7 +32,7 @@ public class Monte {
 		}
 		System.out.print("iters_" + iters + " - ");
 		
-		mNode.expand();
+//		mNode.expand();
 //		Action bestAction = mNode.getNextMove();
 		Action bestAction = mNode.getMove().action;
 		System.out.print("MCTS_" + bestAction + " - ");

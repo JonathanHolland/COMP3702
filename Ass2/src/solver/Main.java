@@ -6,7 +6,6 @@ import problem.Setup;
 import problem.Tour;
 
 public class Main {
-	
 	static String defaultCycleFile = "testcases/demo/medium/cycle.txt";
 	static String defaultMetaTrackFile = "testcases/demo/medium/meta-track.txt";
 	static String defaultOutputFile = "result.txt";

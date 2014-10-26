@@ -12,7 +12,7 @@ public class MonteNode {
 	// A list of all possible actions
 	static final Action actions[] = {Action.FS, Action.FM, Action.FF, Action.NE, Action.SE};
 	static double epsilon = 0.001;
-	static int nActions =3; // may need to be bigger
+	static int nActions = 3; // may need to be bigger
 	
 	RaceState state;
 	Track track;
@@ -121,7 +121,6 @@ public class MonteNode {
         for (int i=0; i<speds; i++) {
             children.add(new MonteNode(actions[i], tour));
         }
-//        System.out.println(children.get(0));
     }
     
     public MonteNode getMove() {
