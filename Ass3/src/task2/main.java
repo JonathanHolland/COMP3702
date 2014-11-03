@@ -1,6 +1,7 @@
-package task1;
+package task2;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,8 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-
-import problem.Cycle;
+import task1.Node;
 
 public class main {
 
@@ -22,7 +22,7 @@ public class main {
 
 	}
 	
-	public void read_file(String filename) {
+	public void read_file(String filename) throws IOException {
 
 		FileReader fr = new FileReader(filename); // the file to read from
 		Scanner in = new Scanner(fr); // scanner for reading the file
@@ -31,6 +31,7 @@ public class main {
 
 		BufferedReader input = new BufferedReader(new FileReader(filename));
 		String line;
+		String[] nodeStrs;
 		int lineNo = 0;
 		Scanner s;
 		try {
@@ -43,6 +44,7 @@ public class main {
 
 			
 			line = input.readLine(); lineNo++;
+			nodeStrs = line.split("\\s+");
 			
 		} catch (InputMismatchException e) {
 			throw new IOException(String.format(
