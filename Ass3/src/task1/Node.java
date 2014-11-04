@@ -19,6 +19,13 @@ public class Node {
 		setNodePos(nodePos);
 	}
 
+	// For use in part 2
+	public Node(String id, int nodePos) {
+		setIdentifier(id);
+		setParents(null);
+		setNodePos(nodePos);
+	}
+
 	public String getIdentifier() {
 		return identifier;
 	}
