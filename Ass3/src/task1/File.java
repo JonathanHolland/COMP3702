@@ -14,7 +14,10 @@ public class File {
 
 	// The nodes list contains Node types that contain references to parents,
 	// and to their list of dataSets
-	private static List<Node> nodes = new ArrayList<Node>();
+	public static List<Node> nodes = new ArrayList<Node>();
+	
+	// The list of lists that corresponds to the dataSets being read
+	public static ArrayList<ArrayList<Integer>> dataSets = new ArrayList<ArrayList<Integer>>();
 
 	/**
 	 * The training data sets for this part are the .txt files whose names start
@@ -50,12 +53,9 @@ public class File {
 		FileReader fr = new FileReader(fileName); // the file to read from
 		Scanner in = new Scanner(fr); // scanner for reading the file
 		int lineNumber = 0; // the number of the line being read
-		// The list of lists that corresponds to the dataSets being read
-		ArrayList<ArrayList<Integer>> dataSets = new ArrayList<ArrayList<Integer>>();
 
 		while (in.hasNextLine()) {
 			String line = in.nextLine(); // read in the file line-by-line
-
 			// If line is null or equal to empty string representation, break
 			// loop
 			if (line == null || EMPTY_LINE.equals(line)) {
@@ -69,7 +69,7 @@ public class File {
 			}
 
 			// Add each beginning position co-ordinate double to the list
-			else if (lineNumber < (nodeNumber + 2)) {
+			else if (lineNumber < (nodeNumber + 1)) {
 				String[] parts = line.split(" ");
 				// Reset nodeParents to empty
 				nodeParents = new ArrayList<Node>();
@@ -100,7 +100,7 @@ public class File {
 
 	private static Node getNode(String id) {
 		for (int i = 0; i < nodes.size(); i++) {
-			if (id == nodes.get(i).getIdentifier()) {
+			if (id.equals(nodes.get(i).getIdentifier())) {
 				return nodes.get(i);
 			}
 		}

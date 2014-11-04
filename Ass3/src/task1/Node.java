@@ -1,6 +1,6 @@
 package task1;
 
-import java.util.List;
+import java.util.*;
 
 public class Node {
 
@@ -12,6 +12,8 @@ public class Node {
 	private List<Node> parents;
 	// Store the position of the node (for each dataSet)
 	private int nodePos;
+	// CPT values
+	private Map<Parents, Double> cpt = new HashMap<Parents, Double>();
 
 	public Node(String id, List<Node> parents, int nodePos) {
 		setIdentifier(id);
@@ -25,7 +27,7 @@ public class Node {
 		setParents(null);
 		setNodePos(nodePos);
 	}
-
+	
 	public String getIdentifier() {
 		return identifier;
 	}
@@ -48,5 +50,23 @@ public class Node {
 
 	public void setNodePos(int nodePos) {
 		this.nodePos = nodePos;
+	}
+
+	public Map<Parents, Double> getValue() {
+		return cpt;
+	}
+
+	public void setValue(Parents p, double value) {
+		cpt.put(p, value);
+	}
+	
+	@Override
+	public String toString() {
+		String s = identifier + ": ";
+		if(parents.contains(null)) return s + parents;
+		for(int i = 0; i < parents.size(); i++) {
+			s += (parents.get(i).identifier + ", ");
+		}
+		return s;
 	}
 }
