@@ -67,6 +67,6 @@ public class Node {
 		for(int i = 0; i < parents.size(); i++) {
 			s += (parents.get(i).identifier + ", ");
 		}
-		return s;
+		return s.substring(0, s.length()-2);
 	}
 }

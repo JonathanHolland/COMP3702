@@ -18,15 +18,17 @@ public class Solution {
 	public static void main(String[] args) throws IOException {
 		
 		// load the network
-		File.read(file4);
+		File.read(file3);
 		Solution s = new Solution(File.nodes, File.dataSets);
 		for(Node n : s.nodes) { // print us the nodes?
 			System.out.println(n);
 		}
+		System.out.println("\nCPTs: ");
 		for(Node n : s.nodes) {
 			s.findCPT(n);
-			System.out.println(n.getValue());
+			System.out.println(n.getIdentifier() + ": " + n.getValue());
 		}
+//		System.out.println("Log Likelyhood: " + log_likely());
 	}
 	
 	public Solution(List<Node> nodes, ArrayList<ArrayList<Integer>> dataset) {
@@ -39,8 +41,8 @@ public class Solution {
 		
 		
 		if(n.getParents().size() < 1) { // if there's no parents just do this 
-			num = count_in_data(n, 1) + 1; // the number of times this node is true
-			n.setValue(null,  num/(dataset.size()+1));
+			num = count_in_data(n, 1); // the number of times this node is true
+			n.setValue(null,  num/(dataset.size()));
 			return;
 		}
 		
@@ -49,11 +51,16 @@ public class Solution {
 		
 		for(List<Boolean> bs : results) {
 			nodeVal = num = den = 0;
-			
+			Parents p = new Parents(n.getParents(), bs);
 			// Search for the case described by bs in dataset and then use that to add the setValue to the node
-			num = count_in_data(n, new Parents(n.getParents(), bs)) + 1;
-			den = count_in_data(new Parents(n.getParents(), bs)) + 1;
+			num = count_in_data(n, p);
+			den = count_in_data(p);
+//			System.out.println("For: " + p);
+//			System.out.println(" num         " + num);
+//			System.out.println("-----       ------");
+//			System.out.println(" den         " + den + "\n");
 			nodeVal = num/den;
+//			System.out.println("Giving: " + nodeVal);
 			
 			// add the value to the node
 			n.setValue(new Parents(n.getParents(), bs), nodeVal);
@@ -76,7 +83,6 @@ public class Solution {
 		return count;
 	}
 	
-	
 	/**
 	 * returns the number of time n is true and p matches with the dataset.
 	 * @param n
@@ -89,10 +95,11 @@ public class Solution {
 			if(set.get(n.getNodePos()) == 1) {
 				int parentmismatch = 0;
 				for(int i = 0; i < p.nodes().size(); i++) {
-					int nodeBool = p.getVal(p.nodes().get(i)) ? 1 : 0;
+					Node t = p.nodes().get(i);
+					int nodeBool = p.getVal(t) ? 1 : 0;
 					// if the parent's needed value (nodeBool) isn't the same as the value in the data
 					// inc parentmismatch.
-					if(nodeBool != set.get(p.nodes().get(i).getNodePos())) parentmismatch++;
+					if(nodeBool != set.get(t.getNodePos())) parentmismatch++;
 				}
 				if(parentmismatch == 0) { // if there were no parent mismatches count this set
 					count++;
@@ -125,6 +132,10 @@ public class Solution {
 		return count;
 	}
 	
+	private double log_likely() {
+		
+		return (Double) null;
+	}
 	
 
 }

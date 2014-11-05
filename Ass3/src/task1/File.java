@@ -91,19 +91,18 @@ public class File {
 				}
 				dataSets.add(dataSet);
 			}
-
 			lineNumber++;
-
 		}
 		in.close();
 	}
 
-	private static Node getNode(String id) {
+	public static Node getNode(String id) {
 		for (int i = 0; i < nodes.size(); i++) {
 			if (id.equals(nodes.get(i).getIdentifier())) {
 				return nodes.get(i);
 			}
 		}
+		System.out.println("#############################");
 		return null;
 	}
 }
