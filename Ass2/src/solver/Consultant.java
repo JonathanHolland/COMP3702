@@ -32,9 +32,6 @@ public class Consultant {
 		s.selection(tour);
 		Cycle best = s.getCycle();
 		
-		// Initiate the MCTS method for movement within a race
-		Monte m = new Monte();
-		
 		// Buy the 3 cycles listed in the three best matches
 		List<Cycle> cycle = new ArrayList<Cycle>();
 		cycle.add(best);
@@ -44,6 +41,13 @@ public class Consultant {
 		// Make sure we don't buy another bike if the same one is in another best match
 		// i.e. with another track
 		tour.buyCycle(cycle.get(0));
+
+		
+	for(Track t : s.getTracks()){
+			tour.registerTrack(t, 1);
+		}
+		// Initiate the MCTS method for movement within a race
+		Monte m = new Monte();
 //		if(!cycle.get(0).equals(cycle.get(1))) {
 //			tour.buyCycle(cycle.get(1));
 //		} 
