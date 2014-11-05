@@ -77,6 +77,16 @@ public class Parents {
         recursivelyCombine(result, temp2, size, index+1);
 	}
 	
+	@Override
+	public String toString() {
+		String str = "[";
+		List<Node> ns = new ArrayList<Node>(m.keySet());
+		for(Node n : ns) {
+			str += n.getIdentifier() + ":" + m.get(n) + " ";
+		}
+		return str.substring(0, str.length()-1) + "]";
+	}
+	
 //	static void recursivelyCombine(List<List<Boolean>> result, List<Boolean> current, List<Boolean> in1, List<Boolean> in2, int index) {
 //	    if (index == in1.size()) {
 //	        result.add(current);
