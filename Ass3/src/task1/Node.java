@@ -45,7 +45,17 @@ public class Node {
 		this.nodePos = nodePos;
 	}
 
-	public Map<Parents, Double> getValue() {
+	public Double getValue(List<Boolean> bs) {
+		System.out.println("rawr");
+		System.out.println(bs);
+		Parents p = new Parents(this.getParents(), bs);
+		System.out.println(p);
+		Double t = cpt.get(p);
+		System.out.println("T: " + t);
+		return t;
+	}
+	
+	public Map<Parents, Double> getValues() {
 		return cpt;
 	}
 

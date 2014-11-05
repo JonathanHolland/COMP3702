@@ -2,6 +2,7 @@ package task1;
 
 import java.io.IOException;
 import java.util.*;
+import java.math.*;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
 
@@ -18,7 +19,7 @@ public class Solution {
 	public static void main(String[] args) throws IOException {
 		
 		// load the network
-		File.read(file3);
+		File.read(file4);
 		Solution s = new Solution(File.nodes, File.dataSets);
 		for(Node n : s.nodes) { // print us the nodes?
 			System.out.println(n);
@@ -26,9 +27,9 @@ public class Solution {
 		System.out.println("\nCPTs: ");
 		for(Node n : s.nodes) {
 			s.findCPT(n);
-			System.out.println(n.getIdentifier() + ": " + n.getValue());
+			System.out.println(n.getIdentifier() + ": " + n.getValues());
 		}
-//		System.out.println("Log Likelyhood: " + log_likely());
+//		System.out.println("Log Likelyhood: " + s.log_likely());
 	}
 	
 	public Solution(List<Node> nodes, ArrayList<ArrayList<Integer>> dataset) {
@@ -133,8 +134,35 @@ public class Solution {
 	}
 	
 	private double log_likely() {
-		
-		return (Double) null;
+		double llh = 0;
+		for(ArrayList<Integer> set : dataset) {
+			for(Node n : nodes) {
+				double tempVal = 0;
+				List<Boolean> bb = build_list_from_set(set);
+				if(n.getParents() == null && bb.get(n.getNodePos()) == false) { // if we have no parents and am false
+					llh += (1 - n.getValues().get(null));
+					continue;
+				} else if(n.getParents() == null && bb.get(n.getNodePos()) == true) {//if we have no parents and am true
+					llh += n.getValues().get(null);
+					continue;
+				}
+				System.out.println(n);
+				System.out.println(bb);
+				tempVal = n.getValue(bb); 
+				if(set.get(n.getNodePos()) == 0) tempVal = 1- tempVal;
+				llh += tempVal;
+			}
+		}
+		return llh;
+	}
+	
+	private List<Boolean> build_list_from_set(List<Integer> set) {
+		List<Boolean> t = new ArrayList<Boolean>();
+		for(Integer i : set) {
+			if(i == 0) t.add(false);
+			else if(i == 1) t.add(true);
+		}
+		return t;
 	}
 	
 
