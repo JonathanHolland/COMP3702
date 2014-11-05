@@ -15,13 +15,6 @@ public class Node {
 	// CPT values
 	private Map<Parents, Double> cpt = new HashMap<Parents, Double>();
 
-	public Node(String id, List<Node> parents, int nodePos) {
-		setIdentifier(id);
-		setParents(parents);
-		setNodePos(nodePos);
-	}
-
-	// For use in part 2
 	public Node(String id, int nodePos) {
 		setIdentifier(id);
 		setParents(null);
