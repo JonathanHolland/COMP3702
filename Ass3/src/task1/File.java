@@ -3,8 +3,12 @@ package task1;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.Set;
 
 public class File {
 
@@ -47,13 +51,17 @@ public class File {
 		nodeNumber = 0;
 		dataNumber = 0;
 		String nodeID;
-		List<Node> nodeParents;
 		int posCount = 0;
 
 		FileReader fr = new FileReader(fileName); // the file to read from
 		Scanner in = new Scanner(fr); // scanner for reading the file
 		int lineNumber = 0; // the number of the line being read
 
+		// A mapping for parents of nodes so that parents can be declared
+		// as parents before they are declared as nodes
+		Map<Node, List<String>> parentMap = new HashMap<Node, List<String>>();
+		List<String> nodeParents; 
+		
 		while (in.hasNextLine()) {
 			String line = in.nextLine(); // read in the file line-by-line
 			// If line is null or equal to empty string representation, break
@@ -68,17 +76,20 @@ public class File {
 				dataNumber = Integer.parseInt(parts[1]);
 			}
 
-			// Add each beginning position co-ordinate double to the list
+			
 			else if (lineNumber < (nodeNumber + 1)) {
 				String[] parts = line.split(" ");
 				// Reset nodeParents to empty
-				nodeParents = new ArrayList<Node>();
+				nodeParents = new ArrayList<String>();
 				nodeID = parts[0];
+				
 				for (int i = 1; i < parts.length; i++) {
-					nodeParents.add(getNode(parts[i]));
+					nodeParents.add(parts[i]);
 				}
+				
 				// Create the node
-				Node n = new Node(nodeID, nodeParents, posCount);
+				Node n = new Node(nodeID, posCount);
+				parentMap.put(n, nodeParents);
 				nodes.add(n);
 				posCount++;
 			}
@@ -95,6 +106,24 @@ public class File {
 			lineNumber++;
 
 		}
+		List<String> parents = new ArrayList<String>();
+		Node n;
+		for (Map.Entry<Node, List<String>> entry : parentMap.entrySet())
+		{
+			n = entry.getKey(); 
+			List<Node> parentNodes =  new ArrayList<Node>();
+		    parents = entry.getValue();
+		    for(int i=0; i<parents.size(); i++) {
+		    	for(int j=0; j<nodes.size(); j++) {
+		    		if(parents.get(i).equals(nodes.get(j).getIdentifier())) {
+		    			parentNodes.add(nodes.get(j));
+		    		}
+		    	}
+		    	
+		    }
+		    //System.out.println(parentNodes);
+		    n.setParents(parentNodes);
+		}
 		in.close();
 	}
 
@@ -105,5 +134,9 @@ public class File {
 			}
 		}
 		return null;
+	}
+	
+	public void writeCPT() {
+		
 	}
 }
