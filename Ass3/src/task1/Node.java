@@ -30,7 +30,7 @@ public class Node {
 	}
 
 	public List<Node> getParents() {
-		return parents;
+		return new ArrayList<Node>(parents);
 	}
 
 	public void setParents(List<Node> parents) {
@@ -46,13 +46,24 @@ public class Node {
 	}
 
 	public Double getValue(List<Boolean> bs) {
-		System.out.println("rawr");
-		System.out.println(bs);
-		Parents p = new Parents(this.getParents(), bs);
-		System.out.println(p);
-		Double t = cpt.get(p);
-		System.out.println("T: " + t);
-		return t;
+		Parents p = null;
+		System.out.println("Getting Value using: " + bs);
+		if(bs != null) p = new Parents(this.getParents(), bs);
+		System.out.println("p: " + p);
+		System.out.println("cpt: " + cpt);
+		List<Parents> Keys = new ArrayList<Parents>(cpt.keySet());
+		if(p != null) {
+			for(Parents k : Keys) {
+				if(p != null && p.equals(k)) {
+					return cpt.get(k);
+				}
+			}
+		} else {
+			return cpt.get(p);
+			
+		}
+		System.out.println("VALUE WAS NOT FOUND CORRECTLY :(");
+		return 1.0;
 	}
 	
 	public Map<Parents, Double> getValues() {

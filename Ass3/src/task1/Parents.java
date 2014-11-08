@@ -77,6 +77,16 @@ public class Parents {
 		}
 		return str.substring(0, str.length()-1) + "]";
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) return false;
+	    if (o == this) return true;
+	    if (!(o instanceof Parents))return false;
+	    Parents p = (Parents)o;
+	    if(this.m.equals(p.m)) return true;
+	    return false;
+	}
 
 	
 	

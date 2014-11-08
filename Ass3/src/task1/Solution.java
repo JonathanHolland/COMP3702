@@ -29,7 +29,9 @@ public class Solution {
 			s.findCPT(n);
 			System.out.println(n.getIdentifier() + ": " + n.getValues());
 		}
-//		System.out.println("Log Likelyhood: " + s.log_likely());
+		double lHood = s.likelyhood();
+		System.out.println("Likelyhood: " + lHood);
+		System.out.println("Log Likelyhood: " + Math.log10(lHood));
 	}
 	
 	public Solution(List<Node> nodes, ArrayList<ArrayList<Integer>> dataset) {
@@ -41,7 +43,7 @@ public class Solution {
 		double nodeVal, num, den;
 		
 		
-		if(n.getParents().size() < 1) { // if there's no parents just do this 
+		if(n.getParents().isEmpty()) { // if there's no parents just do this 
 			num = count_in_data(n, 1); // the number of times this node is true
 			n.setValue(null,  num/(dataset.size()));
 			return;
@@ -56,15 +58,10 @@ public class Solution {
 			// Search for the case described by bs in dataset and then use that to add the setValue to the node
 			num = count_in_data(n, p);
 			den = count_in_data(p);
-//			System.out.println("For: " + p);
-//			System.out.println(" num         " + num);
-//			System.out.println("-----       ------");
-//			System.out.println(" den         " + den + "\n");
 			nodeVal = num/den;
-//			System.out.println("Giving: " + nodeVal);
 			
 			// add the value to the node
-			n.setValue(new Parents(n.getParents(), bs), nodeVal);
+			n.setValue(p, nodeVal);
 		}
 	}
 	
@@ -133,27 +130,52 @@ public class Solution {
 		return count;
 	}
 	
-	private double log_likely() {
-		double llh = 0;
+	/**
+	 * For each node Sum the log value of their dataset's value, 
+	 * @return
+	 */
+	private double likelyhood() {
+		List<Double> setVals = new ArrayList<Double>();
 		for(ArrayList<Integer> set : dataset) {
+			List<Double> nodeVals = new ArrayList<Double>();
 			for(Node n : nodes) {
+				System.out.println("NODE: - " + n.getIdentifier());
+				// find the probability of the parents of this node matching the dataset
 				double tempVal = 0;
-				List<Boolean> bb = build_list_from_set(set);
-				if(n.getParents() == null && bb.get(n.getNodePos()) == false) { // if we have no parents and am false
-					llh += (1 - n.getValues().get(null));
-					continue;
-				} else if(n.getParents() == null && bb.get(n.getNodePos()) == true) {//if we have no parents and am true
-					llh += n.getValues().get(null);
+				List<Node> parents = n.getParents(); // summon 'rents
+				if(parents.isEmpty()) { // do we have parents?
+					if(set.get(n.getNodePos()) == 1) nodeVals.add(n.getValue(null));
+					if(set.get(n.getNodePos()) == 0) nodeVals.add(1 - n.getValue(null)); // negate the value if the set has a false value
+					System.out.println("We got this val: " + nodeVals.get(nodeVals.size()-1));
 					continue;
 				}
-				System.out.println(n);
-				System.out.println(bb);
-				tempVal = n.getValue(bb); 
-				if(set.get(n.getNodePos()) == 0) tempVal = 1- tempVal;
-				llh += tempVal;
+				System.out.println("We have Parent's see: " + n.getParents());
+				List<Boolean> valOfParentsinSet = new ArrayList<Boolean>();
+				for(Node pNode : parents) {
+					if(set.get(pNode.getNodePos()) == 1) valOfParentsinSet.add(true);
+					else if(set.get(pNode.getNodePos()) == 0) valOfParentsinSet.add(false);
+				}
+				System.out.println("Val of rents" + valOfParentsinSet);
+				
+				if(set.get(n.getNodePos()) == 1) nodeVals.add(n.getValue(valOfParentsinSet));
+				if(set.get(n.getNodePos()) == 0) nodeVals.add(1 - n.getValue(valOfParentsinSet));
+				
+				System.out.println("We got this val: " + nodeVals.get(nodeVals.size()-1));
 			}
+			// Total all the node's values
+			double totalForSet = 1;
+			System.out.println("NodeVals: " + nodeVals);
+			for(Double d : nodeVals) {
+				totalForSet = totalForSet * d;
+			}
+			setVals.add(totalForSet);
 		}
-		return llh;
+		// total all the dataset's values
+		double total = 1;
+		for(Double d : setVals) {
+			total = total * d;
+		}
+		return total;
 	}
 	
 	private List<Boolean> build_list_from_set(List<Integer> set) {
