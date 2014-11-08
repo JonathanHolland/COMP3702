@@ -144,6 +144,7 @@ public class Solution {
 				double tempVal = 0;
 				List<Node> parents = n.getParents(); // summon 'rents
 				if(parents.isEmpty()) { // do we have parents?
+					// if we don't then our value is at the null key
 					if(set.get(n.getNodePos()) == 1) nodeVals.add(n.getValue(null));
 					if(set.get(n.getNodePos()) == 0) nodeVals.add(1 - n.getValue(null)); // negate the value if the set has a false value
 					System.out.println("We got this val: " + nodeVals.get(nodeVals.size()-1));
@@ -151,12 +152,13 @@ public class Solution {
 				}
 				System.out.println("We have Parent's see: " + n.getParents());
 				List<Boolean> valOfParentsinSet = new ArrayList<Boolean>();
-				for(Node pNode : parents) {
+				for(Node pNode : parents) { // figure out what values our parents should have
 					if(set.get(pNode.getNodePos()) == 1) valOfParentsinSet.add(true);
 					else if(set.get(pNode.getNodePos()) == 0) valOfParentsinSet.add(false);
 				}
 				System.out.println("Val of rents" + valOfParentsinSet);
 				
+				// add the expected value of us given our parents in the data set and negate it if necessary
 				if(set.get(n.getNodePos()) == 1) nodeVals.add(n.getValue(valOfParentsinSet));
 				if(set.get(n.getNodePos()) == 0) nodeVals.add(1 - n.getValue(valOfParentsinSet));
 				
