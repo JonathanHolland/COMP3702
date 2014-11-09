@@ -1,7 +1,10 @@
 package task1;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -135,7 +138,58 @@ public class File {
 		return null;
 	}
 	
-	public void writeCPT() {
+	public static void writeCPT(String trainingDataName) throws IOException {
+		BufferedWriter writer = null;
+
+		try {
+		    writer = new BufferedWriter(new OutputStreamWriter(
+		          new FileOutputStream("cpt="+trainingDataName+".txt"), "utf-8"));
+		    
+		    for(int i=0; i< nodes.size(); i++) {
+		    	// Write the identifier of this node first
+		    	writer.write(nodes.get(i).getIdentifier());
+		    	// Then add each parent
+		    	int parentSize = nodes.get(i).getParents().size();
+		    	for(int j=0; j<parentSize; j++) {
+		    		writer.write(" "+ nodes.get(i).getParents().get(j).getIdentifier());
+		    	}
+		    	// New line
+			    writer.newLine();
+			    // Write the associated CPT
+			    // for each parent again, take the values in ascending order
+			    List<Boolean> bs =  new ArrayList<Boolean>();
+			    while(bs.contains(false)) {
+			    	writer.write(nodes.get(i).getValue(bs).intValue());
+			    	bs = fullAdder(bs, bs.size()-1);
+			    }
+			    writer.newLine();
+		    }
+		    
+		    
+		} catch (IOException ex) {
+		  // report
+		} finally {
+		   try {writer.close();} catch (Exception ex) {}
+		}
+	}
+	
+	public static List<Boolean> fullAdder(List<Boolean> bs, int indexToCheck) {
+		// if the last element is a false, make it true
+		// if the last element is true, check the one before it again and again until it is false,
+    	// then set it true  and all the others after it to false
+    	// eg. from 0 1 1 to 1 0 0
+		if(bs.get(indexToCheck)==false) {
+    		bs.set(indexToCheck, true);
+    		// set whatever was after it to false
+    		int numAfter = (bs.size()-1)-indexToCheck;
+    		while(numAfter!=0) {
+    			bs.set(bs.size()-numAfter, false);
+    			numAfter--;
+    		}
+    	} else {
+    		fullAdder(bs, indexToCheck-1);
+    	}
 		
+		return bs;
 	}
 }
