@@ -12,6 +12,10 @@ public class Solution {
 	static final String file2 = "data/CPTnoMissingData-d2.txt";
 	static final String file3 = "data/CPTnoMissingData-d3.txt";
 	static final String file4 = "data/lectEx.txt";
+	static final String file5 = "data/part-one-d1.txt";
+	static final String file6 = "data/part-one-d2.txt";
+	static final String file7 = "data/part-one-d3.txt";
+	static final String file8 = "data/part-one-d4.txt";
 	
 	List<Node> nodes = new ArrayList<Node>();
 	ArrayList<ArrayList<Integer>> dataset = new ArrayList<ArrayList<Integer>>();
@@ -19,7 +23,7 @@ public class Solution {
 	public static void main(String[] args) throws IOException {
 		
 		// load the network
-		File.read(file4);
+		File.read(file8);
 		Solution s = new Solution(File.nodes, File.dataSets);
 		for(Node n : s.nodes) { // print us the nodes?
 			System.out.println(n);
@@ -29,9 +33,8 @@ public class Solution {
 			s.findCPT(n);
 			System.out.println(n.getIdentifier() + ": " + n.getValues());
 		}
-		double lHood = s.likelyhood();
-		System.out.println("Likelyhood: " + lHood);
-		System.out.println("Log Likelyhood: " + Math.log10(lHood));
+		System.out.println("Likelyhood: " + s.likelyhood());
+		System.out.println("Log Likelyhood: " + s.log_likelyhood());
 	}
 	
 	public Solution(List<Node> nodes, ArrayList<ArrayList<Integer>> dataset) {
@@ -44,8 +47,8 @@ public class Solution {
 		
 		
 		if(n.getParents().isEmpty()) { // if there's no parents just do this 
-			num = count_in_data(n, 1); // the number of times this node is true
-			n.setValue(null,  num/(dataset.size()));
+			num = count_in_data(n, 1) + 1; // the number of times this node is true
+			n.setValue(null,  num/(dataset.size() + 1));
 			return;
 		}
 		
@@ -56,8 +59,8 @@ public class Solution {
 			nodeVal = num = den = 0;
 			Parents p = new Parents(n.getParents(), bs);
 			// Search for the case described by bs in dataset and then use that to add the setValue to the node
-			num = count_in_data(n, p);
-			den = count_in_data(p);
+			num = count_in_data(n, p) + 1;
+			den = count_in_data(p) + 1;
 			nodeVal = num/den;
 			
 			// add the value to the node
@@ -131,7 +134,7 @@ public class Solution {
 	}
 	
 	/**
-	 * For each node Sum the log value of their dataset's value, 
+	 * For each node product the value of their dataset's value, 
 	 * @return
 	 */
 	private double likelyhood() {
@@ -139,7 +142,7 @@ public class Solution {
 		for(ArrayList<Integer> set : dataset) {
 			List<Double> nodeVals = new ArrayList<Double>();
 			for(Node n : nodes) {
-				System.out.println("NODE: - " + n.getIdentifier());
+//				System.out.println("NODE: - " + n.getIdentifier());
 				// find the probability of the parents of this node matching the dataset
 				double tempVal = 0;
 				List<Node> parents = n.getParents(); // summon 'rents
@@ -147,35 +150,83 @@ public class Solution {
 					// if we don't then our value is at the null key
 					if(set.get(n.getNodePos()) == 1) nodeVals.add(n.getValue(null));
 					if(set.get(n.getNodePos()) == 0) nodeVals.add(1 - n.getValue(null)); // negate the value if the set has a false value
-					System.out.println("We got this val: " + nodeVals.get(nodeVals.size()-1));
+//					System.out.println("We got this val: " + nodeVals.get(nodeVals.size()-1));
 					continue;
 				}
-				System.out.println("We have Parent's see: " + n.getParents());
+//				System.out.println("We have Parent's see: " + n.getParents());
 				List<Boolean> valOfParentsinSet = new ArrayList<Boolean>();
 				for(Node pNode : parents) { // figure out what values our parents should have
 					if(set.get(pNode.getNodePos()) == 1) valOfParentsinSet.add(true);
 					else if(set.get(pNode.getNodePos()) == 0) valOfParentsinSet.add(false);
 				}
-				System.out.println("Val of rents" + valOfParentsinSet);
+//				System.out.println("Val of rents" + valOfParentsinSet);
 				
 				// add the expected value of us given our parents in the data set and negate it if necessary
 				if(set.get(n.getNodePos()) == 1) nodeVals.add(n.getValue(valOfParentsinSet));
 				if(set.get(n.getNodePos()) == 0) nodeVals.add(1 - n.getValue(valOfParentsinSet));
 				
-				System.out.println("We got this val: " + nodeVals.get(nodeVals.size()-1));
+//				System.out.println("We got this val: " + nodeVals.get(nodeVals.size()-1));
 			}
 			// Total all the node's values
 			double totalForSet = 1;
-			System.out.println("NodeVals: " + nodeVals);
+//			System.out.println("NodeVals: " + nodeVals);
 			for(Double d : nodeVals) {
 				totalForSet = totalForSet * d;
 			}
 			setVals.add(totalForSet);
 		}
 		// total all the dataset's values
+//		System.out.println("Each Set's Values: " + setVals);
 		double total = 1;
 		for(Double d : setVals) {
 			total = total * d;
+		}
+		return total;
+	}
+	
+	private double log_likelyhood() {
+		List<Double> setVals = new ArrayList<Double>();
+		for(ArrayList<Integer> set : dataset) {
+			List<Double> nodeVals = new ArrayList<Double>();
+			for(Node n : nodes) {
+//				System.out.println("NODE: - " + n.getIdentifier());
+				// find the probability of the parents of this node matching the dataset
+				double tempVal = 0;
+				List<Node> parents = n.getParents(); // summon 'rents
+				if(parents.isEmpty()) { // do we have parents?
+					// if we don't then our value is at the null key
+					if(set.get(n.getNodePos()) == 1) nodeVals.add(n.getValue(null));
+					if(set.get(n.getNodePos()) == 0) nodeVals.add(1 - n.getValue(null)); // negate the value if the set has a false value
+//					System.out.println("We got this val: " + nodeVals.get(nodeVals.size()-1));
+					continue;
+				}
+//				System.out.println("We have Parent's see: " + n.getParents());
+				List<Boolean> valOfParentsinSet = new ArrayList<Boolean>();
+				for(Node pNode : parents) { // figure out what values our parents should have
+					if(set.get(pNode.getNodePos()) == 1) valOfParentsinSet.add(true);
+					else if(set.get(pNode.getNodePos()) == 0) valOfParentsinSet.add(false);
+				}
+//				System.out.println("Val of rents" + valOfParentsinSet);
+				
+				// add the expected value of us given our parents in the data set and negate it if necessary
+				if(set.get(n.getNodePos()) == 1) nodeVals.add(n.getValue(valOfParentsinSet));
+				if(set.get(n.getNodePos()) == 0) nodeVals.add(1 - n.getValue(valOfParentsinSet));
+				
+//				System.out.println("We got this val: " + nodeVals.get(nodeVals.size()-1));
+			}
+			// Total all the node's values
+			double totalForSet = 0;
+//			System.out.println("NodeVals: " + nodeVals);
+			for(Double d : nodeVals) {
+				totalForSet = totalForSet + Math.log(d);
+			}
+			setVals.add(totalForSet);
+		}
+		// total all the dataset's values
+//		System.out.println("Each Set's Values: " + setVals);
+		double total = 0;
+		for(Double d : setVals) {
+			total = total + d;
 		}
 		return total;
 	}

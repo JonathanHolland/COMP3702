@@ -47,10 +47,10 @@ public class Node {
 
 	public Double getValue(List<Boolean> bs) {
 		Parents p = null;
-		System.out.println("Getting Value using: " + bs);
+//		System.out.println("Getting Value using: " + bs);
 		if(bs != null) p = new Parents(this.getParents(), bs);
-		System.out.println("p: " + p);
-		System.out.println("cpt: " + cpt);
+//		System.out.println("p: " + p);
+//		System.out.println("cpt: " + cpt);
 		List<Parents> Keys = new ArrayList<Parents>(cpt.keySet());
 		if(p != null) {
 			for(Parents k : Keys) {
