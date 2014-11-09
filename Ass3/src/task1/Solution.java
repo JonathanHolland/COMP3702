@@ -240,6 +240,14 @@ public class Solution {
 		return t;
 	}
 	
+	public double getMIof(Node n1, Node n2) {
+		double totalmi = 0;
+		for(ArrayList<Integer> set : dataset) {
+			List<Boolean> bs = new ArrayList<Boolean>(build_list_from_set(set));
+			
+		}
+		return 0.0;
+	}
 
 }
 
