@@ -223,7 +223,7 @@ public class File {
 			    	bs.add(false);
 			    }
 			    while(bs.contains(false)) {
-			    	System.out.println(s.nodes.get(i).getValue(bs));
+//			    	System.out.println(s.nodes.get(i).getValue(bs));
 			    	writer.write(s.nodes.get(i).getValue(bs).toString()+" ");
 			    	bs = fullAdder(bs, bs.size()-1);
 			    }
