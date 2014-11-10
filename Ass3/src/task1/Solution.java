@@ -11,21 +11,25 @@ public class Solution {
 	static final String file1 = "CPTnoMissingData-d1.txt";
 	static final String file2 = "CPTnoMissingData-d2.txt";
 	static final String file3 = "CPTnoMissingData-d3.txt";
-	static final String file4 = "lectEx.txt";
-	static final String file5 = "part-one-d1.txt";
-	static final String file6 = "part-one-d2.txt";
-	static final String file7 = "part-one-d3.txt";
-	static final String file8 = "part-one-d4.txt";
+	static final String file4 = "noMissingData-d1.txt";
+	static final String file5 = "noMissingData-d2.txt";
+	static final String file6 = "noMissingData-d3.txt";
+	static final String file7 = "lectEx.txt";
+	static final String file8 = "part-one-d1.txt";
+	static final String file9 = "part-one-d2.txt";
+	static final String file10 = "part-one-d3.txt";
+	static final String file11 = "part-one-d4.txt";
 	
 	public List<Node> nodes = new ArrayList<Node>();
 
 	public ArrayList<ArrayList<Integer>> dataset = new ArrayList<ArrayList<Integer>>();
 	
 	public static void main(String[] args) throws IOException {
+
+		System.out.println("=========== TASK1 ===========");
 		
 		// EDIT ME!
-		String USING_FILE = file4;
-		
+		String USING_FILE = file7;
 		// load the network
 		File.read("data/" + USING_FILE);
 		Solution s = new Solution(File.nodes, File.dataSets);
@@ -41,6 +45,17 @@ public class Solution {
 		System.out.println("Log Likelyhood: " + s.log_likelyhood());
 		
 		File.writeCPT(USING_FILE, s);
+		
+		System.out.println("\n=========== TASK4 ===========\n");
+		
+		// EDIT ME!
+		USING_FILE = file4;
+		
+		// load the network
+		s = File.task2_read("data/" + USING_FILE);
+		for(Node n : s.nodes) { // print us the nodes?
+			System.out.println(n);
+		}
 	}
 	
 	public Solution(List<Node> nodes, ArrayList<ArrayList<Integer>> dataset) {
@@ -84,6 +99,16 @@ public class Solution {
 		int count = 0;
 		for(ArrayList<Integer> set : dataset) {
 			if(set.get(n.getNodePos()) == i) {
+				count++;
+			}
+		}
+		return count;
+	}
+	
+	private int count_in_data(Node n1, Node n2, List<Boolean> bs) {
+		int count = 0;
+		for(ArrayList<Integer> set : dataset) {
+			if(set.get(n1.getNodePos()) == (bs.get(0)?1:0) && set.get(n2.getNodePos()) == (bs.get(1)?1:0)) {
 				count++;
 			}
 		}
@@ -248,13 +273,24 @@ public class Solution {
 	
 	public double getMIof(Node n1, Node n2) {
 		double totalmi = 0;
-		for(ArrayList<Integer> set : dataset) {
-			List<Boolean> bs = new ArrayList<Boolean>(build_list_from_set(set));
+		List<List<Boolean>> truthTable = new ArrayList<>();
+		Parents.recursivelyCombine(truthTable, new ArrayList<Boolean>(), 2, 0);
+		for(List<Boolean> bs : truthTable) {
+			double tempMi = 0;
+			tempMi += count_in_data(n1, n2, bs);
 			
+			double num = tempMi;
+			double den = count_in_data(n1, (bs.get(0))?1:0) * count_in_data(n2, (bs.get(1))?1:0);
+			
+			tempMi *= Math.log(num/den);
+			totalmi += tempMi;
 		}
-		return 0.0;
+		
+		return totalmi;
 	}
 	
+
+
 	public List<Node> getNodes() {
 		return nodes;
 	}

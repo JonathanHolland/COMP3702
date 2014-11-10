@@ -77,7 +77,7 @@ public class Node {
 	@Override
 	public String toString() {
 		String s = identifier + ": ";
-		if(parents.contains(null)) return s + parents;
+		if(parents == null || parents.isEmpty()) return s + "NO PARENTS";
 		for(int i = 0; i < parents.size(); i++) {
 			s += (parents.get(i).identifier + ", ");
 		}
