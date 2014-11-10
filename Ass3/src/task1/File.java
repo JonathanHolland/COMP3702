@@ -161,14 +161,15 @@ public class File {
 			    // This bit isn't finished? huh?
 			    List<Boolean> bs =  new ArrayList<Boolean>();
 			    //Fill the list with false
-			    for(int p=0; p<=parentSize;p++) {
+			    for(int p=0; p<parentSize;p++) {
 			    	bs.add(false);
 			    }
 			    while(bs.contains(false)) {
-			    	System.out.println(s.nodes.get(i).getValue(bs));
 			    	writer.write(s.nodes.get(i).getValue(bs).toString()+" ");
 			    	bs = fullAdder(bs, bs.size()-1);
 			    }
+			    // Run the final all true boolean list
+			    writer.write(s.nodes.get(i).getValue(bs).toString()+" ");
 			    
 			    
 			    writer.newLine();
