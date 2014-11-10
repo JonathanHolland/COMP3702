@@ -138,32 +138,40 @@ public class File {
 		return null;
 	}
 	
-	public static void writeCPT(String trainingDataName) throws IOException {
+	public static void writeCPT(String trainingDataName, Solution s) throws IOException {
 		BufferedWriter writer = null;
-
+		
 		try {
 		    writer = new BufferedWriter(new OutputStreamWriter(
-		          new FileOutputStream("cpt="+trainingDataName+".txt"), "utf-8"));
+		          new FileOutputStream("solutions/cpt-"+trainingDataName), "utf-8"));
 		    
-		    for(int i=0; i< nodes.size(); i++) {
+		    for(int i=0; i< s.nodes.size(); i++) {
 		    	// Write the identifier of this node first
-		    	writer.write(nodes.get(i).getIdentifier());
+		    	writer.write(s.nodes.get(i).getIdentifier());
 		    	// Then add each parent
-		    	int parentSize = nodes.get(i).getParents().size();
+		    	int parentSize = s.nodes.get(i).getParents().size();
 		    	for(int j=0; j<parentSize; j++) {
-		    		writer.write(" "+ nodes.get(i).getParents().get(j).getIdentifier());
+		    		writer.write(" "+ s.nodes.get(i).getParents().get(j).getIdentifier());
 		    	}
 		    	// New line
 			    writer.newLine();
 			    // Write the associated CPT
 			    // for each parent again, take the values in ascending order
-			    List<Boolean> bs =  new ArrayList<Boolean>();
+			   
+			    // This bit isn't finished? huh?
+			    List<Boolean> bs =  new ArrayList<Boolean>(); 
 			    while(bs.contains(false)) {
-			    	writer.write(nodes.get(i).getValue(bs).intValue());
+			    	writer.write(s.nodes.get(i).getValue(bs).intValue());
 			    	bs = fullAdder(bs, bs.size()-1);
 			    }
+			    
+			    
 			    writer.newLine();
 		    }
+		    
+		    Double llh = s.log_likelyhood();
+		    writer.write(llh.toString());
+		    writer.newLine();
 		    
 		    
 		} catch (IOException ex) {

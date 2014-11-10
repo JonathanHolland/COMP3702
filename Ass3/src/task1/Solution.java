@@ -8,22 +8,26 @@ import com.sun.org.apache.xpath.internal.operations.Bool;
 
 public class Solution {
 	
-	static final String file1 = "data/CPTnoMissingData-d1.txt";
-	static final String file2 = "data/CPTnoMissingData-d2.txt";
-	static final String file3 = "data/CPTnoMissingData-d3.txt";
-	static final String file4 = "data/lectEx.txt";
-	static final String file5 = "data/part-one-d1.txt";
-	static final String file6 = "data/part-one-d2.txt";
-	static final String file7 = "data/part-one-d3.txt";
-	static final String file8 = "data/part-one-d4.txt";
+	static final String file1 = "CPTnoMissingData-d1.txt";
+	static final String file2 = "CPTnoMissingData-d2.txt";
+	static final String file3 = "CPTnoMissingData-d3.txt";
+	static final String file4 = "lectEx.txt";
+	static final String file5 = "part-one-d1.txt";
+	static final String file6 = "part-one-d2.txt";
+	static final String file7 = "part-one-d3.txt";
+	static final String file8 = "part-one-d4.txt";
 	
-	List<Node> nodes = new ArrayList<Node>();
-	ArrayList<ArrayList<Integer>> dataset = new ArrayList<ArrayList<Integer>>();
+	public List<Node> nodes = new ArrayList<Node>();
+
+	public ArrayList<ArrayList<Integer>> dataset = new ArrayList<ArrayList<Integer>>();
 	
 	public static void main(String[] args) throws IOException {
 		
+		// EDIT ME!
+		String USING_FILE = file4;
+		
 		// load the network
-		File.read(file8);
+		File.read("data/" + USING_FILE);
 		Solution s = new Solution(File.nodes, File.dataSets);
 		for(Node n : s.nodes) { // print us the nodes?
 			System.out.println(n);
@@ -35,6 +39,8 @@ public class Solution {
 		}
 		System.out.println("Likelyhood: " + s.likelyhood());
 		System.out.println("Log Likelyhood: " + s.log_likelyhood());
+		
+		File.writeCPT(USING_FILE, s);
 	}
 	
 	public Solution(List<Node> nodes, ArrayList<ArrayList<Integer>> dataset) {
@@ -184,7 +190,7 @@ public class Solution {
 		return total;
 	}
 	
-	private double log_likelyhood() {
+	public double log_likelyhood() {
 		List<Double> setVals = new ArrayList<Double>();
 		for(ArrayList<Integer> set : dataset) {
 			List<Double> nodeVals = new ArrayList<Double>();
@@ -248,6 +254,15 @@ public class Solution {
 		}
 		return 0.0;
 	}
+	
+	public List<Node> getNodes() {
+		return nodes;
+	}
+
+	public ArrayList<ArrayList<Integer>> getDataset() {
+		return dataset;
+	}
+
 
 }
 
