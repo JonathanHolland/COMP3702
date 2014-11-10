@@ -159,9 +159,14 @@ public class File {
 			    // for each parent again, take the values in ascending order
 			   
 			    // This bit isn't finished? huh?
-			    List<Boolean> bs =  new ArrayList<Boolean>(); 
+			    List<Boolean> bs =  new ArrayList<Boolean>();
+			    //Fill the list with false
+			    for(int p=0; p<=parentSize;p++) {
+			    	bs.add(false);
+			    }
 			    while(bs.contains(false)) {
-			    	writer.write(s.nodes.get(i).getValue(bs).intValue());
+			    	System.out.println(s.nodes.get(i).getValue(bs));
+			    	writer.write(s.nodes.get(i).getValue(bs).toString()+" ");
 			    	bs = fullAdder(bs, bs.size()-1);
 			    }
 			    
