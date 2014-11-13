@@ -216,19 +216,25 @@ public class File {
 			    // Write the associated CPT
 			    // for each parent again, take the values in ascending order
 			   
-			    // This bit isn't finished? huh?
-			    List<Boolean> bs =  new ArrayList<Boolean>();
-			    //Fill the list with false
-			    for(int p=0; p<parentSize;p++) {
-			    	bs.add(false);
-			    }
-			    while(bs.contains(false)) {
-			    	writer.write(s.nodes.get(i).getValue(bs).toString()+" ");
-			    	bs = fullAdder(bs, bs.size()-1);
-			    }
-			    // Run the final all true boolean list
-			    writer.write(s.nodes.get(i).getValue(bs).toString()+" ");
 			    
+			    if(s.nodes.get(i).getParents().isEmpty()) { // if there are no parents
+			    	writer.write(s.nodes.get(i).getValue(null).toString()+" ");
+			    }
+			    
+			    else {
+				    // This bit isn't finished? huh?
+				    List<Boolean> bs =  new ArrayList<Boolean>();
+				    //Fill the list with false
+				    for(int p=0; p<parentSize;p++) {
+				    	bs.add(false);
+				    }
+				    while(bs.contains(false)) {
+				    	writer.write(s.nodes.get(i).getValue(bs).toString()+" ");
+				    	bs = fullAdder(bs, bs.size()-1);
+				    }
+				    // Run the final all true boolean list
+				    writer.write(s.nodes.get(i).getValue(bs).toString()+" ");
+			    }
 			    
 			    writer.newLine();
 		    }
@@ -243,6 +249,7 @@ public class File {
 		} finally {
 		   try {writer.close();} catch (Exception ex) {}
 		}
+		System.out.println("\nSaved solution to: solutions/cpt-"+trainingDataName);
 	}
 	
 	public static List<Boolean> fullAdder(List<Boolean> bs, int indexToCheck) {
