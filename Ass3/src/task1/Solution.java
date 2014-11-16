@@ -42,11 +42,11 @@ public class Solution {
 		}
 		System.out.println("\nCPTs: ");
 		for(Node n : s.nodes) {
-			s.findCPT(n);
+			s.findCPT(n, s.dataset);
 			System.out.println(n.getIdentifier() + ": " + n.getValues());
 		}
-		System.out.println("Likelyhood: " + s.likelyhood());
-		System.out.println("Log Likelyhood: " + s.log_likelyhood());
+		System.out.println("Likelyhood: " + s.likelyhood(s.nodes, s.dataset));
+		System.out.println("Log Likelyhood: " + s.log_likelyhood(s.nodes, s.dataset));
 		
 		File.writeCPT(USING_FILE, s);
 		
@@ -67,12 +67,12 @@ public class Solution {
 		this.dataset = dataset;
 	}
 	
-	private void findCPT(Node n) {
+	private void findCPT(Node n, ArrayList<ArrayList<Integer>> dataset) {
 		double nodeVal, num, den;
 		
 		
 		if(n.getParents().isEmpty()) { // if there's no parents just do this 
-			num = count_in_data(n, 1) + 1; // the number of times this node is true
+			num = count_in_data(n, 1, dataset) + 1; // the number of times this node is true
 			n.setValue(null,  num/(dataset.size() + 1));
 			return;
 		}
@@ -84,8 +84,8 @@ public class Solution {
 			nodeVal = num = den = 0;
 			Parents p = new Parents(n.getParents(), bs);
 			// Search for the case described by bs in dataset and then use that to add the setValue to the node
-			num = count_in_data(n, p) + 1;
-			den = count_in_data(p) + 1;
+			num = count_in_data(n, p, dataset) + 1;
+			den = count_in_data(p, dataset) + 1;
 			nodeVal = num/den;
 			
 			// add the value to the node
@@ -99,7 +99,7 @@ public class Solution {
 	 * @param i
 	 * @return
 	 */
-	private int count_in_data(Node n, int i) {
+	private int count_in_data(Node n, int i, ArrayList<ArrayList<Integer>> dataset) {
 		int count = 0;
 		for(ArrayList<Integer> set : dataset) {
 			if(set.get(n.getNodePos()) == i) {
@@ -109,7 +109,7 @@ public class Solution {
 		return count;
 	}
 	
-	private int count_in_data(Node n1, Node n2, List<Boolean> bs) {
+	private int count_in_data(Node n1, Node n2, List<Boolean> bs, ArrayList<ArrayList<Integer>> dataset) {
 		int count = 0;
 		for(ArrayList<Integer> set : dataset) {
 			if(set.get(n1.getNodePos()) == (bs.get(0)?1:0) && set.get(n2.getNodePos()) == (bs.get(1)?1:0)) {
@@ -125,7 +125,7 @@ public class Solution {
 	 * @param p
 	 * @return count
 	 */
-	private int count_in_data(Node n, Parents p) {
+	private int count_in_data(Node n, Parents p, ArrayList<ArrayList<Integer>> dataset) {
 		int count = 0;
 		for(ArrayList<Integer> set : dataset) {
 			if(set.get(n.getNodePos()) == 1) {
@@ -151,7 +151,7 @@ public class Solution {
 	 * @param p
 	 * @return
 	 */
-	private int count_in_data(Parents p) {
+	private int count_in_data(Parents p, ArrayList<ArrayList<Integer>> dataset) {
 		int count = 0;
 		for(ArrayList<Integer> set : dataset) {
 			int parentmismatch = 0;
@@ -172,7 +172,7 @@ public class Solution {
 	 * For each node product the value of their dataset's value, 
 	 * @return
 	 */
-	private double likelyhood() {
+	private double likelyhood(List<Node> nodes, ArrayList<ArrayList<Integer>> dataset) {
 		List<Double> setVals = new ArrayList<Double>();
 		for(ArrayList<Integer> set : dataset) {
 			List<Double> nodeVals = new ArrayList<Double>();
@@ -219,7 +219,7 @@ public class Solution {
 		return total;
 	}
 	
-	public double log_likelyhood() {
+	public double log_likelyhood(List<Node> nodes, ArrayList<ArrayList<Integer>> dataset) {
 		List<Double> setVals = new ArrayList<Double>();
 		for(ArrayList<Integer> set : dataset) {
 			List<Double> nodeVals = new ArrayList<Double>();
@@ -281,10 +281,10 @@ public class Solution {
 		Parents.recursivelyCombine(truthTable, new ArrayList<Boolean>(), 2, 0);
 		for(List<Boolean> bs : truthTable) {
 			double tempMi = 0;
-			tempMi += count_in_data(n1, n2, bs);
+			tempMi += count_in_data(n1, n2, bs, dataset);
 			
 			double num = tempMi;
-			double den = count_in_data(n1, (bs.get(0))?1:0) * count_in_data(n2, (bs.get(1))?1:0);
+			double den = count_in_data(n1, (bs.get(0))?1:0, dataset) * count_in_data(n2, (bs.get(1))?1:0, dataset);
 			
 			tempMi *= Math.log(num/den);
 			totalmi += tempMi;

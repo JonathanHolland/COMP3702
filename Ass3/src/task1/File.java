@@ -239,7 +239,7 @@ public class File {
 			    writer.newLine();
 		    }
 		    
-		    Double llh = s.log_likelyhood();
+		    Double llh = s.log_likelyhood(s.nodes, s.dataset);
 		    writer.write(llh.toString());
 		    writer.newLine();
 		    
