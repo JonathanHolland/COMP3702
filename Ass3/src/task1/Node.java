@@ -9,7 +9,7 @@ public class Node {
 	// The string specified in the file
 	private String identifier;
 	// Store the parents to the current node
-	private List<Node> parents;
+	private List<Node> parents = new ArrayList<Node>();
 	// Store the position of the node (for each dataSet)
 	private int nodePos;
 	// CPT values
@@ -17,7 +17,7 @@ public class Node {
 
 	public Node(String id, int nodePos) {
 		setIdentifier(id);
-		setParents(null);
+		setParents(new ArrayList<Node>());
 		setNodePos(nodePos);
 	}
 	
@@ -44,7 +44,7 @@ public class Node {
 	}
 	
 	public void addParent(Node parent) {
-		this.parents.add(parent);
+		parents.add(parent);
 	}
 
 	public int getNodePos() {
@@ -82,6 +82,16 @@ public class Node {
 
 	public void setValue(Parents p, double value) {
 		cpt.put(p, value);
+	}
+	
+	@Override
+	// A weak comparison on identifier is sufficient
+	public boolean equals(Object o) {
+		if (!(o instanceof Node)) {
+			return false;
+		}
+		Node e = (Node) o; 
+		return (this.identifier==e.identifier);
 	}
 	
 	@Override

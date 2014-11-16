@@ -22,6 +22,7 @@ public class Solution {
 	
 	public List<Node> nodes = new ArrayList<Node>();
 	public List<Node> tempNodes = new ArrayList<Node>();
+	public List<Node> tempNodes2 = new ArrayList<Node>();
 	
 	public ArrayList<ArrayList<Integer>> dataset = new ArrayList<ArrayList<Integer>>();
 	
@@ -46,7 +47,7 @@ public class Solution {
 			System.out.println(n.getIdentifier() + ": " + n.getValues());
 		}
 		System.out.println("Likelyhood: " + s.likelyhood(s.nodes, s.dataset));
-		System.out.println("Log Likelyhood: " + s.log_likelyhood(s.nodes, s.dataset));
+		System.out.println("Log Likelyhood: " + s.log_likelihood(s.nodes, s.dataset));
 		
 		File.writeCPT(USING_FILE, s);
 		
@@ -60,6 +61,12 @@ public class Solution {
 		for(Node n : s.nodes) { // print us the nodes?
 			System.out.println(n);
 		}
+		// Run task 4
+		// This point assumes nodes/datasets have been loaded from file
+		// but not that parents or CPT's have been
+		List<Node> task4result = s.findStructure();
+		System.out.println(task4result);
+		
 	}
 	
 	public Solution(List<Node> nodes, ArrayList<ArrayList<Integer>> dataset) {
@@ -219,7 +226,7 @@ public class Solution {
 		return total;
 	}
 	
-	public double log_likelyhood(List<Node> nodes, ArrayList<ArrayList<Integer>> dataset) {
+	public double log_likelihood(List<Node> nodes, ArrayList<ArrayList<Integer>> dataset) {
 		List<Double> setVals = new ArrayList<Double>();
 		for(ArrayList<Integer> set : dataset) {
 			List<Double> nodeVals = new ArrayList<Double>();
@@ -304,12 +311,15 @@ public class Solution {
 			for(int j=0; j<nodes.size(); j++) {
 				// find the MI weighting between them and create an edge to represent this
 				Node nodeTwo = nodes.get(j);
-				fullSpanning.add(new Edge(nodeOne,nodeTwo,getMIof(nodeOne,nodeTwo)));
+				if(!nodeTwo.equals(nodeOne)) {
+					fullSpanning.add(new Edge(nodeOne,nodeTwo,getMIof(nodeOne,nodeTwo)));
+				}
 			}
 		}
 		
 		// return the resultant max number of edges
 		return fullSpanning;
+		
 	}
 
 	public void minSpanTree() {
@@ -324,7 +334,7 @@ public class Solution {
 		
 		maxSpan = getMaxEdges();
 		Collections.sort(maxSpan);
-		
+
 		// if the number of edges added is nodeNum - 1, stop
 		// as we have found the minimum spanning tree
 		addEdge(minSpan,maxSpan,nodesReached);
@@ -366,13 +376,13 @@ public class Solution {
 	// assuming minSpanTree has run and populated this.tree
 	// we then pick the directionality of children and parents
 	// and compare the resulting likelihood values (to maximise)
-	public void generateDirection() {
-
+	public double generateDirection() {
+		tempNodes = new ArrayList<Node>();
 		Random r = new Random();
 		
 		// for every edge in the minimum spanning tree (this.tree)
 		for(int i=0; i<tree.size();i++) {
-			// Extract the nodes from the edge from the edge list
+			// Extract the nodes from the edges
 			Node one = new Node(tree.get(i).getStart());
 			Node two = new Node(tree.get(i).getEnd());
 			// randomly make one of the nodes a parent and the other a child
@@ -381,22 +391,49 @@ public class Solution {
 		    } else {
 		    	two.addParent(one);
 		    }
-		    tempNodes.add(one);
-		    tempNodes.add(two);
+		    if(!tempNodes.contains(one)) {
+		    	tempNodes.add(one);
+		    }
+		    if(!tempNodes.contains(two)) {
+		    	tempNodes.add(two);
+		    }   
 		}
-		// Check the log-likelihood of tempNodes and return it
+		// calculate cpt for all of tempNodes
+		for(Node n : tempNodes) {
+			findCPT(n, dataset);
+		}
+		// Check the log-likelihood of tempNodes
+		return log_likelihood(tempNodes, dataset);
 		
 	}
 	
 	// Sorts through a bunch of possibilities and finds the best structure
 	public List<Node> findStructure() {
-		// make sure nodes is populated then
-		// minSpanTree();
+		minSpanTree();
+		
+		int i=0;
+		double likely;
+		double oldlikely = Double.MIN_VALUE*-1;
+		
 		// while less than threshold (3minutes time)
-		// generateDirection(); compare likelihoods
+		while(i<10) {			
+			// generateDirection(); compare likelihoods
+			likely = generateDirection();
+			if(likely>=oldlikely) {
+				tempNodes2 = new ArrayList<Node>();
+				// the better value is stored in tempNodes2
+				for(Node n : tempNodes) {
+					// put tempNodes into tempnodes2
+					tempNodes2.add(new Node(n));
+				}
+			}
+			oldlikely = likely;
+			i++;
+		}
 		
 		
-		return nodes;
+		
+		return tempNodes2;
 	}
 	public void setTree(List<Edge> minSpan) {
 		//set minimum spanning tree to its class variable
