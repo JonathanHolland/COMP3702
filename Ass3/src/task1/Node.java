@@ -21,6 +21,12 @@ public class Node {
 		setNodePos(nodePos);
 	}
 	
+	public Node(Node another) {
+	    this.identifier = another.identifier; // you can access
+	    this.parents = another.parents;
+	    this.nodePos = 0;
+	  }
+	
 	public String getIdentifier() {
 		return identifier;
 	}
@@ -35,6 +41,10 @@ public class Node {
 
 	public void setParents(List<Node> parents) {
 		this.parents = parents;
+	}
+	
+	public void addParent(Node parent) {
+		this.parents.add(parent);
 	}
 
 	public int getNodePos() {

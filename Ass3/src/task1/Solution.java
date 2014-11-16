@@ -21,8 +21,12 @@ public class Solution {
 	static final String file11 = "part-one-d4.txt";
 	
 	public List<Node> nodes = new ArrayList<Node>();
-
+	public List<Node> tempNodes = new ArrayList<Node>();
+	
 	public ArrayList<ArrayList<Integer>> dataset = new ArrayList<ArrayList<Integer>>();
+	
+	private List<Edge> tree;
+	private boolean set = false;
 	
 	public static void main(String[] args) throws IOException {
 
@@ -289,7 +293,120 @@ public class Solution {
 		return totalmi;
 	}
 	
+	// function to create the tree with an edge between every vertex
+	public List<Edge> getMaxEdges() {
+		
+		List<Edge> fullSpanning = new ArrayList<Edge>();
+		// for every node
+		for(int i=0; i<nodes.size(); i++) {
+			// to every other node
+			Node nodeOne =  nodes.get(i);
+			for(int j=0; j<nodes.size(); j++) {
+				// find the MI weighting between them and create an edge to represent this
+				Node nodeTwo = nodes.get(j);
+				fullSpanning.add(new Edge(nodeOne,nodeTwo,getMIof(nodeOne,nodeTwo)));
+			}
+		}
+		
+		// return the resultant max number of edges
+		return fullSpanning;
+	}
 
+	public void minSpanTree() {
+		List<Edge> minSpan = new ArrayList<Edge>();
+		List<Edge> maxSpan = new ArrayList<Edge>();
+		List<Node> nodesReached = new ArrayList<Node>();
+		
+		// if nodes 1 or less, return 
+		if(nodes.size() <=1) {
+			return;
+		}
+		
+		maxSpan = getMaxEdges();
+		Collections.sort(maxSpan);
+		
+		// if the number of edges added is nodeNum - 1, stop
+		// as we have found the minimum spanning tree
+		addEdge(minSpan,maxSpan,nodesReached);
+	}
+	
+	private void addEdge(List<Edge> minSpan, List<Edge> maxSpan,
+			List<Node> nodesReached) {
+		// If finished recursive adding
+		if(nodesReached.size()>=nodes.size()) {
+			if(this.set==false) {
+				setTree(minSpan);
+			}
+			return;
+		}
+		
+		// maxSpan is sorted; extract lowest value
+		Edge lowest =  maxSpan.get(0);
+		if(nodesReached.contains(lowest.getStart()) && 
+				nodesReached.contains(lowest.getEnd())) {
+			// Skip this edge as it would be cyclic
+			maxSpan.remove(lowest);
+			addEdge(minSpan,maxSpan,nodesReached);
+		}
+		//if not, add minimum weighted edge
+		else {
+			maxSpan.remove(lowest);
+			minSpan.add(lowest);
+			// If a new node has been reached, add it
+			if(!nodesReached.contains(lowest.getStart())) {
+				nodesReached.add(lowest.getStart());
+			}
+			if(!nodesReached.contains(lowest.getEnd())) {
+				nodesReached.add(lowest.getEnd());
+			}
+			addEdge(minSpan,maxSpan,nodesReached);
+		}
+	}
+
+	// assuming minSpanTree has run and populated this.tree
+	// we then pick the directionality of children and parents
+	// and compare the resulting likelihood values (to maximise)
+	public void generateDirection() {
+
+		Random r = new Random();
+		
+		// for every edge in the minimum spanning tree (this.tree)
+		for(int i=0; i<tree.size();i++) {
+			// Extract the nodes from the edge from the edge list
+			Node one = new Node(tree.get(i).getStart());
+			Node two = new Node(tree.get(i).getEnd());
+			// randomly make one of the nodes a parent and the other a child
+		    if(r.nextInt(1)==1) {
+		    	one.addParent(two);
+		    } else {
+		    	two.addParent(one);
+		    }
+		    tempNodes.add(one);
+		    tempNodes.add(two);
+		}
+		// Check the log-likelihood of tempNodes and return it
+		
+	}
+	
+	// Sorts through a bunch of possibilities and finds the best structure
+	public List<Node> findStructure() {
+		// make sure nodes is populated then
+		// minSpanTree();
+		// while less than threshold (3minutes time)
+		// generateDirection(); compare likelihoods
+		
+		
+		return nodes;
+	}
+	public void setTree(List<Edge> minSpan) {
+		//set minimum spanning tree to its class variable
+		this.tree = minSpan;
+		this.set = true;
+	}
+	
+	public List<Edge> getTree() {
+		return this.tree;
+	}
 
 	public List<Node> getNodes() {
 		return nodes;
