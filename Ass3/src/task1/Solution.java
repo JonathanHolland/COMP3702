@@ -89,7 +89,7 @@ public class Solution {
 		
 		
 		if(n.getParents().isEmpty()) { // if there's no parents just do this 
-			num = count_in_data(n, 1, dataset) + 1; // the number of times this node is true
+			num = count_in_data(n, 1, dataset) + 1; // the number of times this node is true + 1 for saving /0 issue
 			n.setValue(null,  num/(dataset.size() + 1));
 			return;
 		}
