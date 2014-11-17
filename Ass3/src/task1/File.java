@@ -48,7 +48,6 @@ public class File {
 	 * @throws IOException
 	 *             if there is an error reading from the input file.
 	 */
-
 	public static void read(String fileName) throws IOException {
 
 		nodeNumber = 0;
@@ -126,6 +125,12 @@ public class File {
 		    n.setParents(parentNodes);
 		}
 		in.close();
+	}
+	
+	
+	public static void clear(){
+		nodes.clear();
+		dataSets.clear();
 	}
 	
 	public static Solution task2_read(String filename) throws IOException {

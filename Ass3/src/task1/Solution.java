@@ -35,7 +35,7 @@ public class Solution {
 		System.out.println("=========== TASK1 ===========");
 		
 		// EDIT ME!
-		String USING_FILE = file7;
+		String USING_FILE = file1;
 		// load the network
 		File.read("data/" + USING_FILE);
 		Solution s = new Solution(File.nodes, File.dataSets);
@@ -58,11 +58,12 @@ public class Solution {
 		System.out.println("\n=========== TASK4 ===========\n");
 		System.out.println("Comparing log likelihoods: \nBest Tree Initialisation Method");
 		// EDIT ME!
-		USING_FILE = file4;
+		USING_FILE = file6;
 		
 		// load the network
-		File.task2_read("data/" + USING_FILE);
-		s = new Solution(File.nodes, File.dataSets);
+//		File.clear();
+		s = File.task2_read("data/" + USING_FILE);
+//		s = new Solution(File.nodes, File.dataSets);
 		
         // Run Task 4
         // This point assumes nodes/datasets have been loaded from file
@@ -452,7 +453,7 @@ public class Solution {
 		while(i<10) {			
 			// generateDirection(); compare likelihoods
 			likely = generateDirection();
-			System.out.println(likely);
+//			System.out.println(likely);
 			if(likely>=oldlikely) {
 				nodesStructure = new ArrayList<Node>();
 				// the better value is stored in nodesStructure
