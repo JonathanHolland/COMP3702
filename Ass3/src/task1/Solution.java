@@ -23,11 +23,12 @@ public class Solution {
 	public List<Node> nodes = new ArrayList<Node>();
 	public List<Node> tempNodes = new ArrayList<Node>();
 	public List<Node> nodesStructure = new ArrayList<Node>();
+	public static double Score;
 	
 	public ArrayList<ArrayList<Integer>> dataset = new ArrayList<ArrayList<Integer>>();
 	
-	private List<Edge> tree;
-	private boolean set = false;
+	public List<Edge> tree;
+	public boolean set = false;
 	
 	public static void main(String[] args) throws IOException {
 
@@ -56,28 +57,34 @@ public class Solution {
 		// EDIT ME!
 		USING_FILE = file4;
 		
-		// load the network
-		s = File.task2_read("data/" + USING_FILE);
-		for(Node n : s.nodes) { // print us the nodes?
-			System.out.println(n);
-		}
-		// Run task 4
-		// This point assumes nodes/datasets have been loaded from file
-		// but not that parents or CPT's have been
-		List<Node> task4result = s.findStructure();
 		
-		// Here, there is an error for writing to file
-		//s.nodes = task4result;
-		//File.writeCPT(USING_FILE, s);
+		// load the network
+		File.task2_read("data/" + USING_FILE);
+		s = new Solution(File.nodes, File.dataSets);
+		
+        // Run Task 4
+        // This point assumes nodes/datasets have been loaded from file
+        // but not that parents or CPT's have been
+        List<Node> task4result = s.findStructure();
+
+        // Task 5 involves changing the constant C
+        double C = 5;
+        Score = s.log_likelihood(task4result, s.dataset) - C*s.dataset.size();
+        System.out.println(Score);
+        // Task 4 writing to file (including Score)
+        s.nodes = task4result;
+        File.writeCPTStructure(USING_FILE, s);
+
 		
 	}
-	
+
+
 	public Solution(List<Node> nodes, ArrayList<ArrayList<Integer>> dataset) {
 		this.nodes = nodes;
 		this.dataset = dataset;
 	}
 	
-	private void findCPT(Node n, ArrayList<ArrayList<Integer>> dataset) {
+	public void findCPT(Node n, ArrayList<ArrayList<Integer>> dataset) {
 		double nodeVal, num, den;
 		
 		
@@ -109,7 +116,7 @@ public class Solution {
 	 * @param i
 	 * @return
 	 */
-	private int count_in_data(Node n, int i, ArrayList<ArrayList<Integer>> dataset) {
+	public int count_in_data(Node n, int i, ArrayList<ArrayList<Integer>> dataset) {
 		int count = 0;
 		for(ArrayList<Integer> set : dataset) {
 			if(set.get(n.getNodePos()) == i) {
@@ -119,7 +126,7 @@ public class Solution {
 		return count;
 	}
 	
-	private int count_in_data(Node n1, Node n2, List<Boolean> bs, ArrayList<ArrayList<Integer>> dataset) {
+	public int count_in_data(Node n1, Node n2, List<Boolean> bs, ArrayList<ArrayList<Integer>> dataset) {
 		int count = 0;
 		for(ArrayList<Integer> set : dataset) {
 			if(set.get(n1.getNodePos()) == (bs.get(0)?1:0) && set.get(n2.getNodePos()) == (bs.get(1)?1:0)) {
@@ -135,7 +142,7 @@ public class Solution {
 	 * @param p
 	 * @return count
 	 */
-	private int count_in_data(Node n, Parents p, ArrayList<ArrayList<Integer>> dataset) {
+	public int count_in_data(Node n, Parents p, ArrayList<ArrayList<Integer>> dataset) {
 		int count = 0;
 		for(ArrayList<Integer> set : dataset) {
 			if(set.get(n.getNodePos()) == 1) {
@@ -161,7 +168,7 @@ public class Solution {
 	 * @param p
 	 * @return
 	 */
-	private int count_in_data(Parents p, ArrayList<ArrayList<Integer>> dataset) {
+	public int count_in_data(Parents p, ArrayList<ArrayList<Integer>> dataset) {
 		int count = 0;
 		for(ArrayList<Integer> set : dataset) {
 			int parentmismatch = 0;
@@ -182,7 +189,7 @@ public class Solution {
 	 * For each node product the value of their dataset's value, 
 	 * @return
 	 */
-	private double likelyhood(List<Node> nodes, ArrayList<ArrayList<Integer>> dataset) {
+	public double likelyhood(List<Node> nodes, ArrayList<ArrayList<Integer>> dataset) {
 		List<Double> setVals = new ArrayList<Double>();
 		for(ArrayList<Integer> set : dataset) {
 			List<Double> nodeVals = new ArrayList<Double>();
@@ -276,7 +283,7 @@ public class Solution {
 		return total;
 	}
 	
-	private List<Boolean> build_list_from_set(List<Integer> set) {
+	public List<Boolean> build_list_from_set(List<Integer> set) {
 		List<Boolean> t = new ArrayList<Boolean>();
 		for(Integer i : set) {
 			if(i == 0) t.add(false);
@@ -442,7 +449,7 @@ public class Solution {
 			
 			i++;
 		}
-		
+	
 		return nodesStructure;
 	}
 	

@@ -25,6 +25,7 @@ public class Node {
 	    this.identifier = another.identifier; // you can access
 	    this.parents = another.parents;
 	    this.nodePos = 0;
+	    this.cpt = another.cpt;
 	  }
 	
 	public String getIdentifier() {

@@ -251,6 +251,75 @@ public class File {
 		System.out.println("\nSaved solution to: solutions/cpt-"+trainingDataName);
 	}
 	
+	public static void writeCPTStructure(String trainingDataName, Solution s) {
+		BufferedWriter writer = null;
+		
+		try {
+		    writer = new BufferedWriter(new OutputStreamWriter(
+		          new FileOutputStream("solutions/bn-"+trainingDataName), "utf-8"));
+		    
+		    // Unlike writeCPT, write all nodes and parents first
+		    for(int j=0; j < s.nodes.size(); j++) {
+		    	writer.write(s.nodes.get(j).getIdentifier());
+		    	// Then add each parent
+		    	int parentSize = s.nodes.get(j).getParents().size();
+		    	for(int k=0; k<parentSize; k++) {
+		    		writer.write(" "+ s.nodes.get(j).getParents().get(k).getIdentifier());
+		    	}
+		    	// New line
+			    writer.newLine();
+		    }
+		    
+		    
+		    for(int i=0; i < s.nodes.size(); i++) {
+		    	// Write the identifier of this node first
+		    	writer.write(s.nodes.get(i).getIdentifier());
+		    	// Then add each parent
+		    	int parentSize = s.nodes.get(i).getParents().size();
+		    	for(int l=0; l<parentSize; l++) {
+		    		writer.write(" "+ s.nodes.get(i).getParents().get(l).getIdentifier());
+		    	}
+		    	// New line
+			    writer.newLine();
+			    // Write the associated CPT
+			    // for each parent again, take the values in ascending order
+			   
+			    if(s.nodes.get(i).getParents().isEmpty()) { // if there are no parents
+			    	writer.write(s.nodes.get(i).getValue(null).toString()+" ");
+			    }
+			    
+			    else {
+				    List<Boolean> bs =  new ArrayList<Boolean>();
+				    //Fill the list with false
+				    for(int p=0; p<parentSize;p++) {
+				    	bs.add(false);
+				    }
+				    while(bs.contains(false)) {
+				    	writer.write(s.nodes.get(i).getValue(bs).toString()+" ");
+				    	bs = fullAdder(bs, bs.size()-1);
+				    }
+				    // Run the final all true boolean list
+				    writer.write(s.nodes.get(i).getValue(bs).toString()+" ");
+			    }
+			    
+			    writer.newLine();
+		    }
+		    
+		    Double llh = s.log_likelihood(s.nodes, s.dataset);
+		    writer.write(llh.toString()+" ");
+		    writer.write(Double.toString(s.Score));
+		    writer.newLine();
+		    
+		    
+		} catch (IOException ex) {
+		  // report
+		} finally {
+		   try {writer.close();} catch (Exception ex) {}
+		}
+		System.out.println("\nSaved solution to: solutions/bn-"+trainingDataName);
+		
+	}
+	
 	public static List<Boolean> fullAdder(List<Boolean> bs, int indexToCheck) {
 		// if the last element is a false, make it true
 		// if the last element is true, check the one before it again and again until it is false,
@@ -270,4 +339,6 @@ public class File {
 		
 		return bs;
 	}
+
+	
 }
