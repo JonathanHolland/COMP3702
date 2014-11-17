@@ -44,7 +44,10 @@ public class Node {
 	}
 	
 	public void addParent(Node parent) {
-		parents.add(parent);
+		if(!parents.contains(parent)) {
+			parents.add(parent);
+		}
+		
 	}
 
 	public int getNodePos() {

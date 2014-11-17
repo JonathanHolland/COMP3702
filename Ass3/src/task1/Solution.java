@@ -22,7 +22,7 @@ public class Solution {
 	
 	public List<Node> nodes = new ArrayList<Node>();
 	public List<Node> tempNodes = new ArrayList<Node>();
-	public List<Node> tempNodes2 = new ArrayList<Node>();
+	public List<Node> nodesStructure = new ArrayList<Node>();
 	
 	public ArrayList<ArrayList<Integer>> dataset = new ArrayList<ArrayList<Integer>>();
 	
@@ -386,10 +386,16 @@ public class Solution {
 			Node one = new Node(tree.get(i).getStart());
 			Node two = new Node(tree.get(i).getEnd());
 			// randomly make one of the nodes a parent and the other a child
-		    if(r.nextInt(1)==1) {
-		    	one.addParent(two);
+			if(r.nextInt(2)==1) {
+		    	// if not already referenced the other way around
+				if(!two.getParents().contains(one)) {
+					one.addParent(two);
+				}
 		    } else {
-		    	two.addParent(one);
+		    	// if not already referenced the other way around
+		    	if(!one.getParents().contains(two)) {
+		    		two.addParent(one);
+		    	}
 		    }
 		    if(!tempNodes.contains(one)) {
 		    	tempNodes.add(one);
@@ -413,27 +419,33 @@ public class Solution {
 		
 		int i=0;
 		double likely;
-		double oldlikely = Double.MIN_VALUE*-1;
+		double oldlikely = -9999;
 		
 		// while less than threshold (3minutes time)
 		while(i<10) {			
 			// generateDirection(); compare likelihoods
 			likely = generateDirection();
+			System.out.println(likely);
 			if(likely>=oldlikely) {
-				tempNodes2 = new ArrayList<Node>();
-				// the better value is stored in tempNodes2
+				nodesStructure = new ArrayList<Node>();
+				// the better value is stored in nodesStructure
 				for(Node n : tempNodes) {
 					// put tempNodes into tempnodes2
-					tempNodes2.add(new Node(n));
+					nodesStructure.add(new Node(n));
 				}
+				oldlikely = likely;
 			}
-			oldlikely = likely;
+			
 			i++;
 		}
 		
 		
-		
-		return tempNodes2;
+		System.out.println(nodesStructure.size());
+		System.out.println(nodesStructure.get(0));
+		System.out.println(nodesStructure.get(1));
+		System.out.println(nodesStructure.get(2));
+		System.out.println(oldlikely);
+		return nodesStructure;
 	}
 	public void setTree(List<Edge> minSpan) {
 		//set minimum spanning tree to its class variable
