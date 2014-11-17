@@ -47,16 +47,18 @@ public class Solution {
 			s.findCPT(n, s.dataset);
 			System.out.println(n.getIdentifier() + ": " + n.getValues());
 		}
+		
+		System.out.println("\n=========== TASK2 ===========\n");
+		
 		System.out.println("Likelyhood: " + s.likelyhood(s.nodes, s.dataset));
 		System.out.println("Log Likelyhood: " + s.log_likelihood(s.nodes, s.dataset));
 		
 		File.writeCPT(USING_FILE, s);
 		
 		System.out.println("\n=========== TASK4 ===========\n");
-		
+		System.out.println("Comparing log likelihoods: \nBest Tree Initialisation Method");
 		// EDIT ME!
 		USING_FILE = file4;
-		
 		
 		// load the network
 		File.task2_read("data/" + USING_FILE);
@@ -67,15 +69,29 @@ public class Solution {
         // but not that parents or CPT's have been
         List<Node> task4result = s.findStructure();
 
+        System.out.println("\n=========== TASK5 ===========\n");
         // Task 5 involves changing the constant C
         double C = 5;
         Score = s.log_likelihood(task4result, s.dataset) - C*s.dataset.size();
-        System.out.println(Score);
+        System.out.println("Score: " + Score);
         // Task 4 writing to file (including Score)
         s.nodes = task4result;
         File.writeCPTStructure(USING_FILE, s);
 
-		
+		// Task 6 running different initialisations
+        System.out.println("\n=========== TASK6 ===========\n");
+        
+        List<Node> task6result = s.randomChainInit();
+        
+        Score = s.log_likelihood(task6result, s.dataset) - C*s.dataset.size();
+        System.out.println("Random Chain Score: " + Score);
+        
+        List<Node> task6result2 = s.noEdgeInit();
+        
+        Score = s.log_likelihood(task6result2, s.dataset) - C*s.dataset.size();
+        System.out.println("No Edge Score: " + Score);
+        
+        // Task 7 - Task4 was built using the best tree init method
 	}
 
 
@@ -478,7 +494,6 @@ public class Solution {
 			
 			// generateDirection(); compare likelihoods
 			likely = generateDirection();
-			System.out.println(likely);
 			if(likely>=oldlikely) {
 				nodesStructure = new ArrayList<Node>();
 				// the better value is stored in nodesStructure
