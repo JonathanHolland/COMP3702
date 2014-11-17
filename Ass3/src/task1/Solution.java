@@ -65,7 +65,10 @@ public class Solution {
 		// This point assumes nodes/datasets have been loaded from file
 		// but not that parents or CPT's have been
 		List<Node> task4result = s.findStructure();
-		System.out.println(task4result);
+		
+		// Here, there is an error for writing to file
+		//s.nodes = task4result;
+		//File.writeCPT(USING_FILE, s);
 		
 	}
 	
@@ -372,7 +375,7 @@ public class Solution {
 			addEdge(minSpan,maxSpan,nodesReached);
 		}
 	}
-
+	
 	// assuming minSpanTree has run and populated this.tree
 	// we then pick the directionality of children and parents
 	// and compare the resulting likelihood values (to maximise)
@@ -414,6 +417,7 @@ public class Solution {
 	}
 	
 	// Sorts through a bunch of possibilities and finds the best structure
+	// Task 4 already using the best tree init method of task 7
 	public List<Node> findStructure() {
 		minSpanTree();
 		
@@ -430,6 +434,92 @@ public class Solution {
 				nodesStructure = new ArrayList<Node>();
 				// the better value is stored in nodesStructure
 				for(Node n : tempNodes) {
+					// put tempNodes into nodesStructure
+					nodesStructure.add(new Node(n));
+				}
+				oldlikely = likely;
+			}
+			
+			i++;
+		}
+		
+		return nodesStructure;
+	}
+	
+	// same as findStructure but with the no edge initialisation
+	public List<Node> noEdgeInit() {
+		
+		int i=0;
+		double likely;
+		double oldlikely = -9999;
+		
+		List<Edge> edges = new ArrayList<Edge>();
+		Random r = new Random();
+		// while less than threshold (3minutes time)
+		while(i<10) {			
+			// setTree with a random edge addition/subtraction
+			if(r.nextInt(3)>=1) {
+				edges.add(new Edge(nodes.get(r.nextInt(nodes.size())),nodes.get(r.nextInt(nodes.size())),0));
+			}
+			// else try and remove a random edge
+			else {
+				if(edges.size()!=0) {
+					edges.remove(r.nextInt(edges.size()));
+				}
+			}
+			setTree(edges);
+			
+			// generateDirection(); compare likelihoods
+			likely = generateDirection();
+			System.out.println(likely);
+			if(likely>=oldlikely) {
+				nodesStructure = new ArrayList<Node>();
+				// the better value is stored in nodesStructure
+				for(Node n : nodes) {
+					// put tempNodes into tempnodes2
+					nodesStructure.add(new Node(n));
+				}
+				oldlikely = likely;
+			}
+			
+			i++;
+		}
+		return nodesStructure;
+	}
+	
+	// same as findStructure but with the randomChain initialisation
+	public List<Node> randomChainInit() {
+		
+		
+		int i=0;
+		double likely;
+		double oldlikely = -9999;
+		
+		// while less than threshold (3minutes time)
+		while(i<10) {			
+			// generate a random chain between the nodes
+			Random r = new Random();
+			for(int j=0; j<nodes.size();j++) {
+				// add all of the nodes to tempNodes in a random order
+				tempNodes.add(new Node(nodes.get(r.nextInt(nodes.size()))));
+			}
+			
+			for(int k=0; k<tempNodes.size()-1;k++) {
+				// for every node, make the next node it's parent
+				tempNodes.get(k).addParent(tempNodes.get(k+1));
+			}
+			
+			// calculate cpt for all of tempNodes
+			for(Node n : tempNodes) {
+				findCPT(n, dataset);
+			}
+			// Check the log-likelihood of tempNodes
+			likely = log_likelihood(tempNodes, dataset);
+			
+			if(likely>=oldlikely) {
+				nodesStructure = new ArrayList<Node>();
+				// the better value is stored in nodesStructure
+				for(Node n : tempNodes) {
 					// put tempNodes into tempnodes2
 					nodesStructure.add(new Node(n));
 				}
@@ -439,14 +529,9 @@ public class Solution {
 			i++;
 		}
 		
-		
-		System.out.println(nodesStructure.size());
-		System.out.println(nodesStructure.get(0));
-		System.out.println(nodesStructure.get(1));
-		System.out.println(nodesStructure.get(2));
-		System.out.println(oldlikely);
 		return nodesStructure;
 	}
+	
 	public void setTree(List<Edge> minSpan) {
 		//set minimum spanning tree to its class variable
 		this.tree = minSpan;

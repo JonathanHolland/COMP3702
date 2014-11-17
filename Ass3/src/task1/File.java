@@ -222,7 +222,6 @@ public class File {
 			    }
 			    
 			    else {
-				    // This bit isn't finished? huh?
 				    List<Boolean> bs =  new ArrayList<Boolean>();
 				    //Fill the list with false
 				    for(int p=0; p<parentSize;p++) {
